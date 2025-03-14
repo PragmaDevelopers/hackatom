@@ -1,0 +1,28 @@
+[package]
+name = "webdexfactory"
+version = "0.1.0"
+authors = ["Seu Nome seu@email.com"]
+description = "Created with Anchor"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "webdexfactory"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = "0.31.0"
+anchor-attribute-program = "0.31.0"
+anchor-derive-accounts = "0.31.0"
+serde = { version = "1.0", features = ["derive"] }
+
+[dev-dependencies]
+anchor-spl = "0.31.0"
+
