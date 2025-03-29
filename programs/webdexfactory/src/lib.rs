@@ -1,34 +1,30 @@
+#![allow(unexpected_cfgs)]
+
+mod processor {
+    pub mod factory;
+    pub mod payments;
+}
+
+mod state {
+    pub mod factory;
+    pub mod payments;
+}
+
 use anchor_lang::prelude::*;
-use serde::{Deserialize, Serialize};
+use crate::state::factory::*;
+use crate::state::payments::*;
 
-declare_id!("CtL3hTB5hWhF9asHRJTRaYXYMCbZMuozanWHwLEiHGnH");
+declare_id!("D8CM6w2X7mcpf5zb6mENi6JB8h3HohPhkgAgAbVwtGN7");
 
-#[derive(Serialize, Deserialize, Default, Debug)]
-#[account]
-pub struct BotRegistry {
-    pub bots: Vec<(Pubkey, Bot)>, // Usando Vec ao invés de HashMap
-}
-
-#[derive(Serialize, Deserialize, Default, Debug)]
-#[account]
-pub struct Bot {
-    pub name: String,
-    pub prefix: String,
-    pub owner: Pubkey,
-    pub contract_address: Pubkey,
-    pub strategy_address: Pubkey,
-    pub sub_account_address: Pubkey,
-    pub payments_address: Pubkey,
-    pub token_pass_address: Pubkey,
-}
 
 #[program]
 pub mod webdexfactory {
+
     use super::*;
 
     pub fn add_bot(
         ctx: Context<AddBot>,
-        bot_name: String,
+        name: String,
         prefix: String,
         owner: Pubkey,
         contract_address: Pubkey,
@@ -37,18 +33,9 @@ pub mod webdexfactory {
         payments_address: Pubkey,
         token_pass_address: Pubkey,
     ) -> Result<()> {
-        let bots = &mut ctx.accounts.bots.bots; // Acessando o Vec dentro de BotRegistry
-
-        // Verificar se o bot já está registrado
-        for (key, _bot) in bots.iter() {
-            if *key == contract_address {
-                return Err(ErrorCode::BotAlreadyRegistered.into());
-            }
-        }
-
-        // Adicionar novo bot ao vetor
-        let new_bot = Bot {
-            name: bot_name.clone(),
+        FactoryBot::add_bot(
+            ctx,
+            name,
             prefix,
             owner,
             contract_address,
@@ -56,46 +43,31 @@ pub mod webdexfactory {
             sub_account_address,
             payments_address,
             token_pass_address,
-        };
-
-        bots.push((contract_address, new_bot)); // Adicionando o bot ao Vec
-
-        msg!("Bot added: {}", bot_name);
-        Ok(())
+        )
     }
 
-    pub fn check_bot(ctx: Context<CheckBot>, contract_address: Pubkey) -> Result<()> {
-        let bots = &ctx.accounts.bots.bots; // Acessando o Vec dentro de BotRegistry
-
-        // Verificando se o bot está no vetor
-        for (key, _bot) in bots.iter() {
-            if *key == contract_address {
-                return Err(ErrorCode::BotNotFound.into());
-            }
-        }
-
-        msg!("Bot found: {}", contract_address);
-        Ok(())
+    pub fn add_fee_tiers(ctx: Context<AddFeeTiers>, new_fee_tiers: Vec<FeeTier>) -> Result<()> {
+        PaymentsBot::add_fee_tiers(ctx, new_fee_tiers)
     }
-}
 
-#[derive(Accounts)]
-pub struct AddBot<'info> {
-    #[account(mut)]
-    pub owner: Signer<'info>,
-    #[account(mut)]
-    pub bots: Account<'info, BotRegistry>, // O tipo de Account para o BotRegistry
-}
+    pub fn update_bot(
+        ctx: Context<UpdateBot>,
+        strategy_address: Option<Pubkey>,
+        sub_account_address: Option<Pubkey>,
+        payments_address: Option<Pubkey>,
+    ) -> Result<()> {
+        FactoryBot::update_bot(ctx, strategy_address, sub_account_address, payments_address)
+    }
 
-#[derive(Accounts)]
-pub struct CheckBot<'info> {
-    pub bots: Account<'info, BotRegistry>, // O tipo de Account para o BotRegistry
-}
+    pub fn remove_bot(ctx: Context<RemoveBot>) -> Result<()> {
+        FactoryBot::remove_bot(ctx)
+    }
 
-#[error_code]
-pub enum ErrorCode {
-    #[msg("Bot already registered")]
-    BotAlreadyRegistered,
-    #[msg("Bot not found")]
-    BotNotFound,
+    pub fn process_bot_info(
+        ctx: Context<GetBotInfo>,
+        contract_address: Pubkey,
+    ) -> Result<FactoryBot> {
+        // Chama a função get_bot_info do módulo FactoryBot
+        FactoryBot::get_bot_info(ctx, contract_address)
+    }
 }

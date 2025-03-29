@@ -18,10 +18,13 @@ no-log-ix-name = []
 idl-build = ["anchor-lang/idl-build"]
 
 [dependencies]
-anchor-lang = "0.31.0"
+anchor-lang = { version = "0.31.0", features = ["idl-build"] }
 anchor-attribute-program = "0.31.0"
 anchor-derive-accounts = "0.31.0"
 serde = { version = "1.0", features = ["derive"] }
+bytemuck_derive = "=1.8.1"
+regex = "=1.9.0"
+blake3 = "=1.5.4"
 
 [dev-dependencies]
 anchor-spl = "0.31.0"
