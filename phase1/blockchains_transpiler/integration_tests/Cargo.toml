@@ -1,0 +1,16 @@
+[package]
+name = "integration_tests"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[dev-dependencies]
+rust_parser = { path = "../languages/rust_parser" }
+solidity_parser = { path = "../languages/solidity_parser" }
+polygon_orm = { path = "../orm/polygon_orm" }
+solana_orm = { path = "../orm/solana_orm" }
+dsl_lexer = { path = "../dsl/dsl_lexer" }
+dsl_parser = { path = "../dsl/dsl_parser" }
+cli = { path = "../cli" }
+api = { path = "../api" }

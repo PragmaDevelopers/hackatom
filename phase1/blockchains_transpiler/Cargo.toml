@@ -1,0 +1,14 @@
+[workspace]
+members = [
+  "languages/rust_parser",
+  "languages/solidity_parser",
+  "orm/polygon_orm",
+  "orm/solana_orm",
+  "dsl/dsl_lexer",
+  "dsl/dsl_parser",
+  "cli",
+  "api", 
+  "integration_tests", 
+  "scripts"
+]
+resolver = "2"

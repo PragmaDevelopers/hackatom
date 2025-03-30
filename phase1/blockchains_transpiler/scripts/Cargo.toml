@@ -1,0 +1,20 @@
+[package]
+name = "scripts"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+
+[[bin]]
+name = "run_tests"
+path = "src/bin/run_tests.rs"
+
+[[bin]]
+name = "compile"
+path = "src/bin/compile.rs"
+
+
+[[bin]]
+name = "dev_run"
+path = "src/bin/dev_run.rs"

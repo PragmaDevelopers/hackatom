@@ -1,0 +1,613 @@
+.
+├── api
+│   ├── Cargo.toml
+│   └── src
+│       ├── lib.rs
+│       └── main.rs
+├── Cargo.lock
+├── Cargo.toml
+├── cli
+│   ├── Cargo.toml
+│   └── src
+│       ├── lib.rs
+│       └── main.rs
+├── contents.txt
+├── dsl
+│   ├── dsl_lexer
+│   │   ├── Cargo.toml
+│   │   └── src
+│   │       └── lib.rs
+│   └── dsl_parser
+│       ├── Cargo.toml
+│       └── src
+│           └── lib.rs
+├── integration_tests
+│   ├── Cargo.toml
+│   ├── src
+│   │   └── lib.rs
+│   └── tests
+│       └── test_pass.rs
+├── languages
+│   ├── rust_parser
+│   │   ├── Cargo.toml
+│   │   └── src
+│   │       └── lib.rs
+│   └── solidity_parser
+│       ├── Cargo.toml
+│       └── src
+│           └── lib.rs
+├── orm
+│   ├── polygon_orm
+│   │   ├── Cargo.toml
+│   │   └── src
+│   │       └── lib.rs
+│   └── solana_orm
+│       ├── Cargo.toml
+│       └── src
+│           └── lib.rs
+├── README.md
+└── scripts
+    ├── Cargo.toml
+    └── src
+        └── bin
+            ├── compile.rs
+            ├── dev_run.rs
+            └── run_tests.rs
+
+26 directories, 29 files
+./cli/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./cli/src/main.rs:
+fn main() {
+    println!("Hello, world!");
+}
+
+
+./api/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./api/src/main.rs:
+fn main() {
+    println!("Hello, world!");
+}
+
+
+./orm/solana_orm/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./orm/polygon_orm/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./integration_tests/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./integration_tests/tests/test_pass.rs:
+#[test]
+fn test_pass() {
+    // A simple test that always passes
+    assert_eq!(2 + 2, 4);
+}
+
+
+./dsl/dsl_lexer/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./dsl/dsl_parser/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./languages/rust_parser/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./languages/solidity_parser/src/lib.rs:
+pub fn add(left: u64, right: u64) -> u64 {
+    left + right
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn it_works() {
+        let result = add(2, 2);
+        assert_eq!(result, 4);
+    }
+}
+
+
+./scripts/src/bin/compile.rs:
+use std::process::{Command, exit};
+
+fn run_tests() {
+    // Spawn the run_tests binary
+    let status = Command::new("run_tests")
+        .status()
+        .expect("Failed to execute run_tests binary");
+
+    // Check if run_tests executed successfully
+    if !status.success() {
+        eprintln!("run_tests failed with exit code: {}", status);
+        exit(1); // Exit the current binary with an error code
+    }
+}
+
+fn main() {
+    run_tests();
+    println!("Building the project...");
+    let status = Command::new("cargo")
+        .args(&["build", "--workspace"])
+        .status()
+        .expect("Failed to build the project");
+    if !status.success() {
+        eprintln!("Build failed.");
+        std::process::exit(1);
+    }
+}
+
+
+./scripts/src/bin/dev_run.rs:
+use std::process::{Command, exit};
+
+fn run_tests() {
+    // Spawn the run_tests binary
+    let status = Command::new("run_tests")
+        .status()
+        .expect("Failed to execute run_tests binary");
+
+    // Check if run_tests executed successfully
+    if !status.success() {
+        eprintln!("run_tests failed with exit code: {}", status);
+        exit(1); // Exit the current binary with an error code
+    }
+}
+
+fn main() {
+    run_tests();
+    println!("Running in development mode...");
+}
+
+
+./scripts/src/bin/run_tests.rs:
+use std::env;
+use std::process::{Command, exit};
+use std::io::{self, Write};
+
+/// Returns true if executing `cmd --version` succeeds.
+fn command_exists(cmd: &str) -> bool {
+    Command::new(cmd)
+        .arg("--version")
+        .output()
+        .is_ok()
+}
+
+/// Change the working directory to the directory of the executable.
+fn set_current_dir_to_exe_dir() {
+    if let Ok(exe_path) = env::current_exe() {
+        if let Some(exe_dir) = exe_path.parent() {
+            if let Err(e) = env::set_current_dir(exe_dir) {
+                eprintln!("Error setting current directory: {}", e);
+                exit(1);
+            }
+        }
+    }
+}
+
+/// Extracts package names from the JSON output of `cargo metadata`.
+/// This minimal parser does not support full JSON, but it extracts the first occurrence
+/// of a "name" field in each package object inside the "packages" array.
+fn parse_package_names(json: &str) -> Vec<String> {
+    let mut packages = Vec::new();
+
+    // Find the start of the packages array.
+    if let Some(packages_key_index) = json.find("\"packages\":") {
+        // Find the '[' that begins the array.
+        if let Some(array_start_rel) = json[packages_key_index..].find('[') {
+            let array_start = packages_key_index + array_start_rel + 1; // position after '['
+            // Now, find the matching closing ']' for the array.
+            let json_bytes = json.as_bytes();
+            let mut bracket_count = 1;
+            let mut i = array_start;
+            let array_end = loop {
+                if i >= json_bytes.len() {
+                    break None;
+                }
+                if json_bytes[i] == b'[' {
+                    bracket_count += 1;
+                } else if json_bytes[i] == b']' {
+                    bracket_count -= 1;
+                    if bracket_count == 0 {
+                        break Some(i);
+                    }
+                }
+                i += 1;
+            };
+
+            if let Some(array_end) = array_end {
+                let packages_array = &json[array_start..array_end];
+                let bytes = packages_array.as_bytes();
+                let mut pos = 0;
+                while pos < bytes.len() {
+                    // Look for the start of an object.
+                    if bytes[pos] == b'{' {
+                        let obj_start = pos;
+                        let mut brace_count = 1;
+                        pos += 1;
+                        while pos < bytes.len() && brace_count > 0 {
+                            if bytes[pos] == b'{' {
+                                brace_count += 1;
+                            } else if bytes[pos] == b'}' {
+                                brace_count -= 1;
+                            }
+                            pos += 1;
+                        }
+                        // Now we have an object slice.
+                        let object_str = &packages_array[obj_start..pos];
+                        // Look for the first occurrence of `"name":`
+                        if let Some(name_index) = object_str.find("\"name\":") {
+                            // After "name":, skip to the first double quote.
+                            let after_name = &object_str[name_index + 7..];
+                            if let Some(first_quote) = after_name.find('\"') {
+                                let after_first_quote = &after_name[first_quote + 1..];
+                                if let Some(second_quote) = after_first_quote.find('\"') {
+                                    let name = &after_first_quote[..second_quote];
+                                    packages.push(name.to_string());
+                                }
+                            }
+                        }
+                    } else {
+                        pos += 1;
+                    }
+                }
+            }
+        }
+    }
+    packages
+}
+
+fn main() {
+    // Only "cargo" is needed now because we parse the JSON ourselves.
+    let required_commands = ["cargo"];
+
+    for &cmd in &required_commands {
+        if !command_exists(cmd) {
+            eprintln!("Error: Required command '{}' is not installed or not in the PATH.", cmd);
+            exit(1);
+        }
+    }
+
+    // Change to the executable's directory.
+    set_current_dir_to_exe_dir();
+
+    // Run `cargo metadata` and capture its output.
+    let output = Command::new("cargo")
+        .args(&["metadata", "--format-version=1", "--no-deps"])
+        .output()
+        .unwrap_or_else(|e| {
+            eprintln!("Failed to run cargo metadata: {}", e);
+            exit(1);
+        });
+
+    if !output.status.success() {
+        eprintln!("Error: cargo metadata command failed.");
+        exit(1);
+    }
+
+    let metadata_json = String::from_utf8_lossy(&output.stdout);
+    let packages = parse_package_names(&metadata_json);
+
+    if packages.is_empty() {
+        eprintln!("No packages found in cargo metadata output.");
+        exit(1);
+    }
+
+    let mut all_passed = true;
+
+    // Run tests for each package.
+    for package in packages {
+        println!("Running tests for package: {}", package);
+        let status = Command::new("cargo")
+            .args(&["test", "-p", &package])
+            .status()
+            .unwrap_or_else(|e| {
+                eprintln!("Failed to run cargo test for package {}: {}", package, e);
+                exit(1);
+            });
+        if !status.success() {
+            eprintln!("Tests failed for package: {}", package);
+            all_passed = false;
+        }
+    }
+
+    // Run integration tests.
+    println!("Running integration tests");
+    let status = Command::new("cargo")
+        .args(&["test", "-p", "integration_tests"])
+        .status()
+        .unwrap_or_else(|e| {
+            eprintln!("Failed to run cargo test for integration tests: {}", e);
+            exit(1);
+        });
+    if !status.success() {
+        eprintln!("Integration tests failed");
+        all_passed = false;
+    }
+
+    if all_passed {
+        println!("All tests passed successfully.");
+        exit(0);
+    } else {
+        eprintln!("Some tests failed.");
+        exit(1);
+    }
+}
+
+
+./cli/Cargo.toml:
+[package]
+name = "cli"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "cli"
+path = "src/lib.rs"
+
+[[bin]]
+name = "cli_bin"
+path = "src/main.rs"
+
+[dependencies]
+
+./api/Cargo.toml:
+[package]
+name = "api"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+name = "api"
+path = "src/lib.rs"
+
+[[bin]]
+name = "api_bin"
+path = "src/main.rs"
+
+[dependencies]
+
+./orm/solana_orm/Cargo.toml:
+[package]
+name = "solana_orm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+
+./orm/polygon_orm/Cargo.toml:
+[package]
+name = "polygon_orm"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+
+./Cargo.toml:
+[workspace]
+members = [
+  "languages/rust_parser",
+  "languages/solidity_parser",
+  "orm/polygon_orm",
+  "orm/solana_orm",
+  "dsl/dsl_lexer",
+  "dsl/dsl_parser",
+  "cli",
+  "api", 
+  "integration_tests", 
+  "scripts"
+]
+resolver = "2"
+
+[profile.scripts_development]
+inherits = "dev"
+debug = true
+
+[profile.scripts_production]
+inherits = "release"
+debug = false
+
+
+
+./integration_tests/Cargo.toml:
+[package]
+name = "integration_tests"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+[dev-dependencies]
+rust_parser = { path = "../languages/rust_parser" }
+solidity_parser = { path = "../languages/solidity_parser" }
+polygon_orm = { path = "../orm/polygon_orm" }
+solana_orm = { path = "../orm/solana_orm" }
+dsl_lexer = { path = "../dsl/dsl_lexer" }
+dsl_parser = { path = "../dsl/dsl_parser" }
+cli = { path = "../cli" }
+api = { path = "../api" }
+
+./dsl/dsl_lexer/Cargo.toml:
+[package]
+name = "dsl_lexer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+
+./dsl/dsl_parser/Cargo.toml:
+[package]
+name = "dsl_parser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+
+./languages/rust_parser/Cargo.toml:
+[package]
+name = "rust_parser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+
+./languages/solidity_parser/Cargo.toml:
+[package]
+name = "solidity_parser"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+
+
+./scripts/Cargo.toml:
+[package]
+name = "scripts"
+version = "0.1.0"
+edition = "2024"
+
+
+[dependencies]
+
+[[bin]]
+name = "run_tests"
+path = "src/bin/run_tests.rs"
+profile = "scripts_development"
+
+[[bin]]
+name = "compile"
+path = "src/bin/compile.rs"
+profile = "scripts_production"
+
+
+[[bin]]
+name = "dev_run"
+path = "src/bin/dev_run.rs"
+profile = "scripts_production"
+
+
