@@ -1,5 +1,5 @@
 [package]
-name = "webdexfactory"
+name = "webdex_common"
 version = "0.1.0"
 authors = ["Seu Nome seu@email.com"]
 description = "Created with Anchor"
@@ -7,25 +7,21 @@ edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "webdexfactory"
+name = "webdex_common"
 
 [features]
-default = []
-cpi = ["no-entrypoint"]
-no-entrypoint = []
-no-idl = []
-no-log-ix-name = []
-idl-build = ["anchor-lang/idl-build"]
+default = ["error","factory","payments","strategy"]
+error = []
+factory = []
+payments = []
+strategy = []
 
 [dependencies]
-anchor-lang = { version = "0.31.0", features = ["idl-build"] }
+anchor-lang = { version = "0.31.0" }
+anchor-spl = { version = "0.31.0" }
 anchor-attribute-program = "0.31.0"
 anchor-derive-accounts = "0.31.0"
 serde = { version = "1.0", features = ["derive"] }
 bytemuck_derive = "=1.8.1"
 regex = "=1.9.0"
 blake3 = "=1.5.4"
-
-[dev-dependencies]
-anchor-spl = "0.31.0"
-

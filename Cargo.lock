@@ -2966,7 +2966,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "webdexfactory"
+name = "webdex_common"
 version = "0.1.0"
 dependencies = [
  "anchor-attribute-program",
@@ -2977,6 +2977,66 @@ dependencies = [
  "bytemuck_derive",
  "regex",
  "serde",
+]
+
+[[package]]
+name = "webdex_factory"
+version = "0.1.0"
+dependencies = [
+ "anchor-attribute-program",
+ "anchor-derive-accounts",
+ "anchor-lang",
+ "anchor-spl",
+ "blake3",
+ "bytemuck_derive",
+ "regex",
+ "serde",
+ "webdex_common",
+]
+
+[[package]]
+name = "webdex_manager"
+version = "0.1.0"
+dependencies = [
+ "anchor-attribute-program",
+ "anchor-derive-accounts",
+ "anchor-lang",
+ "anchor-spl",
+ "blake3",
+ "bytemuck_derive",
+ "regex",
+ "serde",
+ "webdex_common",
+]
+
+[[package]]
+name = "webdex_payments"
+version = "0.1.0"
+dependencies = [
+ "anchor-attribute-program",
+ "anchor-derive-accounts",
+ "anchor-lang",
+ "anchor-spl",
+ "blake3",
+ "bytemuck_derive",
+ "regex",
+ "serde",
+ "webdex_common",
+]
+
+[[package]]
+name = "webdex_strategy"
+version = "0.1.0"
+dependencies = [
+ "anchor-attribute-program",
+ "anchor-derive-accounts",
+ "anchor-lang",
+ "anchor-spl",
+ "blake3",
+ "bytemuck_derive",
+ "regex",
+ "serde",
+ "webdex_common",
 ]
 
 [[package]]

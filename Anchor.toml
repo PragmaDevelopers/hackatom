@@ -6,7 +6,11 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-webdexfactory = "D8CM6w2X7mcpf5zb6mENi6JB8h3HohPhkgAgAbVwtGN7"
+webdex_common = "C9jYWL7cKmsfqtFwJgf6BzA1wjcUy9HU6o6oMDEkFAGi"
+webdex_factory = "5RZ5WphwNXyqgkfBQExGNCEEUTjCTKnDkm4KqQzeavq1"
+webdex_manager = "6RuoSrSkzbTyMTdVzXp1xn2gyH4h9FtdZ8iQa12jmZqp"
+webdex_payments = "9MUsHPBR22Dorhi7Thq1ewPoFm4Uzx8JmsDZvVeWuwiF"
+webdex_strategy = "5ozi32fjP7BEngQ2A2dbQrt98CYuhsq9kL4tmGt79URs"
 
 [registry]
 url = "https://api.apr.dev"
