@@ -12,4 +12,8 @@ pub enum ErrorCode {
     CoinNotFound,
     #[msg("Strategy not found")]
     StrategyNotFound,
+    #[msg("Unregistered manager")]
+    UnregisteredManager,
+    #[msg("User already registered")]
+    UserAlreadyRegistered,
 }

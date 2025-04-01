@@ -78,6 +78,20 @@ pub fn _find_strategy(
     })
 }
 
+#[event]
+pub struct StrategyAddedEvent {
+    pub contract_address: Pubkey,
+    pub name: String,
+    pub token_address: Pubkey,
+}
+
+#[event]
+pub struct StrategyStatusUpdatedEvent {
+    pub contract_address: Pubkey,
+    pub token_address: Pubkey,
+    pub is_active: bool,
+}
+
 pub fn _add_strategy(ctx: Context<AddStrategy>, name: String, contract_address: Pubkey) -> Result<()> {
     let bot = &mut ctx.accounts.bot;
     let strategy_list = &mut ctx.accounts.strategy_list;
@@ -95,6 +109,13 @@ pub fn _add_strategy(ctx: Context<AddStrategy>, name: String, contract_address: 
         is_active: true,
     };
     strategy_list.strategies.push(strategy);
+
+    emit!(StrategyStatusUpdatedEvent {
+        contract_address: contract_address,
+        token_address: token_address,
+        is_active: true,
+    });
+
     Ok(())
 }
 
@@ -106,6 +127,11 @@ pub fn _update_strategy_status(ctx: Context<UpdateStrategyStatus>, contract_addr
     }
     if let Some(strategy) = strategy_list.strategies.iter_mut().find(|s| s.token_address == token_address) {
         strategy.is_active = is_active;
+        emit!(StrategyStatusUpdatedEvent {
+            contract_address: contract_address,
+            token_address: token_address,
+            is_active: true,
+        });
     } else {
         return Err(ErrorCode::StrategyNotFound.into());
     }

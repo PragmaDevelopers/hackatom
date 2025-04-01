@@ -5,6 +5,7 @@ use webdex_common::error::ErrorCode;
 
 declare_id!("6RuoSrSkzbTyMTdVzXp1xn2gyH4h9FtdZ8iQa12jmZqp");
 
+#[cfg(feature = "use_global_allocator")]
 #[program]
 pub mod webdex_manager {
 

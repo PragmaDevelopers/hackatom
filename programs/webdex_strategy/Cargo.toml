@@ -10,7 +10,8 @@ crate-type = ["cdylib", "lib"]
 name = "webdex_strategy"
 
 [features]
-default = []
+default = ["use-global-allocator"]
+use-global-allocator = []
 cpi = ["no-entrypoint"]
 no-entrypoint = []
 no-idl = []

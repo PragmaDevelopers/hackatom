@@ -72,11 +72,6 @@ pub struct Coin {
     pub lp_token_mint: Pubkey,
 }
 
-#[account]
-pub struct CoinList {
-    pub coins: Vec<Coin>,
-}
-
 #[derive(Accounts)]
 pub struct InitializeLpToken<'info> {
     #[account(

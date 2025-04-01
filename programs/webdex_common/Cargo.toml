@@ -10,9 +10,10 @@ crate-type = ["cdylib", "lib"]
 name = "webdex_common"
 
 [features]
-default = ["error","factory","payments","strategy"]
+default = ["error","factory","manager","payments","strategy"]
 error = []
 factory = []
+manager = []
 payments = []
 strategy = []
 

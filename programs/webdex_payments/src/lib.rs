@@ -5,6 +5,7 @@ use webdex_common::error::ErrorCode;
 
 declare_id!("9MUsHPBR22Dorhi7Thq1ewPoFm4Uzx8JmsDZvVeWuwiF");
 
+#[cfg(feature = "use_global_allocator")]
 #[program]
 pub mod webdex_payments {
 
