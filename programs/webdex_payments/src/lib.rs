@@ -14,4 +14,9 @@ pub mod webdex_payments {
     pub fn revoke_or_allow_currency(ctx: Context<RevokeOrAllowCurrency>, coin_address: Pubkey, status: bool) -> Result<()> {
         payments::_revoke_or_allow_currency(ctx,coin_address,status)
     }
+
+    pub fn get_sub_account_address(ctx: Context<GetBotInfo>) -> Result<Pubkey> {
+        // Retorna o Pubkey da subconta armazenado na conta do bot
+        Ok(ctx.accounts.bot.sub_account_address)
+    }
 }

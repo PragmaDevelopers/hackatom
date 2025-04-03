@@ -6,21 +6,21 @@ Este repositório contém os programas on-chain e o front-end do WebdEX, um sist
 
 ```
 webdex-project/
-│── app/                 # Front-end do projeto
-│── programs/            # Programas on-chain
-│   ├── webdex_manager/   # Gerencia usuários, saldos e chamadas para outros contratos
-│   ├── webdex_factory/   # Cria novos contratos e componentes do sistema
-│   ├── webdex_payments/  # Lida com transações financeiras, taxas e fluxo de ativos
-│   ├── webdex_strategies/ # Gerencia e armazena estratégias de negociação
+│── app/                    # Front-end do projeto
+│── programs/               # Programas on-chain
+│   ├── webdex_common/      # Biblioteca compartilhada entre os programas
+│   ├── webdex_manager/     # Gerencia usuários, saldos e chamadas para outros contratos
+│   ├── webdex_factory/     # Cria novos contratos e componentes do sistema
+│   ├── webdex_payments/    # Lida com transações financeiras, taxas e fluxo de ativos
+│   ├── webdex_strategies/  # Gerencia e armazena estratégias de negociação
 │   ├── webdex_subaccounts/ # Implementa subcontas para melhor organização dos usuários
-│   ├── webdex_network/   # Lida com networks e indicações
-│── webdex_common/       # Biblioteca compartilhada entre os programas
-│── target/              # Diretório de build gerado pelo Anchor
-│── migrations/          # Scripts de migração
-│── tests/               # Testes automatizados
-│── Anchor.toml          # Configuração do Anchor
-│── Cargo.toml           # Dependências do projeto
-│── ts/                  # SDK TypeScript para interação com os programas
+│   ├── webdex_network/     # Lida com networks e indicações
+│── target/                 # Diretório de build gerado pelo Anchor
+│── migrations/             # Scripts de migração
+│── tests/                  # Testes automatizados
+│── Anchor.toml             # Configuração do Anchor
+│── Cargo.toml              # Dependências do projeto
+│── ts/                     # SDK TypeScript para interação com os programas
 ```
 
 ### 📌 `webdex_common`

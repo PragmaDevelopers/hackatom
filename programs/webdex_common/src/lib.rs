@@ -8,6 +8,8 @@ pub mod manager;
 pub mod payments;
 #[cfg(feature = "strategy")]
 pub mod strategy;
+#[cfg(feature = "sub_account")]
+pub mod sub_account;
 
 use anchor_lang::declare_id;
 

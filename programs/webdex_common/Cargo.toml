@@ -10,19 +10,22 @@ crate-type = ["cdylib", "lib"]
 name = "webdex_common"
 
 [features]
-default = ["error","factory","manager","payments","strategy"]
+default = ["error","factory","manager","payments","strategy","sub_account"]
 error = []
 factory = []
 manager = []
 payments = []
 strategy = []
+sub_account = []
 
 [dependencies]
-anchor-lang = { version = "0.31.0" }
-anchor-spl = { version = "0.31.0" }
+anchor-lang = { version = "0.31.0", features = ["init-if-needed"] }
+anchor-spl = { version = "0.31.0", features = ["metadata"] }
 anchor-attribute-program = "0.31.0"
 anchor-derive-accounts = "0.31.0"
 serde = { version = "1.0", features = ["derive"] }
 bytemuck_derive = "=1.8.1"
 regex = "=1.9.0"
 blake3 = "=1.5.4"
+mpl-token-metadata = { version = "5.1.0" }
+solana-program = "=2.1.12"

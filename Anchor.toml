@@ -11,6 +11,7 @@ webdex_factory = "5RZ5WphwNXyqgkfBQExGNCEEUTjCTKnDkm4KqQzeavq1"
 webdex_manager = "6RuoSrSkzbTyMTdVzXp1xn2gyH4h9FtdZ8iQa12jmZqp"
 webdex_payments = "9MUsHPBR22Dorhi7Thq1ewPoFm4Uzx8JmsDZvVeWuwiF"
 webdex_strategy = "5ozi32fjP7BEngQ2A2dbQrt98CYuhsq9kL4tmGt79URs"
+webdex_sub_accounts = "GKBBSsJsQMeERKGf1GaQakEGS71dSLE8K8KVDRJSfFci"
 
 [registry]
 url = "https://api.apr.dev"
