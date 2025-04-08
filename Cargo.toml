@@ -1,11 +1,6 @@
 [workspace]
 members = [
-    "programs/webdex_common",
     "programs/webdex_factory",
-    "programs/webdex_manager",
-    "programs/webdex_payments",
-    "programs/webdex_strategy",
-    "programs/webdex_sub_accounts",
 ]
 resolver = "2"
 

@@ -10,22 +10,17 @@ crate-type = ["cdylib", "lib"]
 name = "webdex_factory"
 
 [features]
-default = ["use-global-allocator"]
-use-global-allocator = []
+default = []
 cpi = ["no-entrypoint"]
 no-entrypoint = []
 no-idl = []
 no-log-ix-name = []
-idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
+idl-build = ["anchor-spl/idl-build"]
 
 [dependencies]
-anchor-lang = { version = "0.31.0", features = ["idl-build"] }
-anchor-spl = { version = "0.31.0", features = ["idl-build"] }
+anchor-lang = { version = "0.31.0" }
+anchor-spl = { version = "0.31.0", features = ["metadata"] }
 anchor-attribute-program = "0.31.0"
 anchor-derive-accounts = "0.31.0"
 serde = { version = "1.0", features = ["derive"] }
-bytemuck_derive = "=1.8.1"
-regex = "=1.9.0"
-blake3 = "=1.5.4"
-webdex_common = { path = "../webdex_common" }
-
+mpl-token-metadata = "5.1.0"
