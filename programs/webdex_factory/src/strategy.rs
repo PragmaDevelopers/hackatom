@@ -3,11 +3,39 @@ use anchor_spl::token::{self, Mint, Token};
 use crate::factory::*;
 use crate::error::ErrorCode;
 
+#[account]
+pub struct Strategy {
+    pub name: String,
+    pub token_address: Pubkey,
+    pub is_active: bool,
+}
+
+impl Strategy {
+    pub const MAX_SIZE: usize = 4 + 32 + 1; // name (4 + x), token_address (32), is_active (1)
+}
+
+#[account]
+pub struct StrategyList {
+    pub contract_address: Pubkey,  
+    pub strategies: Vec<Strategy>,
+}
+
+impl StrategyList {
+    pub const MAX_STRATEGIES: usize = 10;
+    pub const INIT_SPACE: usize = 8 + 32 + 4 + Self::MAX_STRATEGIES * Strategy::MAX_SIZE;
+}
+
 #[derive(Accounts)]
 pub struct AddStrategy<'info> {
      #[account(mut)]
     pub bot: Account<'info, Bot>,
-    #[account(mut)]
+    #[account(
+        init_if_needed,
+        payer = payer,
+        space = StrategyList::INIT_SPACE,
+        seeds = [b"strategy_list", bot.key().as_ref()],
+        bump
+    )]
     pub strategy_list: Account<'info, StrategyList>,
     #[account(init, payer = payer, mint::decimals = 0, mint::authority = token_authority.key())]
     pub token_mint: Account<'info, Mint>,
@@ -33,27 +61,15 @@ pub struct UpdateStrategyStatus<'info> {
     pub strategy_list: Account<'info, StrategyList>,
 }
 
-#[account]
-pub struct Strategy {
-    pub name: String,
-    pub token_address: Pubkey,
-    pub is_active: bool,
-}
-
-#[account]
-pub struct StrategyList {
-    pub strategies: Vec<Strategy>,
-}
-
-#[derive(Accounts)]
-pub struct GetStrategies<'info> {
-    pub strategy_list: Account<'info, StrategyList>,
-}
-
 #[derive(Accounts)]
 pub struct FindStrategy<'info> {
     #[account(mut)]
     pub bot: Account<'info, Bot>,
+    pub strategy_list: Account<'info, StrategyList>,
+}
+
+#[derive(Accounts)]
+pub struct GetStrategies<'info> {
     pub strategy_list: Account<'info, StrategyList>,
 }
 
@@ -71,9 +87,4 @@ pub struct StrategyStatusUpdatedEvent {
     pub contract_address: Pubkey,
     pub token_address: Pubkey,
     pub is_active: bool,
-}
-
-pub fn _get_strategies(ctx: Context<GetStrategies>) -> Result<Vec<Strategy>> {
-    let strategy_list = &ctx.accounts.strategy_list;
-    Ok(strategy_list.strategies.clone())
 }

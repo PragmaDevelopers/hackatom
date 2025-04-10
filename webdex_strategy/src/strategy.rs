@@ -9,16 +9,45 @@ use mpl_token_metadata::accounts::Metadata;
 use crate::factory::*;
 use crate::error::ErrorCode;
 
+#[account]
+pub struct Strategy {
+    pub name: String,
+    pub token_address: Pubkey,
+    pub is_active: bool,
+}
+
+impl Strategy {
+    pub const MAX_SIZE: usize = 4 + 32 + 1; // name (4 + x), token_address (32), is_active (1)
+}
+
+#[account]
+pub struct StrategyList {
+    pub contract_address: Pubkey,  
+    pub strategies: Vec<Strategy>,
+}
+
+impl StrategyList {
+    pub const MAX_STRATEGIES: usize = 10;
+    pub const INIT_SPACE: usize = 8 + 32 + 4 + Self::MAX_STRATEGIES * Strategy::MAX_SIZE;
+}
+
 #[derive(Accounts)]
 pub struct AddStrategy<'info> {
      #[account(mut)]
     pub bot: Account<'info, Bot>,
-    #[account(mut)]
+    #[account(
+        init_if_needed,
+        payer = payer,
+        space = StrategyList::INIT_SPACE,
+        seeds = [b"strategy_list", bot.key().as_ref()],
+        bump
+    )]
     pub strategy_list: Account<'info, StrategyList>,
     #[account(init, payer = payer, mint::decimals = 0, mint::authority = token_authority.key())]
     pub token_mint: Account<'info, Mint>,
     /// CHECK: Esta conta é verificada pelo programa Metaplex
     pub metadata_program: AccountInfo<'info>,
+    /// CHECK: Esta conta é verificada pelo programa Metaplex
     #[account(mut)]
     pub metadata: UncheckedAccount<'info>,
     #[account(mut)]
@@ -38,23 +67,6 @@ pub struct UpdateStrategyStatus<'info> {
     pub strategy_list: Account<'info, StrategyList>,
 }
 
-#[account]
-pub struct Strategy {
-    pub name: String,
-    pub token_address: Pubkey,
-    pub is_active: bool,
-}
-
-#[account]
-pub struct StrategyList {
-    pub strategies: Vec<Strategy>,
-}
-
-#[derive(Accounts)]
-pub struct GetStrategies<'info> {
-    pub strategy_list: Account<'info, StrategyList>,
-}
-
 #[derive(Accounts)]
 pub struct FindStrategy<'info> {
     #[account(mut)]
@@ -62,32 +74,9 @@ pub struct FindStrategy<'info> {
     pub strategy_list: Account<'info, StrategyList>,
 }
 
-pub fn _find_strategy(
-    ctx: Context<FindStrategy>,
-    contract_address: Pubkey,
-    token_address: Pubkey,
-) -> Result<Strategy> {
-    let bot = &ctx.accounts.bot;
-    let strategy_list = &ctx.accounts.strategy_list;
-
-    // Verifica se o bot está registrado
-    if bot.manager_address != contract_address {
-        return Err(ErrorCode::BotNotFound.into());
-    }
-
-    // Itera sobre as estratégias para encontrar a correspondente
-    for strategy in &strategy_list.strategies {
-        if strategy.token_address == token_address {
-            return Ok(strategy.clone());
-        }
-    }
-
-    // Retorna uma estratégia padrão caso não encontre a desejada
-    Ok(Strategy {
-        name: "unknown".to_string(),
-        token_address: Pubkey::default(),
-        is_active: false,
-    })
+#[derive(Accounts)]
+pub struct GetStrategies<'info> {
+    pub strategy_list: Account<'info, StrategyList>,
 }
 
 #[event]

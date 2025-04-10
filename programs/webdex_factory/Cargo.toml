@@ -18,7 +18,7 @@ no-log-ix-name = []
 idl-build = ["anchor-spl/idl-build"]
 
 [dependencies]
-anchor-lang = { version = "0.31.0" }
+anchor-lang = { version = "0.31.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.31.0", features = ["metadata"] }
 anchor-attribute-program = "0.31.0"
 anchor-derive-accounts = "0.31.0"

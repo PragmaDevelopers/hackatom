@@ -40,7 +40,7 @@ pub struct AddBotAndFeeTiers<'info> {
     )]
     pub bot: Account<'info, Bot>,
     #[account(
-        init,
+        init_if_needed,
         payer = user,
         space = Payments::INIT_SPACE, // ou calcule o espaço necessário
         seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
@@ -53,6 +53,13 @@ pub struct AddBotAndFeeTiers<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
+}
+
+#[event]
+pub struct BotCreated {
+    pub contract_address: Pubkey,
+    pub bot: Pubkey,
+    pub owner: Pubkey,
 }
 
 #[derive(Accounts)]
@@ -69,9 +76,23 @@ pub struct UpdateBot<'info> {
     pub owner: Signer<'info>,
 }
 
+#[event]
+pub struct BotUpdated {
+    pub bot: Pubkey,
+    pub strategy_address: Pubkey,
+    pub sub_account_address: Pubkey,
+    pub payments_address: Pubkey,
+}
+
 #[derive(Accounts)]
 pub struct RemoveBot<'info> {
     #[account(mut, has_one = owner, close = owner)]
     pub bot: Account<'info, Bot>,
     pub owner: Signer<'info>,
+}
+
+#[event]
+pub struct BotRemoved {
+    pub bot: Pubkey,
+    pub owner: Pubkey,
 }

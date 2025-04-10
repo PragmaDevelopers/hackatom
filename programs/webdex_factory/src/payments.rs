@@ -10,7 +10,7 @@ pub struct FeeTier {
     pub fee: [u8; 32],     // 32 bytes
 }
 
-#[derive(Serialize, Deserialize, BorshSerialize, BorshDeserialize, Clone, Default)]
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct Coins {
     pub name: String,          // 4 + name.len()
     pub symbol: String,        // 4 + symbol.len()
@@ -18,11 +18,17 @@ pub struct Coins {
     pub status: bool,          // 1
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct CoinData {
+    pub pubkey: Pubkey,
+    pub coin: Coins,
+}
+
 #[account]
 pub struct Payments {
     pub contract_address: Pubkey,            // 32 bytes
     pub fee_tiers: Vec<FeeTier>,             // 4 (len) + N * FeeTier
-    pub coins: Vec<(Pubkey, Coins)>,         // 4 (len) + N * (32 + Coins)
+    pub coins: Vec<CoinData>,         // 4 (len) + N * (32 + Coins)
 }
 
 pub const MAX_FEE_TIERS: usize = 10;
