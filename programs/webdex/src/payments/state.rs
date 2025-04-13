@@ -1,8 +1,6 @@
 use anchor_lang::prelude::*;
-use anchor_lang::prelude::borsh::{BorshDeserialize, BorshSerialize};
 use serde::{Deserialize, Serialize};
-use crate::factory::*;
-use crate::error::ErrorCode;
+use crate::factory::state::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Serialize, Deserialize, Clone, Default)]
 pub struct FeeTier {
@@ -43,8 +41,9 @@ impl Payments {
 
 #[derive(Accounts)]
 pub struct RevokeOrAllowCurrency<'info> {
-    #[account(mut)]
+    #[account(has_one = owner)]
     pub bot: Account<'info, Bot>,
     #[account(mut)]
     pub payments: Box<Account<'info, Payments>>,
+    pub owner: Signer<'info>,
 }

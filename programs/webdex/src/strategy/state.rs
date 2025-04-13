@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{self, Mint, Token};
-use crate::factory::*;
-use crate::error::ErrorCode;
+use anchor_spl::token::{Mint, Token};
+use crate::factory::state::*;
 
 #[account]
 pub struct Strategy {
@@ -27,27 +26,32 @@ impl StrategyList {
 
 #[derive(Accounts)]
 pub struct AddStrategy<'info> {
-     #[account(mut)]
+    #[account(has_one = owner)]
     pub bot: Account<'info, Bot>,
     #[account(
         init_if_needed,
-        payer = payer,
+        payer = owner,
         space = StrategyList::INIT_SPACE,
         seeds = [b"strategy_list", bot.key().as_ref()],
         bump
     )]
     pub strategy_list: Account<'info, StrategyList>,
-    #[account(init, payer = payer, mint::decimals = 0, mint::authority = token_authority.key())]
+
+    #[account(init, payer = owner, mint::decimals = 0, mint::authority = token_authority.key())]
     pub token_mint: Account<'info, Mint>,
+
     /// CHECK: Esta conta é verificada pelo programa Metaplex
     pub metadata_program: AccountInfo<'info>,
     /// CHECK: Esta conta é verificada pelo programa Metaplex
     #[account(mut)]
     pub metadata: UncheckedAccount<'info>,
+
     #[account(mut)]
     pub token_authority: Signer<'info>,
+
     #[account(mut)]
-    pub payer: Signer<'info>,
+    pub owner: Signer<'info>,
+
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
     pub token_program: Program<'info, Token>,
@@ -55,22 +59,30 @@ pub struct AddStrategy<'info> {
 
 #[derive(Accounts)]
 pub struct UpdateStrategyStatus<'info> {
-    #[account(mut)]
+    #[account(has_one = owner)]
     pub bot: Account<'info, Bot>,
     #[account(mut)]
     pub strategy_list: Account<'info, StrategyList>,
-}
-
-#[derive(Accounts)]
-pub struct FindStrategy<'info> {
-    #[account(mut)]
-    pub bot: Account<'info, Bot>,
-    pub strategy_list: Account<'info, StrategyList>,
+    pub owner: Signer<'info>,
 }
 
 #[derive(Accounts)]
 pub struct GetStrategies<'info> {
     pub strategy_list: Account<'info, StrategyList>,
+}
+
+#[derive(Accounts)]
+pub struct FindStrategy<'info> {
+    pub strategy_list: Account<'info, StrategyList>,
+}
+
+#[derive(Accounts)]
+pub struct DeleteStrategy<'info> {
+    #[account(has_one = owner)]
+    pub bot: Account<'info, Bot>,
+    #[account(mut)]
+    pub strategy_list: Account<'info, StrategyList>,
+    pub owner: Signer<'info>,
 }
 
 #[event]

@@ -14,6 +14,16 @@ pub enum ErrorCode {
     StrategyNotFound,
     #[msg("Coin already exists")]
     CoinAlreadyExists,
-    #[msg("Max Strategies Reached")]
+    #[msg("Max strategies reached")]
     MaxStrategiesReached,
+    #[msg("Unauthorized")]
+    Unauthorized,
+    #[msg("Você não tem permissão para acessar esta subconta.")]
+    UnauthorizedSubAccount,
+    #[msg("SubAccount not found")]
+    SubAccountNotFound,
+    #[msg("Account not linked to currency")]
+    AccountNotLinkedToCurrency,
+    #[msg("Max Sub Accounts Reached")]
+    MaxSubAccountsReached
 }

@@ -1,5 +1,5 @@
 [package]
-name = "webdex_factory"
+name = "webdex"
 version = "0.1.0"
 authors = ["Seu Nome seu@email.com"]
 description = "Created with Anchor"
@@ -7,7 +7,7 @@ edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "webdex_factory"
+name = "webdex"
 
 [features]
 default = []

@@ -1,12 +1,12 @@
 use anchor_lang::prelude::*;
-use crate::payments::*;
+use crate::payments::state::*;
 
 #[account]
 pub struct Bot {
     pub name: String,
     pub prefix: String,
     pub owner: Pubkey,
-    pub contract_address: Pubkey,
+    pub contract_address: Pubkey, // manager_address
     pub strategy_address: Pubkey,
     pub sub_account_address: Pubkey,
     pub payments_address: Pubkey,
@@ -22,7 +22,7 @@ pub struct BotInfo {
     pub name: String,
     pub prefix: String,
     pub owner: Pubkey,
-    pub contract_address: Pubkey,
+    pub contract_address: Pubkey, // manager_address
     pub strategy_address: Pubkey,
     pub sub_account_address: Pubkey,
     pub payments_address: Pubkey,
@@ -33,25 +33,28 @@ pub struct BotInfo {
 pub struct AddBotAndFeeTiers<'info> {
     #[account(
         init,
-        payer = user,
+        payer = owner,
         space = Bot::INIT_SPACE,
         seeds = [b"bot", contract_address.key().as_ref()],
         bump
     )]
     pub bot: Account<'info, Bot>,
+
     #[account(
         init_if_needed,
-        payer = user,
+        payer = owner,
         space = Payments::INIT_SPACE, // ou calcule o espaço necessário
         seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
         bump
     )]
     pub payments: Box<Account<'info, Payments>>,
+
     // Essa conta é só para obter o endereço do contrato (pode ser `UncheckedAccount`)
     /// CHECK: não estamos lendo nem escrevendo
     pub contract_address: UncheckedAccount<'info>,
+
     #[account(mut)]
-    pub user: Signer<'info>,
+    pub owner: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 

@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-webdex_factory = "B8YC8hQT7ox647xPKk5JhpwD9NPMUXXRxo8yfyGX6nyW"
+webdex = "8u8f1q3R3GUBsq7nD2tMRHQABQVZGzMkUypw6FKrYcnJ"
 
 [registry]
 url = "https://api.apr.dev"

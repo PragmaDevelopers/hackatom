@@ -1,17 +1,18 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexFactory } from "../target/types/webdex_factory";
-import { PublicKey } from "@solana/web3.js";
+import { Webdex } from "../target/types/webdex";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import BN from "bn.js";
+import { expect } from "chai";
 
-describe("webdex_factory", () => {
+describe("webdex", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
-  const program = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
+  const program = anchor.workspace.Webdex as Program<Webdex>;
   const user = provider.wallet;
 
   // 👉 Variáveis compartilhadas entre os testes
@@ -19,6 +20,8 @@ describe("webdex_factory", () => {
   let botPda: PublicKey;
   let paymentsPda: PublicKey;
   let coinToAdd: PublicKey;
+  let strategyListPda: PublicKey;
+  let strategyTokenAddress: PublicKey;
   const METADATA_PROGRAM_ID = new PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" // Metaplex Metadata Program
   );
@@ -60,7 +63,7 @@ describe("webdex_factory", () => {
       .addBotFeeTiers(
         "TradingBotX", // name
         "TBX",         // prefix
-        user.publicKey,
+        user.publicKey, // owner é quem paga
         contractAddress,
         strategyAddress,
         subAccountAddress,
@@ -69,8 +72,9 @@ describe("webdex_factory", () => {
         feeTiers
       )
       .accounts({
-        user: user.publicKey,
+        owner: user.publicKey, // owner é quem paga
         contractAddress: contractAddress,
+        systemProgram: SystemProgram.programId
       })
       .rpc();
 
@@ -101,7 +105,8 @@ describe("webdex_factory", () => {
       )
       .accounts({
         bot: botPda,
-        // owner: user.publicKey,
+        owner: user.publicKey,
+        systemProgram: SystemProgram.programId
       })
       .rpc();
 
@@ -136,6 +141,7 @@ describe("webdex_factory", () => {
       .accounts({
         bot: botPda,
         payments: paymentsPda,
+        systemProgram: SystemProgram.programId
       })
       .rpc();
 
@@ -174,6 +180,7 @@ describe("webdex_factory", () => {
       .accounts({
         bot: botPda,
         payments: paymentsPda,
+        systemProgram: SystemProgram.programId
       })
       .rpc();
 
@@ -192,13 +199,14 @@ describe("webdex_factory", () => {
   });
 
   it("Add Strategy", async () => {
-    const [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from("strategy_list"), botPda.toBuffer()],
       program.programId
     );
 
     // 🎨 Criar uma nova conta mint (NFT)
     const mint = anchor.web3.Keypair.generate();
+    strategyTokenAddress = mint.publicKey;
 
     // 📜 Endereço de metadados PDA conforme padrão do Metaplex
     const [metadataPda] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -220,28 +228,40 @@ describe("webdex_factory", () => {
       )
       .accounts({
         bot: botPda,
-        // strategyList: strategyListPda,
+        strategyList: strategyListPda,
         tokenMint: mint.publicKey,
         metadataProgram: METADATA_PROGRAM_ID,
         metadata: metadataPda,
-        tokenAuthority: provider.wallet.publicKey,
-        payer: provider.wallet.publicKey,
-        // rent: anchor.web3.SYSVAR_RENT_PUBKEY,
-        // systemProgram: anchor.web3.SystemProgram.programId,
-        // tokenProgram: TOKEN_PROGRAM_ID,
+        tokenAuthority: user.publicKey, // pessoa que cria o token e poderá futuramente usá-lo para mintar ou transferir a autoridade se desejar.,
+        owner: user.publicKey,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        systemProgram: SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
       })
       .signers([mint]) // mint precisa estar assinado se você usar anchor_mint macro
       .rpc();
 
     console.log("🚀 Strategy Added TX:", tx);
+  });
 
-    // 🧾 Opcional: Buscar strategy list e verificar se foi inserida
-    const strategyList = await program.account.strategyList.fetch(strategyListPda);
-    console.log("📦 Strategies:", strategyList.strategies);
+  it("Get Strategies", async () => {
+    // Chamada da função de leitura
+    const strategies = await program.methods
+      .getStrategies(contractAddress)
+      .accounts({
+        strategyList: strategyListPda,
+      })
+      .view(); // <- importante: view() para funções que retornam valores
+
+    console.log("📦 Strategies List:", strategies);
+
+    // Verificação básica (ajuste conforme seu cenário)
+    expect(strategies.length).to.be.greaterThan(0);
+    expect(strategies[0]).to.have.all.keys("name", "tokenAddress", "isActive");
   });
 
   it("Update Strategy Status", async () => {
-    const [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from("strategy_list"), botPda.toBuffer()],
       program.programId
     );
@@ -258,9 +278,70 @@ describe("webdex_factory", () => {
       .rpc();
 
     console.log("🔄 Updated Strategy Status TX:", tx);
+  });
 
-    const updatedList = await program.account.strategyList.fetch(strategyListPda);
-    console.log("📦 Updated Strategies:", updatedList.strategies);
+  it("Find Strategy by Token Address", async () => {
+    const foundStrategy = await program.methods
+      .findStrategy(contractAddress, strategyTokenAddress)
+      .accounts({
+        strategyList: strategyListPda,
+      })
+      .view();
+
+    console.log("🔍 Strategy Found:", foundStrategy);
+  });
+
+  it("Create SubAccount", async () => {
+    const name = "Main Account";
+
+    const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("sub_account_list"), botPda.toBuffer(), user.publicKey.toBuffer()],
+      program.programId
+    );
+
+    const [subAccountPda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [Buffer.from("sub_account"), botPda.toBuffer(), user.publicKey.toBuffer(), Buffer.from(name)],
+      program.programId
+    );
+
+    const tx = await program.methods
+      .createSubAccount(name)
+      .accounts({
+        bot: botPda,
+        subAccountList: subAccountListPda,
+        subAccount: subAccountPda,
+        owner: user.publicKey, // É QUEM PAGA E CRIADOR DO BOT
+        user: user.publicKey, // É QUEM CRIA A SUBCONTA
+        systemProgram: SystemProgram.programId,
+      })
+      .rpc();
+
+    console.log("🧾 SubAccount Created TX:", tx);
+
+    const subAccountList = await program.account.subAccountList.fetch(subAccountListPda);
+    const subAccount = await program.account.subAccount.fetch(subAccountPda);
+
+    expect(subAccountList.subAccounts.length).to.be.greaterThan(0);
+    expect(subAccount.name).to.equal(name);
+  });
+
+  it("Delete Strategy", async () => {
+    const strategyList = await program.account.strategyList.fetch(strategyListPda);
+    const tokenAddress = strategyList.strategies[0].tokenAddress;
+
+    const tx = await program.methods
+      .deleteStrategy(contractAddress, tokenAddress)
+      .accounts({
+        bot: botPda,
+        strategyList: strategyListPda,
+        owner: user.publicKey,
+      })
+      .rpc();
+
+    console.log("🗑️ Delete Strategy TX:", tx);
+
+    const updated = await program.account.strategyList.fetch(strategyListPda);
+    console.log("📦 After Delete:", updated.strategies);
   });
 
   it("Remove Coin from Payments", async () => {
@@ -269,6 +350,7 @@ describe("webdex_factory", () => {
       .accounts({
         bot: botPda,
         payments: paymentsPda,
+        owner: user.publicKey,
       })
       .rpc();
 
@@ -283,7 +365,8 @@ describe("webdex_factory", () => {
       .removeBot()
       .accounts({
         bot: botPda,
-        // owner: user.publicKey,
+        owner: user.publicKey,
+        systemProgram: SystemProgram.programId
       })
       .rpc();
 

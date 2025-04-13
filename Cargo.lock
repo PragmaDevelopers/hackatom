@@ -2991,7 +2991,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "webdex_factory"
+name = "webdex"
 version = "0.1.0"
 dependencies = [
  "anchor-attribute-program",
