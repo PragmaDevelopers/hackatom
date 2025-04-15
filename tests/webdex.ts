@@ -22,6 +22,10 @@ describe("webdex", () => {
   let coinToAdd: PublicKey;
   let strategyListPda: PublicKey;
   let strategyTokenAddress: PublicKey;
+  let subAccountListPda: PublicKey;
+  let subAccountPda: PublicKey;
+  let subAccountId: PublicKey;
+  let strategyBalancePda: PublicKey;
   const METADATA_PROGRAM_ID = new PublicKey(
     "metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s" // Metaplex Metadata Program
   );
@@ -44,18 +48,14 @@ describe("webdex", () => {
       program.programId
     );
 
-    const bnToUint8Array32 = (bn: BN): number[] => {
-      return bn.toArray("le", 32);
-    };
-
     const feeTiers = [
       {
-        limit: bnToUint8Array32(new BN(1)),
-        fee: bnToUint8Array32(new BN(100)),
+        limit: new BN(1),
+        fee: new BN(100),
       },
       {
-        limit: bnToUint8Array32(new BN(2)),
-        fee: bnToUint8Array32(new BN(200)),
+        limit: new BN(2),
+        fee: new BN(200),
       },
     ];
 
@@ -294,12 +294,12 @@ describe("webdex", () => {
   it("Create SubAccount", async () => {
     const name = "Main Account";
 
-    const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from("sub_account_list"), botPda.toBuffer(), user.publicKey.toBuffer()],
       program.programId
     );
 
-    const [subAccountPda] = anchor.web3.PublicKey.findProgramAddressSync(
+    [subAccountPda] = anchor.web3.PublicKey.findProgramAddressSync(
       [Buffer.from("sub_account"), botPda.toBuffer(), user.publicKey.toBuffer(), Buffer.from(name)],
       program.programId
     );
@@ -323,6 +323,91 @@ describe("webdex", () => {
 
     expect(subAccountList.subAccounts.length).to.be.greaterThan(0);
     expect(subAccount.name).to.equal(name);
+  });
+
+  it("Get Sub Accounts", async () => {
+    // Chamada da função get_sub_accounts
+    const subAccounts = await program.methods
+      .getSubAccounts(contractAddress)
+      .accounts({
+        subAccountList: subAccountListPda,
+      })
+      .view();
+
+    // ✅ Verificações
+    expect(subAccounts.length).to.be.greaterThan(0);
+
+    const first = subAccounts[0];
+    expect(first).to.have.all.keys("id", "name", "subAccountAddress");
+
+    // Passando o ID para o "Add Liquidity to SubAccount" encontrar a conta
+    subAccountId = first.id;
+
+    console.log("📦 SubAccounts:", subAccounts);
+  });
+
+  it("Add Liquidity to SubAccount", async () => {
+    // Constantes básicas
+    const amount = new BN(1_000_000); // 1 USDT com 6 casas decimais
+    const decimals = 6;
+    const ico = "USDT";
+    const name = "Tether USD";
+
+    [strategyBalancePda] = anchor.web3.PublicKey.findProgramAddressSync(
+      [
+        Buffer.from("strategy_balance"),
+        botPda.toBuffer(),
+        subAccountPda.toBuffer(),
+        strategyTokenAddress.toBuffer(),
+      ],
+      program.programId
+    );
+
+    const tx = await program.methods
+      .addLiquidity(
+        subAccountId.toString(),
+        strategyTokenAddress,
+        coinToAdd,
+        amount,
+        name,
+        ico,
+        decimals
+      )
+      .accounts({
+        bot: botPda,
+        subAccount: subAccountPda,
+        strategyBalance: strategyBalancePda,
+        owner: user.publicKey,
+        user: user.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    console.log("✅ TX Hash:", tx);
+
+    const strategyBalance = await program.account.strategyBalanceList.fetch(strategyBalancePda);
+    const subAccount = await program.account.subAccount.fetch(subAccountPda);
+
+    // ✅ Verificações
+    expect(subAccount.strategies.length).to.be.greaterThan(0);
+    expect(strategyBalance.listCoins.length).to.equal(1);
+    expect(strategyBalance.balance[0].token.toBase58()).to.equal(coinToAdd.toBase58());
+    expect(strategyBalance.balance[0].amount.toNumber()).to.equal(amount.toNumber());
+  });
+
+  it("Get Balance", async () => {
+    const result = await program.methods
+      .getBalance(subAccountId.toString(), strategyTokenAddress, coinToAdd)
+      .accounts({
+        subAccount: subAccountPda,
+        strategyBalance: strategyBalancePda,
+      })
+      .view();
+
+    console.log("BalanceStrategy:", result);
+
+    expect(result.token.toBase58()).to.equal(coinToAdd.toBase58());
+    expect(result.status).to.be.true;
   });
 
   it("Delete Strategy", async () => {

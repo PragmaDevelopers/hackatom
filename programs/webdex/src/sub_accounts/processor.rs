@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::sub_accounts::state::{CreateSubAccount,SubAccountInfo,CreateSubAccountEvent,GetSubAccounts};
+use crate::sub_accounts::state::{CreateSubAccount,CreateSubAccountEvent,GetSubAccounts,SubAccount,SimpleSubAccount,AddLiquidity,BalanceLiquidityEvent,StrategyBalanceList,BalanceStrategy,GetBalance};
 use crate::error::ErrorCode;
 
 pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Result<()> {
@@ -50,8 +50,11 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     sub_account.strategies = Vec::new();
 
     // ✅ Atualiza a lista de subcontas
-    let sub_account_pda = sub_account.key();
-    sub_account_list.sub_accounts.push(sub_account_pda);
+    sub_account_list.sub_accounts.push(SimpleSubAccount {
+        sub_account_address: sub_account.key(),
+        id: sub_account_id.to_string(),
+        name: name.clone(),
+    });
 
     // ✅ Emite o evento
     emit!(CreateSubAccountEvent {
@@ -64,7 +67,128 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     Ok(())
 }
 
-/*pub fn get_sub_accounts(ctx: Context<GetSubAccounts>) -> Result<Vec<SubAccountInfo>> {
-    let sub_account_list = &ctx.accounts.sub_account_list;
-    Ok(sub_account_list.sub_accounts.clone())
-}*/
+pub fn _get_sub_accounts(
+    ctx: Context<GetSubAccounts>,
+    contract_address: Pubkey,
+) -> Result<Vec<SimpleSubAccount>> {
+    let list = &ctx.accounts.sub_account_list;
+
+    // ✅ Validação de segurança
+    if list.contract_address != contract_address {
+        return Err(ErrorCode::InvalidContractAddress.into());
+    }
+
+    // ✅ Converte de SubAccountEntry para SimpleSubAccount (mais leve)
+    let sub_accounts = list
+        .sub_accounts
+        .iter()
+        .map(|entry| SimpleSubAccount {
+            sub_account_address: entry.sub_account_address.clone(),
+            id: entry.id.clone(),
+            name: entry.name.clone(),
+        })
+        .collect();
+
+    Ok(sub_accounts)
+}
+
+pub fn _add_liquidity(
+    ctx: Context<AddLiquidity>,
+    account_id: String,
+    strategy_token: Pubkey,
+    coin: Pubkey,
+    amount: u64,
+    name: String,
+    ico: String,
+    decimals: u8,
+) -> Result<()> {
+    let sub_account = &mut ctx.accounts.sub_account;
+    let strat_balance = &mut ctx.accounts.strategy_balance;
+
+    // ✅ Confirma subconta correta
+    if sub_account.id != account_id {
+        return Err(ErrorCode::InvalidSubAccountId.into());
+    }
+
+    // ✅ Vincula strategy_token se ainda não existe
+    if !sub_account.list_strategies.contains(&strategy_token) {
+        sub_account.list_strategies.push(strategy_token);
+        sub_account.strategies.push(strat_balance.key());
+    }
+
+    // ✅ Verifica se a moeda já está na lista
+    let coin_index = strat_balance
+        .list_coins
+        .iter()
+        .position(|c| *c == coin);
+
+    if let Some(idx) = coin_index {
+        // Coin já existe, incrementa amount
+        strat_balance.balance[idx].amount = strat_balance.balance[idx]
+            .amount
+            .saturating_add(amount);
+    } else {
+        // Nova moeda e novo balance
+        strat_balance.list_coins.push(coin);
+        strat_balance.balance.push(BalanceStrategy {
+            amount,
+            token: coin,
+            decimals,
+            ico,
+            name,
+            status: true,
+            paused: false,
+        });
+    }
+
+    // ✅ Emite o evento
+    emit!(BalanceLiquidityEvent {
+        owner: ctx.accounts.owner.key(),
+        user: ctx.accounts.user.key(),
+        id: account_id,
+        strategy_token,
+        coin,
+        amount,
+        increase: true,
+        is_operation: false,
+    });
+
+    Ok(())
+}
+
+pub fn _get_balance(
+    ctx: Context<GetBalance>,
+    account_id: String,
+    strategy_token: Pubkey,
+    coin: Pubkey,
+) -> Result<BalanceStrategy> {
+    let sub_account = &ctx.accounts.sub_account;
+    let strat_balance = &ctx.accounts.strategy_balance;
+    msg!("Lista de estratégias: {:?}", sub_account.list_strategies);    
+    msg!("Procurando por: {}", strategy_token);
+    // ✅ Verifica se o SubAccount pertence ao contrato
+    if sub_account.id != account_id {
+        return Err(ErrorCode::InvalidSubAccountId.into());
+    }
+
+    // ✅ Verifica se a strategy está registrada
+    if !sub_account.list_strategies.contains(&strategy_token) {
+        return Err(ErrorCode::StrategyNotLinked.into());
+    }
+
+    // ✅ Confirma que strategy_token é o correto
+    if strat_balance.strategy_token != strategy_token || !strat_balance.status {
+        return Err(ErrorCode::StrategyNotLinked.into());
+    }
+
+    // ✅ Busca coin dentro do strategy balance
+    let coin_index = strat_balance
+        .list_coins
+        .iter()
+        .position(|c| *c == coin)
+        .ok_or(ErrorCode::CoinNotLinked)?;
+
+    let balance = strat_balance.balance[coin_index].clone();
+
+    Ok(balance)
+}

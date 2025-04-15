@@ -4,8 +4,8 @@ use crate::factory::state::*;
 
 #[derive(AnchorSerialize, AnchorDeserialize, Serialize, Deserialize, Clone, Default)]
 pub struct FeeTier {
-    pub limit: [u8; 32],   // 32 bytes
-    pub fee: [u8; 32],     // 32 bytes
+    pub limit: u64,
+    pub fee: u64,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
@@ -24,18 +24,18 @@ pub struct CoinData {
 
 #[account]
 pub struct Payments {
-    pub contract_address: Pubkey,            // 32 bytes
-    pub fee_tiers: Vec<FeeTier>,             // 4 (len) + N * FeeTier
-    pub coins: Vec<CoinData>,         // 4 (len) + N * (32 + Coins)
+    pub contract_address: Pubkey,     
+    pub fee_tiers: Vec<FeeTier>,          
+    pub coins: Vec<CoinData>,        
 }
 
 pub const MAX_FEE_TIERS: usize = 10;
 pub const MAX_COINS: usize = 10;
 
 impl Payments {
-    pub const INIT_SPACE: usize = 8 // Anchor discriminator
-        + 32 // contract_address
-        + 4 + MAX_FEE_TIERS * 64 // fee_tiers
+    pub const INIT_SPACE: usize = 8  // discriminator
+        + 32                         // contract_address
+        + 4 + MAX_FEE_TIERS * 64     // Vec<FeeTier>: 4 + n * 64
         + 4 + MAX_COINS * (32 + 52); // coins (Pubkey + Coins)
 }
 

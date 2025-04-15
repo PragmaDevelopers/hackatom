@@ -3,9 +3,9 @@ use crate::factory::state::*;
 
 #[account]
 pub struct BalanceStrategy {
-    pub amount: [u8; 32],
+    pub amount: u64,
     pub token: Pubkey,
-    pub decimals: [u8; 32],
+    pub decimals: u8,
     pub ico: String,
     pub name: String,
     pub status: bool,
@@ -13,16 +13,14 @@ pub struct BalanceStrategy {
 }
 
 impl BalanceStrategy {
-    pub const MAX_ICO_LEN: usize = 64; // Defina o comprimento máximo esperado para 'ico'
-    pub const MAX_NAME_LEN: usize = 64; // Defina o comprimento máximo esperado para 'name'
-
-    pub const SPACE: usize = 32 // amount
-        + 32 // token
-        + 32 // decimals
-        + 4 + Self::MAX_ICO_LEN // ico
-        + 4 + Self::MAX_NAME_LEN // name
-        + 1 // status
-        + 1; // paused
+    pub const SPACE: usize = 8    // amount: u64
+        + 32                      // token
+        + 1                       // decimals
+        + 4 + 64                  // ico string
+        + 4 + 64                  // name string
+        + 1                       // status
+        + 1;                      // paused
+    // TOTAL: 175 bytes
 }
 
 #[account]
@@ -61,24 +59,32 @@ impl SubAccount {
         + 4 + (Self::MAX_STRATEGIES * 32); // strategy_refs
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
+pub struct SimpleSubAccount {
+    pub sub_account_address: Pubkey,
+    pub id: String,
+    pub name: String,
+}
+
 #[account]
 pub struct SubAccountList {
     pub contract_address: Pubkey,
-    pub sub_accounts: Vec<Pubkey>,
+    pub sub_accounts: Vec<SimpleSubAccount>,
 }
 
 impl SubAccountList {
-    pub const MAX_SUB_ACCOUNTS: usize = 50;
+    pub const MAX_SUBACCOUNTS: usize = 50;
+    pub const MAX_ID_LEN: usize = 64;
+    pub const MAX_NAME_LEN: usize = 64;
 
-    pub const SPACE: usize = 8 // discriminador
+    pub const SPACE: usize = 8 // discriminator
         + 32 // contract_address
-        + 4 + (Self::MAX_SUB_ACCOUNTS * 32); // 32 bytes por Pubkey
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct SubAccountInfo {
-    pub name: String,
-    pub id: String,
+        + 4 // len of vec
+        + Self::MAX_SUBACCOUNTS * (
+            32 // key
+            + 4 + Self::MAX_ID_LEN // id (String)
+            + 4 + Self::MAX_NAME_LEN // name (String)
+        );
 }
 
 // USADO SOMENTE NO WEBDEX/MANAGER
@@ -136,15 +142,41 @@ pub struct GetSubAccounts<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(account_id: String)]
-pub struct GetBalance<'info> {
+#[instruction(account_id: String, strategy_token: Pubkey)]
+pub struct AddLiquidity<'info> {
+    #[account(mut, has_one = owner)]
+    pub bot: Account<'info, Bot>,
+
     #[account(mut)]
-    pub user: Signer<'info>,
+    pub sub_account: Account<'info, SubAccount>,
+
     #[account(
-        seeds = [b"sub_account_list", user.key().as_ref(), account_id.as_bytes()],
-        bump,
+        init_if_needed,
+        payer = owner,
+        space = StrategyBalanceList::SPACE,
+        seeds = [
+            b"strategy_balance",
+            bot.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
     )]
-    pub sub_account_list: Account<'info, SubAccountList>,
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
+
+    /// CHECK: Usuário da subconta
+    pub user: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct GetBalance<'info> {
+    pub sub_account: Account<'info, SubAccount>,
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
 }
 
 #[event]
@@ -153,4 +185,16 @@ pub struct CreateSubAccountEvent {
     pub user: Pubkey,
     pub id: String,
     pub name: String,
+}
+
+#[event]
+pub struct BalanceLiquidityEvent {
+    pub owner: Pubkey,
+    pub user: Pubkey,
+    pub id: String,
+    pub strategy_token: Pubkey,
+    pub coin: Pubkey,
+    pub amount: u64,
+    pub increase: bool,
+    pub is_operation: bool,
 }
