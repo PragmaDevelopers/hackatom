@@ -129,6 +129,8 @@ pub fn _add_liquidity(
             .saturating_add(amount);
     } else {
         // Nova moeda e novo balance
+        strat_balance.strategy_token = strategy_token;
+        strat_balance.status = true;
         strat_balance.list_coins.push(coin);
         strat_balance.balance.push(BalanceStrategy {
             amount,
@@ -164,8 +166,7 @@ pub fn _get_balance(
 ) -> Result<BalanceStrategy> {
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &ctx.accounts.strategy_balance;
-    msg!("Lista de estratégias: {:?}", sub_account.list_strategies);    
-    msg!("Procurando por: {}", strategy_token);
+    
     // ✅ Verifica se o SubAccount pertence ao contrato
     if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountId.into());
