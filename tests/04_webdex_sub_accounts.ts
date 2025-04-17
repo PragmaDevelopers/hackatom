@@ -154,4 +154,19 @@ describe("webdex_sub_accounts", () => {
 
     console.log("BalanceStrategy:", result);  // Imprimindo o resultado do teste para depuração
   });
+
+  it("Get Sub Account Strategies", async () => {
+    const result = await subAccountsProgram.methods
+      .getSubAccountStrategies(subAccountId.toString())
+      .accounts({
+        subAccount: subAccountPda,
+      })
+      .view();
+
+    console.log("🔗 Estratégias vinculadas à subconta:", result);
+
+    // Valida retorno
+    expect(Array.isArray(result)).to.be.true;
+    expect(result.every((key) => key instanceof anchor.web3.PublicKey)).to.be.true;
+  });
 });
