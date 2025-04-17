@@ -6,13 +6,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-webdex = "8u8f1q3R3GUBsq7nD2tMRHQABQVZGzMkUypw6FKrYcnJ"
+webdex_factory = "AZpLbd9HonogrHXnLqy4YSkc2Zf6BvTv1Qpn4jZrpXfM"
+webdex_payments = "AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1"
+webdex_strategy = "BW8NiUW7jpcKmwFtBLVdgBwxNA4QR5CydPbKWb5oSkna"
+webdex_sub_accounts = "9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

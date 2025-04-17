@@ -1,6 +1,13 @@
 [workspace]
 members = [
-    "programs/webdex",
+    "programs/webdex_factory",
+    "programs/webdex_payments",
+    "programs/webdex_strategy",
+    "programs/webdex_sub_accounts",
+    "shared/factory",
+    "shared/payments",
+    "shared/strategy",
+    "shared/sub_accounts",
 ]
 resolver = "2"
 
