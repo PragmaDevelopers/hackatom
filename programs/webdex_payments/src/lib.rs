@@ -11,7 +11,6 @@ use crate::state::*;
 use crate::processor::*;
 
 use shared_payments::state::*;
-use shared_payments::ID as PAYMENTS_ID;
 
 declare_id!("AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1");
 

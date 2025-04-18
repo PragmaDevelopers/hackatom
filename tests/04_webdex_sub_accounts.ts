@@ -18,6 +18,7 @@ describe("webdex_sub_accounts", () => {
   let subAccountPda: PublicKey;
   let subAccountId: PublicKey;
   let strategyBalancePda: PublicKey;
+  let isPausedCoin: Boolean;
 
   it("Create SubAccount", async () => {
     const name = "Main Account";
@@ -73,13 +74,14 @@ describe("webdex_sub_accounts", () => {
 
     // Passando o ID para o "Add Liquidity to SubAccount" encontrar a conta
     subAccountId = first.id;
+    sharedState.subAccountId = subAccountId;
 
     console.log("📦 SubAccounts:", subAccounts);
   });
 
   it("Add Liquidity to SubAccount", async () => {
     // Constantes básicas
-    const amount = new BN(1_000_000); // 1 USDT com 6 casas decimais
+    const amount = new BN(10_000_000); // 10 USDT com 6 casas decimais
     const decimals = 6;
     const ico = "USDT";
     const name = "Tether USD";
@@ -137,22 +139,14 @@ describe("webdex_sub_accounts", () => {
       })
       .view();
 
+    isPausedCoin = result.paused;
+
+    result.amount = result.amount.toNumber() // Convertendo BN pra Number
+
     console.log("BalanceStrategy:", result);
 
     expect(result.token.toBase58()).to.equal(sharedState.coinToAdd.toBase58());
     expect(result.status).to.be.true;
-  });
-
-  it("Get Balances", async () => {
-    const result = await subAccountsProgram.methods
-      .getBalances(subAccountId.toString(), sharedState.strategyTokenAddress)
-      .accounts({
-        subAccount: subAccountPda,
-        strategyBalance: strategyBalancePda,
-      })
-      .view();  // Indicando que é uma chamada "view" (sem transação)
-
-    console.log("BalanceStrategy:", result);  // Imprimindo o resultado do teste para depuração
   });
 
   it("Get Sub Account Strategies", async () => {
@@ -168,5 +162,112 @@ describe("webdex_sub_accounts", () => {
     // Valida retorno
     expect(Array.isArray(result)).to.be.true;
     expect(result.every((key) => key instanceof anchor.web3.PublicKey)).to.be.true;
+  });
+
+  it("Toggle Pause", async () => {
+    const tx = await subAccountsProgram.methods
+      .togglePause(
+        subAccountId.toString(),
+        sharedState.strategyTokenAddress,
+        sharedState.coinToAdd,
+        !isPausedCoin
+      )
+      .accounts({
+        bot: sharedState.botPda,
+        subAccount: sharedState.subAccountPda,
+        strategyBalance: sharedState.strategyBalancePda,
+        owner: user.publicKey,
+        user: user.publicKey,
+        contractAddress: sharedState.contractAddress,
+      })
+      .rpc();
+
+    console.log("🔁 Toggle Pause TX:", tx);
+  });
+
+  it("Remove Liquidity", async () => {
+    const amountToRemove = new anchor.BN(5_000_000);
+
+    const tx = await subAccountsProgram.methods
+      .removeLiquidity(
+        subAccountId.toString(),
+        sharedState.strategyTokenAddress,
+        sharedState.coinToAdd,
+        amountToRemove,
+      )
+      .accounts({
+        bot: sharedState.botPda,
+        subAccount: sharedState.subAccountPda,
+        strategyBalance: sharedState.strategyBalancePda,
+        owner: user.publicKey,
+        user: user.publicKey,
+        contractAddress: sharedState.contractAddress,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    console.log("💸 Liquidez removida. TX:", tx);
+  });
+
+  it("Get Balances", async () => {
+    const result = await subAccountsProgram.methods
+      .getBalances(subAccountId.toString(), sharedState.strategyTokenAddress)
+      .accounts({
+        subAccount: subAccountPda,
+        strategyBalance: strategyBalancePda,
+      })
+      .view();  // Indicando que é uma chamada "view" (sem transação)
+
+    result[0].amount = result[0].amount.toNumber()
+
+    console.log("BalanceStrategy:", result);  // Imprimindo o resultado do teste para depuração
+  });
+
+  it("Position Liquidity (+Add and -Remove)", async () => {
+    const deltaAmount = new anchor.BN(5_000_000); // ou 5000 para aumentar
+    // const deltaAmount = new anchor.BN(-5_000_000); // ou -5000 para reduzir
+
+    const tx = await subAccountsProgram.methods
+      .positionLiquidity(
+        subAccountId.toString(),
+        sharedState.strategyTokenAddress,
+        sharedState.coinToAdd,
+        deltaAmount
+      )
+      .accounts({
+        bot: sharedState.botPda,
+        payments: sharedState.paymentsPda,
+        subAccount: sharedState.subAccountPda,
+        strategyBalance: sharedState.strategyBalancePda,
+        owner: user.publicKey,
+        user: user.publicKey,
+        contractAddress: sharedState.contractAddress,
+      })
+      .rpc();
+
+    console.log("⚙️ TX Position:", tx);
+
+    const updated = await subAccountsProgram.account.strategyBalanceList.fetch(
+      sharedState.strategyBalancePda
+    );
+
+    const newAmount = updated.balance[0].amount;
+    console.log("⬆️ Novo saldo:", newAmount.toNumber());
+  });
+
+  it("Find Sub Account Index By Id", async () => {
+    // Chamada da função get_sub_accounts
+    const subAccountsIndex = await subAccountsProgram.methods
+      .findSubAccountIndexById(sharedState.contractAddress, subAccountId.toString())
+      .accounts({
+        subAccountList: subAccountListPda,
+      })
+      .view();
+
+    // Passando o ID para o "Add Liquidity to SubAccount" encontrar a conta
+    subAccountId = subAccountsIndex.id;
+    sharedState.subAccountId = subAccountId;
+
+    console.log("📦 SubAccounts:", subAccountsIndex);
   });
 });

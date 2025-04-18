@@ -8,7 +8,7 @@ pub enum ErrorCode {
     BotNotFound,
     #[msg("Bot already registered")]
     BotAlreadyRegistered,
-    #[msg("A moeda especificada não foi encontrada.")]
+    #[msg("Coin not found")]
     CoinNotFound,
     #[msg("Strategy not found")]
     StrategyNotFound,

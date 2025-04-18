@@ -8,8 +8,6 @@ pub enum ErrorCode {
     BotNotFound,
     #[msg("Bot already registered")]
     BotAlreadyRegistered,
-    #[msg("A moeda especificada não foi encontrada.")]
-    CoinNotFound,
     #[msg("Strategy not found")]
     StrategyNotFound,
     #[msg("Coin already exists")]
@@ -33,5 +31,17 @@ pub enum ErrorCode {
     #[msg("Strategy Balance Not Found")]
     StrategyBalanceNotFound,
     #[msg("Coin Not Linked")]
-    CoinNotLinked
+    CoinNotLinked,
+    #[msg("Liquidity must be paused before removal")]
+    MustPauseBeforeWithdraw,
+    #[msg("Coin not found")]
+    CoinNotFound,
+    #[msg("Coin not linked to strategy")]
+    CoinNotLinkedToStrategy,
+    #[msg("The paused state must be different")]
+    PauseStateUnchanged,
+    #[msg("Only the registered Payments program can call this")]
+    UnauthorizedPaymentsCaller,
+    #[msg("Insufficient funds to subtract")]
+    InsufficientFunds,
 }

@@ -10,7 +10,6 @@ use crate::state::*;
 use crate::processor::*;
 
 use shared_factory::state::*;
-use shared_factory::ID as FACTORY_ID;
 
 declare_id!("AZpLbd9HonogrHXnLqy4YSkc2Zf6BvTv1Qpn4jZrpXfM");
 

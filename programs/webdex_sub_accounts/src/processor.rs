@@ -11,8 +11,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     let owner = &ctx.accounts.owner;
     let user = &ctx.accounts.user;
 
-    // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != owner.key() {
+    if bot.contract_address != ctx.accounts.contract_address.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
@@ -94,6 +93,27 @@ pub fn _get_sub_accounts(
     Ok(sub_accounts)
 }
 
+pub fn _find_sub_account_index_by_id(
+    ctx: Context<FindSubAccountIndex>,
+    contract_address: Pubkey,
+    account_id: String,
+) -> Result<i64> {
+    let list = &ctx.accounts.sub_account_list;
+
+    // ✅ Validação de segurança
+    if list.contract_address != contract_address {
+        return Err(ErrorCode::InvalidContractAddress.into());
+    }
+
+    for (i, entry) in list.sub_accounts.iter().enumerate() {
+        if entry.id == account_id {
+            return Ok(i as i64);
+        }
+    }
+
+    Ok(-1)
+}
+
 pub fn _add_liquidity(
     ctx: Context<AddLiquidity>,
     account_id: String,
@@ -106,6 +126,10 @@ pub fn _add_liquidity(
 ) -> Result<()> {
     let sub_account = &mut ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
+
+    if ctx.accounts.bot.contract_address != ctx.accounts.contract_address.key() {
+        return Err(ErrorCode::Unauthorized.into());
+    }
 
     // ✅ Confirma subconta correta
     if sub_account.id != account_id {
@@ -231,4 +255,170 @@ pub fn _get_sub_account_strategies(
 
     // ✅ Retorna a lista de estratégias vinculadas
     Ok(sub_account.list_strategies.clone())
+}
+
+pub fn _remove_liquidity(
+    ctx: Context<RemoveLiquidity>,
+    account_id: String,
+    strategy_token: Pubkey,
+    coin: Pubkey,
+    amount: u64,
+) -> Result<()> {
+    let sub_account = &ctx.accounts.sub_account;
+    let strat_balance = &mut ctx.accounts.strategy_balance;
+
+    if ctx.accounts.bot.contract_address != ctx.accounts.contract_address.key() {
+        return Err(ErrorCode::Unauthorized.into());
+    }
+
+    // ✅ Confirma subconta correta
+    if sub_account.id != account_id {
+        return Err(ErrorCode::InvalidSubAccountId.into());
+    }
+
+    // ✅ Confirma que a moeda existe na lista
+    let coin_index = strat_balance
+        .balance
+        .iter()
+        .position(|b| b.token == coin);
+
+    let idx = coin_index.ok_or(ErrorCode::CoinNotFound)?;
+
+    let balance_entry = &mut strat_balance.balance[idx];
+
+    // ✅ Confirma que está pausado
+    if !balance_entry.paused {
+        return Err(ErrorCode::MustPauseBeforeWithdraw.into());
+    }
+
+    // ✅ Confirma saldo suficiente
+    if balance_entry.amount < amount {
+        return Err(ErrorCode::InsufficientFunds.into());
+    }
+
+    // ✅ Atualiza o saldo
+    balance_entry.amount = balance_entry.amount.saturating_sub(amount);
+
+    // ✅ Emite evento de saída
+    emit!(BalanceLiquidityEvent {
+        owner: ctx.accounts.owner.key(),
+        user: ctx.accounts.user.key(),
+        id: account_id,
+        strategy_token,
+        coin,
+        amount,
+        increase: false,
+        is_operation: false,
+    });
+
+    Ok(())
+}
+
+pub fn _toggle_pause(
+    ctx: Context<TogglePause>,
+    account_id: String,
+    strategy_token: Pubkey,
+    coin: Pubkey,
+    paused: bool,
+) -> Result<()> {
+    let sub_account = &ctx.accounts.sub_account;
+    let strat_balance = &mut ctx.accounts.strategy_balance;
+
+    if ctx.accounts.bot.contract_address != ctx.accounts.contract_address.key() {
+        return Err(ErrorCode::Unauthorized.into());
+    }
+
+    if sub_account.id != account_id {
+        return Err(ErrorCode::InvalidSubAccountId.into());
+    }
+
+    let coin_index = strat_balance
+        .balance
+        .iter()
+        .position(|b| b.token == coin);
+
+    let idx = coin_index.ok_or(ErrorCode::CoinNotFound)?;
+
+    let balance_entry = &mut strat_balance.balance[idx];
+
+    if !balance_entry.status {
+        return Err(ErrorCode::CoinNotLinkedToStrategy.into());
+    }
+
+    if balance_entry.paused == paused {
+        return Err(ErrorCode::PauseStateUnchanged.into());
+    }
+
+    balance_entry.paused = paused;
+
+    emit!(ChangePausedEvent {
+        owner: ctx.accounts.owner.key(),
+        user: ctx.accounts.user.key(),
+        id: account_id,
+        strategy_token,
+        coin,
+        paused,
+    });
+
+    Ok(())
+}
+
+pub fn _position_liquidity(
+    ctx: Context<PositionLiquidity>,
+    account_id: String,
+    strategy_token: Pubkey,
+    coin: Pubkey,
+    amount: i64, // pode ser positivo ou negativo
+) -> Result<u64> {
+    // ✅ Garante que quem chamou foi o programa de pagamentos
+    if ctx.accounts.payments.key() == ctx.accounts.bot.payments_address {
+        return Err(ErrorCode::UnauthorizedPaymentsCaller.into());
+    }
+
+    let sub_account = &ctx.accounts.sub_account;
+    if sub_account.id != account_id {
+        return Err(ErrorCode::InvalidSubAccountId.into());
+    }
+
+    let strat_balance = &mut ctx.accounts.strategy_balance;
+
+    let idx = strat_balance
+        .balance
+        .iter()
+        .position(|b| b.token == coin)
+        .ok_or(ErrorCode::CoinNotFound)?;
+
+    let entry = &mut strat_balance.balance[idx];
+
+    if !entry.status {
+        return Err(ErrorCode::CoinNotLinkedToStrategy.into());
+    }
+
+    let old_balance = entry.amount;
+
+    // ✅ Aplica a operação
+    let new_balance = if amount >= 0 {
+        entry.amount.saturating_add(amount as u64)
+    } else {
+        let sub = amount.unsigned_abs();
+        if entry.amount < sub {
+            return Err(ErrorCode::InsufficientFunds.into());
+        }
+        entry.amount.saturating_sub(sub)
+    };
+
+    entry.amount = new_balance;
+
+    emit!(BalanceLiquidityEvent {
+        owner: ctx.accounts.owner.key(),
+        user: ctx.accounts.user.key(),
+        id: account_id,
+        strategy_token,
+        coin,
+        amount: amount.unsigned_abs(),
+        increase: amount >= 0,
+        is_operation: true,
+    });
+
+    Ok(old_balance)
 }

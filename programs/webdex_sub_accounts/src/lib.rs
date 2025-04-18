@@ -9,7 +9,6 @@ use crate::processor::*;
 use crate::state::*;
 
 use shared_sub_accounts::state::*;
-use shared_sub_accounts::ID as SUB_ACCOUNTS_ID;
 
 declare_id!("9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL");
 
@@ -27,6 +26,14 @@ pub mod webdex_sub_accounts {
         contract_address: Pubkey,
     ) -> Result<Vec<SimpleSubAccount>> {
         _get_sub_accounts(ctx, contract_address)
+    }
+
+    pub fn find_sub_account_index_by_id(
+        ctx: Context<FindSubAccountIndex>,
+        contract_address: Pubkey,
+        account_id: String,
+    ) -> Result<i64> {
+        _find_sub_account_index_by_id(ctx,contract_address,account_id)
     }
 
     pub fn add_liquidity(
@@ -64,5 +71,35 @@ pub mod webdex_sub_accounts {
         account_id: String,
     ) -> Result<Vec<Pubkey>> {
         _get_sub_account_strategies(ctx,account_id)
+    }
+
+    pub fn remove_liquidity(
+        ctx: Context<RemoveLiquidity>,
+        account_id: String,
+        strategy_token: Pubkey,
+        coin: Pubkey,
+        amount: u64,
+    ) -> Result<()> {
+        _remove_liquidity(ctx,account_id,strategy_token,coin,amount)
+    }
+
+    pub fn toggle_pause(
+        ctx: Context<TogglePause>,
+        account_id: String,
+        strategy_token: Pubkey,
+        coin: Pubkey,
+        paused: bool,
+    ) -> Result<()> {
+        _toggle_pause(ctx,account_id,strategy_token,coin,paused)
+    }
+
+    pub fn position_liquidity(
+        ctx: Context<PositionLiquidity>,
+        account_id: String,
+        strategy_token: Pubkey,
+        coin: Pubkey,
+        amount: i64, // pode ser positivo ou negativo
+    ) -> Result<u64> {
+        _position_liquidity(ctx,account_id,strategy_token,coin,amount)
     }
 }

@@ -120,3 +120,13 @@ pub struct BalanceLiquidityEvent {
     pub increase: bool,
     pub is_operation: bool,
 }
+
+#[event]
+pub struct ChangePausedEvent {
+    pub owner: Pubkey,
+    pub user: Pubkey,
+    pub id: String,
+    pub strategy_token: Pubkey,
+    pub coin: Pubkey,
+    pub paused: bool,
+}

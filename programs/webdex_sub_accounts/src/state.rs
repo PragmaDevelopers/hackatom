@@ -51,6 +51,11 @@ pub struct GetSubAccounts<'info> {
 }
 
 #[derive(Accounts)]
+pub struct FindSubAccountIndex<'info> {
+    pub sub_account_list: Account<'info, SubAccountList>,
+}
+
+#[derive(Accounts)]
 #[instruction(account_id: String, strategy_token: Pubkey)]
 pub struct AddLiquidity<'info> {
     #[account(
@@ -105,4 +110,111 @@ pub struct GetBalances<'info> {
 #[derive(Accounts)]
 pub struct GetSubAccountStrategies<'info> {
     pub sub_account: Account<'info, SubAccount>,
+}
+
+#[derive(Accounts)]
+#[instruction(account_id: String, strategy_token: Pubkey)]
+pub struct RemoveLiquidity<'info> {
+    #[account(
+        seeds = [b"bot", contract_address.key().as_ref()],
+        bump,
+        seeds::program = FACTORY_ID,
+        has_one = owner
+    )]
+    pub bot: Account<'info, Bot>,
+
+    #[account(mut)]
+    pub sub_account: Account<'info, SubAccount>,
+
+    #[account(
+        mut,
+        seeds = [
+            b"strategy_balance",
+            bot.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
+
+    /// CHECK: Usuário vinculado à subconta
+    pub user: AccountInfo<'info>,
+
+    /// CHECK: Apenas usada para seed do bot
+    pub contract_address: AccountInfo<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(account_id: String, strategy_token: Pubkey)]
+pub struct TogglePause<'info> {
+    #[account(
+        seeds = [b"bot", contract_address.key().as_ref()],
+        bump,
+        seeds::program = FACTORY_ID,
+        has_one = owner
+    )]
+    pub bot: Account<'info, Bot>,
+
+    pub sub_account: Account<'info, SubAccount>,
+
+    #[account(
+        mut,
+        seeds = [
+            b"strategy_balance",
+            bot.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
+
+    /// CHECK: usuário vinculado à subconta
+    pub user: AccountInfo<'info>,
+
+    /// CHECK: só para seed
+    pub contract_address: AccountInfo<'info>,
+}
+
+#[derive(Accounts)]
+#[instruction(account_id: String, strategy_token: Pubkey)]
+pub struct PositionLiquidity<'info> {
+    #[account(
+        seeds = [b"bot", contract_address.key().as_ref()],
+        bump,
+        seeds::program = FACTORY_ID,
+    )]
+    pub bot: Account<'info, Bot>,
+
+    pub sub_account: Account<'info, SubAccount>,
+
+    #[account(
+        mut,
+        seeds = [
+            b"strategy_balance",
+            bot.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+
+    #[account(mut)]
+    pub owner: Signer<'info>,
+    /// CHECK: Usuário da subconta
+    pub user: AccountInfo<'info>,
+    /// CHECK: usado para seed
+    pub contract_address: AccountInfo<'info>,
+    /// CHECK
+    pub payments: AccountInfo<'info>,
 }
