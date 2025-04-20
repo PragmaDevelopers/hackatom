@@ -3,8 +3,6 @@ use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
 
-use shared_payments::state::*;
-
 pub fn _add_fee_tiers(
     ctx: Context<AddFeeTiers>,
     contract_address: Pubkey,
@@ -48,10 +46,10 @@ pub fn _add_coin(
     }
 
     let new_coin = Coins {
-        name,
-        symbol,
+        name: format!("LP {}", name),
+        symbol: format!("LP{}", symbol),
         decimals,
-        status: false, // começa como desativado
+        status: true,
     };
 
     payments.coins.push(CoinData {
@@ -68,12 +66,12 @@ pub fn _revoke_or_allow_currency(ctx: Context<RevokeOrAllowCurrency>, coin: Pubk
     let payments = &mut ctx.accounts.payments;
 
     // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.owner.key() {
+    if bot.owner != ctx.accounts.signer.key() && bot.manager_address != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
     // Verifica se o bot está registrado
-    if bot.contract_address != payments.contract_address {
+    if bot.manager_address != payments.contract_address {
         return Err(ErrorCode::BotNotFound.into());
     }
 

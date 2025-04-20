@@ -6,20 +6,10 @@ pub enum ErrorCode {
     InvalidContractAddress,
     #[msg("Bot not found")]
     BotNotFound,
-    #[msg("Bot already registered")]
-    BotAlreadyRegistered,
-    #[msg("Strategy not found")]
-    StrategyNotFound,
-    #[msg("You must the WebDexPayments")]
-    YouMustTheWebDexPayments,
-    #[msg("Max strategies reached")]
-    MaxStrategiesReached,
     #[msg("Unauthorized")]
     Unauthorized,
     #[msg("Você não tem permissão para acessar esta subconta.")]
     UnauthorizedSubAccount,
-    #[msg("SubAccount not found")]
-    SubAccountNotFound,
     #[msg("Account not linked to currency")]
     AccountNotLinkedToCurrency,
     #[msg("Max Sub Accounts Reached")]
@@ -34,8 +24,6 @@ pub enum ErrorCode {
     CoinNotLinked,
     #[msg("Liquidity must be paused before removal")]
     MustPauseBeforeWithdraw,
-    #[msg("Coin not found")]
-    CoinNotFound,
     #[msg("Coin not linked to strategy")]
     CoinNotLinkedToStrategy,
     #[msg("The paused state must be different")]
@@ -44,4 +32,16 @@ pub enum ErrorCode {
     UnauthorizedPaymentsCaller,
     #[msg("Insufficient funds to subtract")]
     InsufficientFunds,
+    #[msg("Unregistered Manager")]
+    UnregisteredManager,
+    #[msg("Unregistered User")]
+    UnregisteredUser,
+    #[msg("Insufficient Gas Balance")]
+    InsufficientGasBalance,
+    #[msg("Invalid Amount")]
+    InvalidAmount,
+    #[msg("Insufficient Pass Balance")]
+    InsufficientPassBalance,
+    #[msg("You must the WebDexPayments")]
+    YouMustTheWebDexPayments,
 }

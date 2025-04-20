@@ -2,8 +2,6 @@ use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
 
-use shared_factory::state::*;
-
 pub fn _add_bot(
     ctx: Context<AddBot>,
     name: String,
@@ -18,14 +16,14 @@ pub fn _add_bot(
     let bot = &mut ctx.accounts.bot;
 
     // ⚠️ Evita sobrescrever bot já existente
-    if bot.contract_address != Pubkey::default() {
+    if bot.manager_address != Pubkey::default() {
         return Err(ErrorCode::BotAlreadyRegistered.into());
     }
 
     bot.name = name;
     bot.prefix = prefix;
     bot.owner = owner;
-    bot.contract_address = contract_address;
+    bot.manager_address = contract_address;
     bot.strategy_address = strategy_address;
     bot.sub_account_address = sub_account_address;
     bot.payments_address = payments_address;
@@ -43,7 +41,7 @@ pub fn _add_bot(
 pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Result<BotInfo> {
     let bot = &ctx.accounts.bot;
 
-    if bot.contract_address != contract_address {
+    if bot.manager_address != contract_address {
         return Err(ErrorCode::InvalidContractAddress.into());
     }
 
@@ -51,7 +49,7 @@ pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Resu
         name: bot.name.clone(),
         prefix: bot.prefix.clone(),
         owner: bot.owner,
-        contract_address: bot.contract_address,
+        manager_address: bot.manager_address,
         strategy_address: bot.strategy_address,
         sub_account_address: bot.sub_account_address,
         payments_address: bot.payments_address,
@@ -68,7 +66,7 @@ pub fn _update_bot(
     let bot = &mut ctx.accounts.bot;
 
     // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.owner.key() {
+    if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
     
@@ -96,11 +94,11 @@ pub fn _remove_bot(ctx: Context<RemoveBot>) -> Result<()> {
     let bot_pubkey = ctx.accounts.bot.key();
     let bot = &mut ctx.accounts.bot;
 
-    if bot.owner != ctx.accounts.owner.key() {
+    if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
-    if bot.contract_address == Pubkey::default() {
+    if bot.manager_address == Pubkey::default() {
         return Err(ErrorCode::BotNotFound.into());
     }
 

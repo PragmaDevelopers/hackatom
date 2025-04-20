@@ -1,32 +1,24 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
-
-use shared_sub_accounts::state::*;
+use anchor_spl::token::{Transfer, MintTo, Burn, Token, TokenAccount, Mint, transfer, mint_to, burn};
 
 pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Result<()> {
-    let bot = &ctx.accounts.bot;
     let sub_account_list = &mut ctx.accounts.sub_account_list;
     let sub_account = &mut ctx.accounts.sub_account;
-    let owner = &ctx.accounts.owner;
+    let signer = &ctx.accounts.signer;
     let user = &ctx.accounts.user;
 
-    if bot.contract_address != ctx.accounts.contract_address.key() {
-        return Err(ErrorCode::Unauthorized.into());
+    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
+       return Err(ErrorCode::Unauthorized.into());
     }
 
     // ✅ Garante que o contrato da lista pertence ao mesmo bot
     if sub_account_list.contract_address == Pubkey::default() {
-        sub_account_list.contract_address = bot.contract_address;
-    } else if sub_account_list.contract_address != bot.contract_address {
-        return Err(ErrorCode::InvalidContractAddress.into());
+        sub_account_list.contract_address = signer.key();
     }
 
-    // ✅ Limite máximo de subcontas
     let sub_account_count = sub_account_list.sub_accounts.len();
-    if sub_account_count >= 50 {
-        return Err(ErrorCode::MaxSubAccountsReached.into());
-    }
 
     // ✅ Converte para u8 com verificação segura
     let index_byte = u8::try_from(sub_account_count)
@@ -36,7 +28,6 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     let (sub_account_id, _bump) = Pubkey::find_program_address(
         &[
             b"sub_account_id",
-            bot.key().as_ref(),
             user.key().as_ref(),
             name.as_bytes(),
             &[index_byte],
@@ -59,7 +50,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
 
     // ✅ Emite o evento
     emit!(CreateSubAccountEvent {
-        owner: owner.key(),
+        signer: signer.key(),
         user: user.key(),
         id: sub_account_id.to_string(),
         name,
@@ -123,38 +114,50 @@ pub fn _add_liquidity(
     name: String,
     ico: String,
     decimals: u8,
+    sub_account_name: String,
 ) -> Result<()> {
     let sub_account = &mut ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
+    let signer = &ctx.accounts.signer;
+    let token_program = &ctx.accounts.token_program;
+    let vault_account = &ctx.accounts.vault_account;
 
-    if ctx.accounts.bot.contract_address != ctx.accounts.contract_address.key() {
+    // Verificação de permissão
+    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
-    // ✅ Confirma subconta correta
+    // Confirma subconta correta
     if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
-    // ✅ Vincula strategy_token se ainda não existe
+    // Vincula strategy_token se ainda não existe
     if !sub_account.list_strategies.contains(&strategy_token) {
         sub_account.list_strategies.push(strategy_token);
         sub_account.strategies.push(strat_balance.key());
     }
 
-    // ✅ Verifica se a moeda já está na lista
+    // Transferência de token do usuário para a vault (subconta)
+    let transfer_accounts = Transfer {
+        from: ctx.accounts.signer.to_account_info(),
+        to: vault_account.to_account_info(),
+        authority: ctx.accounts.signer.to_account_info(),
+    };
+    let cpi_transfer_ctx = CpiContext::new(token_program.to_account_info(), transfer_accounts);
+    transfer(cpi_transfer_ctx, amount)?;
+
+    // Atualiza ou adiciona novo balance
     let coin_index = strat_balance
         .list_coins
         .iter()
         .position(|c| *c == coin);
 
     if let Some(idx) = coin_index {
-        // Coin já existe, incrementa amount
         strat_balance.balance[idx].amount = strat_balance.balance[idx]
             .amount
             .saturating_add(amount);
     } else {
-        // Nova moeda e novo balance
         strat_balance.strategy_token = strategy_token;
         strat_balance.status = true;
         strat_balance.list_coins.push(coin);
@@ -169,9 +172,28 @@ pub fn _add_liquidity(
         });
     }
 
-    // ✅ Emite o evento
+    // Mint dos tokens LP para o usuário
+    let mint_to_accounts = MintTo {
+        mint: ctx.accounts.lp_token.to_account_info(),
+        to: ctx.accounts.user_lp_token_account.to_account_info(),
+        authority: ctx.accounts.mint_authority.to_account_info(),
+    };
+    let bump = ctx.bumps.mint_authority;
+    let seeds: &[&[u8]] = &[
+        b"mint_authority",
+        &[bump],
+    ];
+    let signer_seeds: &[&[&[u8]]] = &[seeds];
+    let cpi_mint_ctx = CpiContext::new_with_signer(
+        token_program.to_account_info(),
+        mint_to_accounts,
+        signer_seeds,
+    );
+    mint_to(cpi_mint_ctx, amount)?;
+
+    // Emite evento
     emit!(BalanceLiquidityEvent {
-        owner: ctx.accounts.owner.key(),
+        signer: signer.key(),
         user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
@@ -263,11 +285,16 @@ pub fn _remove_liquidity(
     strategy_token: Pubkey,
     coin: Pubkey,
     amount: u64,
+    sub_account_name: String,
 ) -> Result<()> {
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
+    let signer = &ctx.accounts.signer;
+    let token_program = &ctx.accounts.token_program;
+    let user = ctx.accounts.user.key();
+    let bot = ctx.accounts.bot.key();
 
-    if ctx.accounts.bot.contract_address != ctx.accounts.contract_address.key() {
+    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
@@ -280,11 +307,10 @@ pub fn _remove_liquidity(
     let coin_index = strat_balance
         .balance
         .iter()
-        .position(|b| b.token == coin);
+        .position(|b| b.token == coin)
+        .ok_or(ErrorCode::CoinNotFound)?;
 
-    let idx = coin_index.ok_or(ErrorCode::CoinNotFound)?;
-
-    let balance_entry = &mut strat_balance.balance[idx];
+    let balance_entry = &mut strat_balance.balance[coin_index];
 
     // ✅ Confirma que está pausado
     if !balance_entry.paused {
@@ -299,9 +325,42 @@ pub fn _remove_liquidity(
     // ✅ Atualiza o saldo
     balance_entry.amount = balance_entry.amount.saturating_sub(amount);
 
+    // ✅ Queima os tokens LP do usuário
+    let burn_accounts = Burn {
+        mint: ctx.accounts.lp_token.to_account_info(),
+        from: ctx.accounts.user_lp_token_account.to_account_info(),
+        authority: signer.to_account_info(),
+    };
+    let cpi_burn_ctx = CpiContext::new(token_program.to_account_info(), burn_accounts);
+    burn(cpi_burn_ctx, amount)?;
+
+    // ✅ Transfere o token original da vault para o usuário
+    let transfer_accounts = Transfer {
+        from: ctx.accounts.vault_account.to_account_info(),
+        to: ctx.accounts.user_token_account.to_account_info(),
+        authority: ctx.accounts.sub_account.to_account_info(), // vault authority
+    };
+
+    let vault_bump = ctx.bumps.sub_account;
+    let vault_seeds: &[&[u8]] = &[
+        b"sub_account",
+        bot.as_ref(),
+        user.as_ref(),
+        sub_account.name.as_bytes(),
+        &[vault_bump],
+    ];
+    let signer_seeds: &[&[&[u8]]] = &[vault_seeds];
+
+    let cpi_transfer_ctx = CpiContext::new_with_signer(
+        token_program.to_account_info(),
+        transfer_accounts,
+        signer_seeds,
+    );
+    transfer(cpi_transfer_ctx, amount)?;
+
     // ✅ Emite evento de saída
     emit!(BalanceLiquidityEvent {
-        owner: ctx.accounts.owner.key(),
+        signer: signer.key(),
         user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
@@ -324,8 +383,8 @@ pub fn _toggle_pause(
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
-    if ctx.accounts.bot.contract_address != ctx.accounts.contract_address.key() {
-        return Err(ErrorCode::Unauthorized.into());
+    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
+       return Err(ErrorCode::Unauthorized.into());
     }
 
     if sub_account.id != account_id {
@@ -352,7 +411,7 @@ pub fn _toggle_pause(
     balance_entry.paused = paused;
 
     emit!(ChangePausedEvent {
-        owner: ctx.accounts.owner.key(),
+        signer: ctx.accounts.signer.key(),
         user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
@@ -370,12 +429,16 @@ pub fn _position_liquidity(
     coin: Pubkey,
     amount: i64, // pode ser positivo ou negativo
 ) -> Result<u64> {
-    // ✅ Garante que quem chamou foi o programa de pagamentos
-    if ctx.accounts.payments.key() == ctx.accounts.bot.payments_address {
-        return Err(ErrorCode::UnauthorizedPaymentsCaller.into());
+    let sub_account = &ctx.accounts.sub_account;
+
+    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
+       return Err(ErrorCode::Unauthorized.into());
     }
 
-    let sub_account = &ctx.accounts.sub_account;
+    if ctx.accounts.bot.payments_address != ctx.accounts.signer.key() {
+       return Err(ErrorCode::YouMustTheWebDexPayments.into());
+    }
+
     if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountId.into());
     }
@@ -410,7 +473,7 @@ pub fn _position_liquidity(
     entry.amount = new_balance;
 
     emit!(BalanceLiquidityEvent {
-        owner: ctx.accounts.owner.key(),
+        signer: ctx.accounts.signer.key(),
         user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,

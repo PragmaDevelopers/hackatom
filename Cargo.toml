@@ -4,10 +4,7 @@ members = [
     "programs/webdex_payments",
     "programs/webdex_strategy",
     "programs/webdex_sub_accounts",
-    "shared/factory",
-    "shared/payments",
-    "shared/strategy",
-    "shared/sub_accounts",
+    "programs/webdex_manager",
 ]
 resolver = "2"
 

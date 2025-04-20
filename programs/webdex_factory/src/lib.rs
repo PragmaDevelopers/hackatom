@@ -9,8 +9,6 @@ pub mod error;
 use crate::state::*;
 use crate::processor::*;
 
-use shared_factory::state::*;
-
 declare_id!("AZpLbd9HonogrHXnLqy4YSkc2Zf6BvTv1Qpn4jZrpXfM");
 
 #[program]

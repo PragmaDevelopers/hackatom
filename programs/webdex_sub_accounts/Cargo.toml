@@ -19,8 +19,9 @@ idl-build = ["anchor-spl/idl-build"]
 
 [dependencies]
 anchor-lang = { version = "0.31.0", features = ["init-if-needed"] }
-anchor-spl = { version = "0.31.0", features = ["metadata"] }
+anchor-spl = { version = "0.31.0", features = ["token"] }
 serde = { version = "1.0", features = ["derive"] }
 mpl-token-metadata = "5.1.0"
-shared_factory = { path = "../../shared/factory" }
-shared_sub_accounts = { path = "../../shared/sub_accounts" }
+webdex_factory = { path = "../webdex_factory", features = ["no-entrypoint"] }
+webdex_payments = { path = "../webdex_payments", features = ["no-entrypoint"] }
+shared_manager = { path = "../../shared/manager" }

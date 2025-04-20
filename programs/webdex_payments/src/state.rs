@@ -1,33 +1,60 @@
 use anchor_lang::prelude::*;
-use shared_factory::state::*;
-use shared_payments::state::*;
-use shared_factory::ID as FACTORY_ID;
+use webdex_factory::state::*;
+use serde::{Deserialize, Serialize};
+
+#[account]
+pub struct Payments {
+    pub contract_address: Pubkey,     
+    pub fee_tiers: Vec<FeeTier>,          
+    pub coins: Vec<CoinData>,        
+}
+
+pub const MAX_FEE_TIERS: usize = 10;
+pub const MAX_COINS: usize = 10;
+
+impl Payments {
+    pub const INIT_SPACE: usize = 8  // discriminator
+        + 32                         // contract_address
+        + 4 + MAX_FEE_TIERS * 64     // Vec<FeeTier>: 4 + n * 64
+        + 4 + MAX_COINS * (32 + 52); // coins (Pubkey + Coins)
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Serialize, Deserialize, Clone, Default)]
+pub struct FeeTier {
+    pub limit: u64,
+    pub fee: u64,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct Coins {
+    pub name: String,          // 4 + name.len()
+    pub symbol: String,        // 4 + symbol.len()
+    pub decimals: u8,          // 1
+    pub status: bool,          // 1
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct CoinData {
+    pub pubkey: Pubkey,
+    pub coin: Coins,
+}
 
 #[derive(Accounts)]
 pub struct AddFeeTiers<'info> {
-    #[account(
-        seeds = [b"bot", contract_address.key().as_ref()],
-        bump,
-        seeds::program = FACTORY_ID, // ← ISSO É O QUE FALTA GERALMENTE
-        has_one = owner
-    )]
     pub bot: Account<'info, Bot>,
 
     #[account(
         init_if_needed,
-        payer = owner,
+        payer = signer,
         space = Payments::INIT_SPACE, // ou calcule o espaço necessário
         seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
         bump
     )]
-    pub payments: Box<Account<'info, Payments>>,
-
-    // Essa conta é só para obter o endereço do contrato (pode ser `UncheckedAccount`)
-    /// CHECK: não estamos lendo nem escrevendo
-    pub contract_address: UncheckedAccount<'info>,
+    pub payments: Account<'info, Payments>,
 
     #[account(mut)]
-    pub owner: Signer<'info>,
+    pub signer: Signer<'info>,
+
     pub system_program: Program<'info, System>,
 }
 
@@ -38,17 +65,8 @@ pub struct GetFeeTiers<'info> {
 
 #[derive(Accounts)]
 pub struct RevokeOrAllowCurrency<'info> {
-    #[account(
-        seeds = [b"bot", contract_address.key().as_ref()],
-        bump,
-        seeds::program = FACTORY_ID, // ← ISSO É O QUE FALTA GERALMENTE
-        has_one = owner
-    )]
     pub bot: Account<'info, Bot>,
    #[account(mut)]
     pub payments: Box<Account<'info, Payments>>,
-    pub owner: Signer<'info>,
-    // Essa conta é só para obter o endereço do contrato (pode ser `UncheckedAccount`)
-    /// CHECK: não estamos lendo nem escrevendo
-    pub contract_address: UncheckedAccount<'info>,
+    pub signer: Signer<'info>,
 }

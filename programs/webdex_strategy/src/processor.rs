@@ -8,8 +8,6 @@ use mpl_token_metadata::types::DataV2;
 use crate::state::*;
 use crate::error::ErrorCode;
 
-use shared_strategy::state::*;
-
 pub fn _add_strategy(
     ctx: Context<AddStrategy>,
     name: String,
@@ -21,11 +19,11 @@ pub fn _add_strategy(
     let strategy_list = &mut ctx.accounts.strategy_list;
 
     // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.owner.key() {
+    if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
-    if bot.contract_address != contract_address {
+    if bot.manager_address != contract_address {
         return Err(ErrorCode::BotNotFound.into());
     }
 
@@ -70,7 +68,7 @@ pub fn _add_strategy(
 
     // ✅ Se a conta strategy_list já tinha contract_address, não sobrescreve
     if strategy_list.contract_address == Pubkey::default() {
-        strategy_list.contract_address = bot.contract_address;
+        strategy_list.contract_address = bot.manager_address;
     } else if strategy_list.contract_address != contract_address {
         return Err(ErrorCode::InvalidContractAddress.into());
     }
@@ -101,11 +99,11 @@ pub fn _update_strategy_status(ctx: Context<UpdateStrategyStatus>, contract_addr
     let strategy_list = &mut ctx.accounts.strategy_list;
 
     // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.owner.key() {
+    if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
     
-    if bot.contract_address != contract_address {
+    if bot.manager_address != contract_address {
         return Err(ErrorCode::BotNotFound.into());
     }
     
@@ -165,11 +163,11 @@ pub fn _delete_strategy(
     let strategy_list = &mut ctx.accounts.strategy_list;
 
     // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.owner.key() {
+    if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
-    if bot.contract_address != contract_address {
+    if bot.manager_address != contract_address {
         return Err(ErrorCode::BotNotFound.into());
     }
 

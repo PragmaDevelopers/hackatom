@@ -8,8 +8,6 @@ pub mod error;
 use crate::processor::*;
 use crate::state::*;
 
-use shared_sub_accounts::state::*;
-
 declare_id!("9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL");
 
 #[program]
@@ -42,11 +40,12 @@ pub mod webdex_sub_accounts {
         strategy_token: Pubkey,
         coin: Pubkey,
         amount: u64,
-        name: String,
-        ico: String,
-        decimals: u8,
+        coin_name: String,
+        coin_ico: String,
+        coin_decimals: u8,
+        sub_account_name: String,
     ) -> Result<()> {
-        _add_liquidity(ctx,account_id,strategy_token,coin,amount,name,ico,decimals)
+        _add_liquidity(ctx,account_id,strategy_token,coin,amount,coin_name,coin_ico,coin_decimals,sub_account_name)
     }
 
     pub fn get_balance(
@@ -79,8 +78,9 @@ pub mod webdex_sub_accounts {
         strategy_token: Pubkey,
         coin: Pubkey,
         amount: u64,
+        sub_account_name: String,
     ) -> Result<()> {
-        _remove_liquidity(ctx,account_id,strategy_token,coin,amount)
+        _remove_liquidity(ctx,account_id,strategy_token,coin,amount,sub_account_name)
     }
 
     pub fn toggle_pause(

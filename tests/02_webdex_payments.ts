@@ -18,12 +18,12 @@ describe("webdex_payments", () => {
   it("Add Feer Tiers", async () => {
     const feeTiers = [
       {
-        limit: new BN(1),
-        fee: new BN(100),
+        limit: new BN(3),
+        fee: new BN(300),
       },
       {
-        limit: new BN(2),
-        fee: new BN(200),
+        limit: new BN(4),
+        fee: new BN(400),
       },
     ];
 

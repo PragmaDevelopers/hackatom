@@ -10,8 +10,6 @@ use crate::state::*;
 
 use crate::processor::*;
 
-use shared_payments::state::*;
-
 declare_id!("AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1");
 
 #[program]

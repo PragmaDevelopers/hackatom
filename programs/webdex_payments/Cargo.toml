@@ -20,5 +20,5 @@ idl-build = ["anchor-spl/idl-build"]
 [dependencies]
 anchor-lang = { version = "0.31.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.31.0", features = ["metadata"] }
-shared_factory = { path = "../../shared/factory" }
-shared_payments = { path = "../../shared/payments" }
+serde = { version = "1.0", features = ["derive"] }
+webdex_factory = { path = "../webdex_factory", features = ["no-entrypoint"] }

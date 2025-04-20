@@ -1694,7 +1694,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "shared_factory"
+name = "shared_manager"
 version = "0.1.0"
 dependencies = [
  "anchor-attribute-program",
@@ -1703,37 +1703,6 @@ dependencies = [
  "anchor-spl",
  "mpl-token-metadata",
  "serde",
-]
-
-[[package]]
-name = "shared_payments"
-version = "0.1.0"
-dependencies = [
- "anchor-attribute-program",
- "anchor-derive-accounts",
- "anchor-lang",
- "anchor-spl",
- "mpl-token-metadata",
- "serde",
-]
-
-[[package]]
-name = "shared_strategy"
-version = "0.1.0"
-dependencies = [
- "anchor-attribute-program",
- "anchor-derive-accounts",
- "anchor-lang",
- "anchor-spl",
- "mpl-token-metadata",
- "serde",
-]
-
-[[package]]
-name = "shared_sub_accounts"
-version = "0.1.0"
-dependencies = [
- "anchor-lang",
 ]
 
 [[package]]
@@ -3037,14 +3006,22 @@ dependencies = [
 name = "webdex_factory"
 version = "0.1.0"
 dependencies = [
- "anchor-attribute-program",
- "anchor-derive-accounts",
+ "anchor-lang",
+ "anchor-spl",
+]
+
+[[package]]
+name = "webdex_manager"
+version = "0.1.0"
+dependencies = [
  "anchor-lang",
  "anchor-spl",
  "mpl-token-metadata",
  "serde",
- "shared_factory",
- "shared_payments",
+ "shared_manager",
+ "webdex_factory",
+ "webdex_strategy",
+ "webdex_sub_accounts",
 ]
 
 [[package]]
@@ -3053,8 +3030,8 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "shared_factory",
- "shared_payments",
+ "serde",
+ "webdex_factory",
 ]
 
 [[package]]
@@ -3067,8 +3044,7 @@ dependencies = [
  "anchor-spl",
  "mpl-token-metadata",
  "serde",
- "shared_factory",
- "shared_strategy",
+ "webdex_factory",
 ]
 
 [[package]]
@@ -3079,8 +3055,9 @@ dependencies = [
  "anchor-spl",
  "mpl-token-metadata",
  "serde",
- "shared_factory",
- "shared_sub_accounts",
+ "shared_manager",
+ "webdex_factory",
+ "webdex_payments",
 ]
 
 [[package]]

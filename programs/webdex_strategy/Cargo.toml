@@ -24,5 +24,4 @@ anchor-attribute-program = "0.31.0"
 anchor-derive-accounts = "0.31.0"
 serde = { version = "1.0", features = ["derive"] }
 mpl-token-metadata = "5.1.0"
-shared_factory = { path = "../../shared/factory" }
-shared_strategy = { path = "../../shared/strategy" }
+webdex_factory = { path = "../webdex_factory", features = ["no-entrypoint"] }
