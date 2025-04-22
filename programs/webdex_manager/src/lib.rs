@@ -15,7 +15,20 @@ pub mod webdex_manager {
 
     use super::*;
 
+    pub fn register_manager(ctx: Context<RegisterManager>, manager: Pubkey) -> Result<()> {
+        _register_manager(ctx,manager)
+    }
+
     pub fn register(ctx: Context<Register>, manager: Pubkey) -> Result<()> {
         _register(ctx,manager)
+    }
+
+    pub fn liquidity_add(
+        ctx: Context<LiquidityAdd>,
+        strategy_token: Pubkey,
+        _decimals: u8,
+        amount: u64,
+    ) -> Result<()> {
+        _liquidity_add(ctx,strategy_token,_decimals,amount)
     }
 }

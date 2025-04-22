@@ -1,20 +1,5 @@
 use anchor_lang::prelude::*;
-
-#[account]
-pub struct Bot {
-    pub name: String,
-    pub prefix: String,
-    pub owner: Pubkey,
-    pub manager_address: Pubkey, // manager_address
-    pub strategy_address: Pubkey,
-    pub sub_account_address: Pubkey,
-    pub payments_address: Pubkey,
-    pub token_pass_address: Pubkey,
-}
-
-impl Bot {
-    pub const INIT_SPACE: usize = 8 + 36 + 14 + 32 * 6;
-}
+use shared_factory::state::{Bot};
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct BotInfo {
@@ -52,7 +37,7 @@ pub struct BotRemoved {
 #[derive(Accounts)]
 pub struct AddBot<'info> {
     #[account(
-        init,
+        init_if_needed,
         payer = signer,
         space = Bot::INIT_SPACE,
         seeds = [b"bot", manager_address.key().as_ref()],
@@ -60,12 +45,12 @@ pub struct AddBot<'info> {
     )]
     pub bot: Account<'info, Bot>,
 
-    // Essa conta é só para obter o endereço do contrato (pode ser `UncheckedAccount`)
-    /// CHECK: não estamos lendo nem escrevendo
-    pub manager_address: UncheckedAccount<'info>,
+    /// CHECK
+    pub manager_address: AccountInfo<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
+
     pub system_program: Program<'info, System>,
 }
 

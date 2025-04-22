@@ -20,12 +20,8 @@ pub enum ErrorCode {
     Unauthorized,
     #[msg("Você não tem permissão para acessar esta subconta.")]
     UnauthorizedSubAccount,
-    #[msg("SubAccount not found")]
-    SubAccountNotFound,
     #[msg("Account not linked to currency")]
     AccountNotLinkedToCurrency,
-    #[msg("Max Sub Accounts Reached")]
-    MaxSubAccountsReached,
     #[msg("Invalid Sub Account Id")]
     InvalidSubAccountId,
     #[msg("Strategy Not Linked")]
@@ -33,5 +29,7 @@ pub enum ErrorCode {
     #[msg("Strategy Balance Not Found")]
     StrategyBalanceNotFound,
     #[msg("Coin Not Linked")]
-    CoinNotLinked
+    CoinNotLinked,
+    #[msg("Account not found")]
+    AccountNotFound
 }

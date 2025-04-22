@@ -1,10 +1,10 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
+import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
 import { expect } from "chai";
-import { sharedState } from "./setup";
+import { sharedState } from "../setup";
 
 describe("webdex_sub_accounts", () => {
   const provider = anchor.AnchorProvider.env();

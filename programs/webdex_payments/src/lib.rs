@@ -29,31 +29,39 @@ pub mod webdex_payments {
         _get_fee_tiers(ctx)
     }
 
-    pub fn add_coin(
+    pub fn currency_allow(
         ctx: Context<RevokeOrAllowCurrency>,
-        pub_key: Pubkey,
+        coin_pubkey: Pubkey,
         name: String,
         symbol: String,
         decimals: u8,
     ) -> Result<()> {
-        _add_coin(ctx,pub_key,name,symbol,decimals)
-    }
-
-    pub fn currency_allow(
-        ctx: Context<RevokeOrAllowCurrency>,
-        coin: Pubkey,
-    ) -> Result<()> {
-        _revoke_or_allow_currency(ctx,coin,true)
+        _revoke_or_allow_currency(ctx,coin_pubkey,true,name,symbol,decimals)
     }
 
     pub fn currency_revoke(
         ctx: Context<RevokeOrAllowCurrency>,
-        coin: Pubkey,
+        coin_pubkey: Pubkey,
+        name: String,
+        symbol: String,
+        decimals: u8,
     ) -> Result<()> {
-        _revoke_or_allow_currency(ctx,coin,false)
+        _revoke_or_allow_currency(ctx,coin_pubkey,false,name,symbol,decimals)
     }
 
-    pub fn remove_coin(ctx: Context<RevokeOrAllowCurrency>, coin: Pubkey) -> Result<()> {
+    pub fn remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
         _remove_coin(ctx,coin)
+    }
+
+    pub fn open_position(
+        ctx: Context<OpenPosition>,
+        account_id: String,
+        strategy_token: Pubkey,
+        amount: i64,
+        coin: Pubkey,
+        gas: u64,
+        currrencys: Vec<Currencys>,
+    ) -> Result<()> {
+        _open_position(ctx,account_id,strategy_token,amount,coin,gas,currrencys)
     }
 }

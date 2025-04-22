@@ -44,4 +44,6 @@ pub enum ErrorCode {
     InsufficientPassBalance,
     #[msg("You must the WebDexPayments")]
     YouMustTheWebDexPayments,
+    #[msg("Strategy Not Found")]
+    StrategyNotFound
 }

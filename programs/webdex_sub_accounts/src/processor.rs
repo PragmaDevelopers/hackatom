@@ -1,7 +1,9 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
-use anchor_spl::token::{Transfer, MintTo, Burn, Token, TokenAccount, Mint, transfer, mint_to, burn};
+use anchor_spl::token::{Transfer, Burn, transfer, burn};
+
+use shared_sub_accounts::state::{BalanceStrategy};
 
 pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Result<()> {
     let sub_account_list = &mut ctx.accounts.sub_account_list;
@@ -9,7 +11,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     let signer = &ctx.accounts.signer;
     let user = &ctx.accounts.user;
 
-    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
+    if ctx.accounts.bot.manager_address == Pubkey::default() {
        return Err(ErrorCode::Unauthorized.into());
     }
 
@@ -86,15 +88,9 @@ pub fn _get_sub_accounts(
 
 pub fn _find_sub_account_index_by_id(
     ctx: Context<FindSubAccountIndex>,
-    contract_address: Pubkey,
     account_id: String,
 ) -> Result<i64> {
     let list = &ctx.accounts.sub_account_list;
-
-    // ✅ Validação de segurança
-    if list.contract_address != contract_address {
-        return Err(ErrorCode::InvalidContractAddress.into());
-    }
 
     for (i, entry) in list.sub_accounts.iter().enumerate() {
         if entry.id == account_id {
@@ -105,26 +101,23 @@ pub fn _find_sub_account_index_by_id(
     Ok(-1)
 }
 
-pub fn _add_liquidity(
+pub fn _add_liquidity<'info>(
     ctx: Context<AddLiquidity>,
-    account_id: String,
     strategy_token: Pubkey,
+    account_id: String,
     coin: Pubkey,
     amount: u64,
     name: String,
     ico: String,
     decimals: u8,
-    sub_account_name: String,
 ) -> Result<()> {
     let sub_account = &mut ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
     let signer = &ctx.accounts.signer;
-    let token_program = &ctx.accounts.token_program;
-    let vault_account = &ctx.accounts.vault_account;
 
     // Verificação de permissão
-    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
-        return Err(ErrorCode::Unauthorized.into());
+    if ctx.accounts.bot.manager_address == Pubkey::default() {
+       return Err(ErrorCode::Unauthorized.into());
     }
 
     // Confirma subconta correta
@@ -137,15 +130,6 @@ pub fn _add_liquidity(
         sub_account.list_strategies.push(strategy_token);
         sub_account.strategies.push(strat_balance.key());
     }
-
-    // Transferência de token do usuário para a vault (subconta)
-    let transfer_accounts = Transfer {
-        from: ctx.accounts.signer.to_account_info(),
-        to: vault_account.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
-    };
-    let cpi_transfer_ctx = CpiContext::new(token_program.to_account_info(), transfer_accounts);
-    transfer(cpi_transfer_ctx, amount)?;
 
     // Atualiza ou adiciona novo balance
     let coin_index = strat_balance
@@ -171,25 +155,6 @@ pub fn _add_liquidity(
             paused: false,
         });
     }
-
-    // Mint dos tokens LP para o usuário
-    let mint_to_accounts = MintTo {
-        mint: ctx.accounts.lp_token.to_account_info(),
-        to: ctx.accounts.user_lp_token_account.to_account_info(),
-        authority: ctx.accounts.mint_authority.to_account_info(),
-    };
-    let bump = ctx.bumps.mint_authority;
-    let seeds: &[&[u8]] = &[
-        b"mint_authority",
-        &[bump],
-    ];
-    let signer_seeds: &[&[&[u8]]] = &[seeds];
-    let cpi_mint_ctx = CpiContext::new_with_signer(
-        token_program.to_account_info(),
-        mint_to_accounts,
-        signer_seeds,
-    );
-    mint_to(cpi_mint_ctx, amount)?;
 
     // Emite evento
     emit!(BalanceLiquidityEvent {
@@ -279,13 +244,62 @@ pub fn _get_sub_account_strategies(
     Ok(sub_account.list_strategies.clone())
 }
 
+pub fn _toggle_pause(
+    ctx: Context<TogglePause>,
+    account_id: String,
+    strategy_token: Pubkey,
+    coin: Pubkey,
+    paused: bool,
+) -> Result<()> {
+    let sub_account = &ctx.accounts.sub_account;
+    let strat_balance = &mut ctx.accounts.strategy_balance;
+
+    if ctx.accounts.bot.manager_address == Pubkey::default() {
+       return Err(ErrorCode::Unauthorized.into());
+    }
+
+    if sub_account.id != account_id {
+        return Err(ErrorCode::InvalidSubAccountId.into());
+    }
+
+    let coin_index = strat_balance
+        .balance
+        .iter()
+        .position(|b| b.token == coin);
+
+    let idx = coin_index.ok_or(ErrorCode::CoinNotFound)?;
+
+    let balance_entry = &mut strat_balance.balance[idx];
+
+    if !balance_entry.status {
+        return Err(ErrorCode::CoinNotLinkedToStrategy.into());
+    }
+
+    if balance_entry.paused == paused {
+        return Err(ErrorCode::PauseStateUnchanged.into());
+    }
+
+    balance_entry.paused = paused;
+
+    emit!(ChangePausedEvent {
+        signer: ctx.accounts.signer.key(),
+        user: ctx.accounts.user.key(),
+        id: account_id,
+        strategy_token,
+        coin,
+        paused,
+    });
+
+    Ok(())
+}
+
 pub fn _remove_liquidity(
     ctx: Context<RemoveLiquidity>,
     account_id: String,
     strategy_token: Pubkey,
     coin: Pubkey,
     amount: u64,
-    sub_account_name: String,
+    _sub_account_name: String,
 ) -> Result<()> {
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
@@ -294,8 +308,8 @@ pub fn _remove_liquidity(
     let user = ctx.accounts.user.key();
     let bot = ctx.accounts.bot.key();
 
-    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
-        return Err(ErrorCode::Unauthorized.into());
+    if ctx.accounts.bot.manager_address == Pubkey::default() {
+       return Err(ErrorCode::Unauthorized.into());
     }
 
     // ✅ Confirma subconta correta
@@ -373,57 +387,8 @@ pub fn _remove_liquidity(
     Ok(())
 }
 
-pub fn _toggle_pause(
-    ctx: Context<TogglePause>,
-    account_id: String,
-    strategy_token: Pubkey,
-    coin: Pubkey,
-    paused: bool,
-) -> Result<()> {
-    let sub_account = &ctx.accounts.sub_account;
-    let strat_balance = &mut ctx.accounts.strategy_balance;
-
-    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
-       return Err(ErrorCode::Unauthorized.into());
-    }
-
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
-    }
-
-    let coin_index = strat_balance
-        .balance
-        .iter()
-        .position(|b| b.token == coin);
-
-    let idx = coin_index.ok_or(ErrorCode::CoinNotFound)?;
-
-    let balance_entry = &mut strat_balance.balance[idx];
-
-    if !balance_entry.status {
-        return Err(ErrorCode::CoinNotLinkedToStrategy.into());
-    }
-
-    if balance_entry.paused == paused {
-        return Err(ErrorCode::PauseStateUnchanged.into());
-    }
-
-    balance_entry.paused = paused;
-
-    emit!(ChangePausedEvent {
-        signer: ctx.accounts.signer.key(),
-        user: ctx.accounts.user.key(),
-        id: account_id,
-        strategy_token,
-        coin,
-        paused,
-    });
-
-    Ok(())
-}
-
-pub fn _position_liquidity(
-    ctx: Context<PositionLiquidity>,
+pub fn _position_liquidity<'info>(
+    mut ctx: CpiContext<'_, '_, '_, 'info, PositionLiquidity<'info>>,
     account_id: String,
     strategy_token: Pubkey,
     coin: Pubkey,
@@ -431,7 +396,7 @@ pub fn _position_liquidity(
 ) -> Result<u64> {
     let sub_account = &ctx.accounts.sub_account;
 
-    if ctx.accounts.bot.manager_address != ctx.accounts.manager_address.key() {
+    if ctx.accounts.bot.manager_address == Pubkey::default() {
        return Err(ErrorCode::Unauthorized.into());
     }
 

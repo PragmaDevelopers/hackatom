@@ -1,0 +1,55 @@
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
+import { WebdexManager } from "../target/types/webdex_manager";
+import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
+import { PublicKey } from "@solana/web3.js";
+import {
+    createMint, getOrCreateAssociatedTokenAccount, mintTo
+} from "@solana/spl-token";
+import { sharedState } from "./setup";
+
+describe("webdex_manager", () => {
+    const provider = anchor.AnchorProvider.env();
+    anchor.setProvider(provider);
+
+    const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
+    const user = provider.wallet;
+
+    it("Register", async () => {
+        // Deriva o PDA do manager
+        const [managerPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("manager"), user.publicKey.toBuffer()],
+            managerProgram.programId
+        );
+
+        // REGISTRANDO MANAGER
+        await managerProgram.methods
+            .registerManager(sharedState.contractAddress)
+            .accounts({
+                signer: user.publicKey,
+            })
+            .rpc();
+
+        // Deriva o PDA do user
+        const [userPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("user"), user.publicKey.toBuffer()],
+            managerProgram.programId
+        );
+        sharedState.userPda = userPda;
+
+        // REGISTRANDO USER
+        const tx = await managerProgram.methods
+            .register(user.publicKey)
+            .accounts({
+                signer: user.publicKey,
+                manager: managerPda,
+            })
+            .rpc();
+
+        console.log("✅ Transaction:", tx);
+
+        // Verifica que a conta user foi criada e populada
+        const userAccount = await managerProgram.account.user.fetch(userPda);
+        console.log("👤 User account:", userAccount);
+    });
+});

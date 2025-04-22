@@ -1,6 +1,13 @@
 use anchor_lang::prelude::*;
-use webdex_factory::state::*;
 use serde::{Deserialize, Serialize};
+
+use shared_factory::state::{Bot};
+use shared_manager::state::{User};
+
+use webdex_strategy::state::{Strategy};
+use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
+
+use anchor_spl::token::{Token,TokenAccount,Mint};
 
 #[account]
 pub struct Payments {
@@ -39,23 +46,28 @@ pub struct CoinData {
     pub coin: Coins,
 }
 
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct Currencys {
+    pub from: Pubkey,
+    pub to: Pubkey,
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct PositionDetails {
+    pub strategy: Pubkey,
+    pub coin: Pubkey,
+    pub old_balance: u64,
+    pub fee: u64,
+    pub gas: u64,
+    pub profit: i64,
+}
+
 #[derive(Accounts)]
 pub struct AddFeeTiers<'info> {
-    pub bot: Account<'info, Bot>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = Payments::INIT_SPACE, // ou calcule o espaço necessário
-        seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
-        bump
-    )]
+    #[account(mut)]
     pub payments: Account<'info, Payments>,
 
-    #[account(mut)]
     pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -66,7 +78,83 @@ pub struct GetFeeTiers<'info> {
 #[derive(Accounts)]
 pub struct RevokeOrAllowCurrency<'info> {
     pub bot: Account<'info, Bot>,
-   #[account(mut)]
-    pub payments: Box<Account<'info, Payments>>,
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = Payments::INIT_SPACE, // ou calcule o espaço necessário
+        seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
+        bump
+    )]
+    pub payments: Account<'info, Payments>,
+    #[account(mut)]
     pub signer: Signer<'info>,
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+pub struct RemoveCoin<'info> {
+    pub bot: Account<'info, Bot>,
+    #[account(mut)]
+    pub payments: Account<'info, Payments>,
+    pub signer: Signer<'info>,
+}
+
+#[derive(Accounts)]
+pub struct OpenPosition<'info> {
+    pub bot: Account<'info, Bot>,
+
+    pub payments: Account<'info, Payments>,
+
+    pub strategy: Account<'info, Strategy>, 
+
+    pub sub_account: Account<'info, SubAccount>,
+
+    pub strategy_balance: Account<'info, StrategyBalanceList>, 
+
+    #[account(mut)]
+    pub user: Account<'info, User>,
+
+    #[account(mut)]
+    pub lp_token: Account<'info, Mint>, // ✅ LP token necessário pra mint/burn
+
+    #[account(mut)]
+    pub user_lp_token_account: Account<'info, TokenAccount>, // ✅ Conta onde LP será creditado/debitado
+
+    /// CHECK: Autoridade de mint
+    #[account(
+        seeds = [b"mint_authority"],
+        bump
+    )]
+    pub mint_authority: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+
+    /// CHECK: CPI calls
+    pub sub_account_program: AccountInfo<'info>,
+    /// CHECK: CPI calls
+    pub manager_program: AccountInfo<'info>,
+}
+
+#[event]
+pub struct OpenPositionEvent {
+    pub contract_address: Pubkey,
+    pub user: Pubkey,
+    pub id: String,
+    pub strategy_token: Pubkey,
+    pub coin: Pubkey,
+    pub old_balance: u64,
+    pub fee: u64,
+    pub gas: u64,
+    pub profit: i64,
+}
+
+#[event]
+pub struct TraderEvent {
+    pub contract_address: Pubkey,
+    pub from: Pubkey,
+    pub to: Pubkey,
 }

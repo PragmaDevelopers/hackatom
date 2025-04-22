@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Mint, Token};
-use webdex_factory::state::*;
+use shared_factory::state::{Bot};
 
 #[account]
 pub struct Strategy {
@@ -57,10 +57,10 @@ pub struct AddStrategy<'info> {
     pub token_mint: Account<'info, Mint>,
 
     /// CHECK: Esta conta é verificada pelo programa Metaplex
-    // pub metadata_program: AccountInfo<'info>,
+    pub metadata_program: AccountInfo<'info>,
     /// CHECK: Esta conta é verificada pelo programa Metaplex
-    // #[account(mut)]
-    // pub metadata: UncheckedAccount<'info>,
+    #[account(mut)]
+    pub metadata: UncheckedAccount<'info>,
 
     #[account(mut)]
     pub token_authority: Signer<'info>,

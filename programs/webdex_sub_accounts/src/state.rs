@@ -1,31 +1,8 @@
 use anchor_lang::prelude::*;
-use webdex_factory::state::*;
-use webdex_payments::state::*;
-use shared_manager::state::*;
+use shared_factory::state::{Bot};
+use shared_manager::state::{User};
+use shared_sub_accounts::state::{BalanceStrategy};
 use anchor_spl::token::{Mint, Token,TokenAccount};
-use anchor_spl::associated_token::AssociatedToken;
-
-#[account]
-pub struct BalanceStrategy {
-    pub amount: u64,
-    pub token: Pubkey,
-    pub decimals: u8,
-    pub ico: String,
-    pub name: String,
-    pub status: bool,
-    pub paused: bool,
-}
-
-impl BalanceStrategy {
-    pub const SPACE: usize = 8    // amount: u64
-        + 32                      // token
-        + 1                       // decimals
-        + 4 + 64                  // ico string
-        + 4 + 64                  // name string
-        + 1                       // status
-        + 1;                      // paused
-    // TOTAL: 175 bytes
-}
 
 #[account]
 pub struct StrategyBalanceList {
@@ -149,9 +126,6 @@ pub struct CreateSubAccount<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    /// CHECK: usado para validação
-    pub manager_address: AccountInfo<'info>,
-
     pub system_program: Program<'info, System>,
 }
 
@@ -166,28 +140,14 @@ pub struct FindSubAccountIndex<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(strategy_token: Pubkey, decimals: u8, coin: Pubkey,sub_account_name: String)]
+#[instruction(strategy_token: Pubkey)]
 pub struct AddLiquidity<'info> {
     pub bot: Account<'info, Bot>,
 
     pub user: Account<'info, User>,
 
-    #[account(
-        mut,
-        seeds = [b"sub_account", user.key().as_ref(), sub_account_name.as_bytes()],
-        bump,
-    )]
+    #[account(mut,)]
     pub sub_account: Account<'info, SubAccount>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = coin,
-        associated_token::authority = sub_account
-    )]
-    pub vault_account: Account<'info, TokenAccount>,
-
-    pub coin: Account<'info, Mint>,
 
     #[account(
         init_if_needed,
@@ -203,41 +163,10 @@ pub struct AddLiquidity<'info> {
     )]
     pub strategy_balance: Account<'info, StrategyBalanceList>,
 
-    #[account(
-        init_if_needed,
-        payer = signer,
-        seeds = [b"lp_token", sub_account.key().as_ref(), strategy_token.as_ref(), coin.key().as_ref()],
-        bump,
-        mint::decimals = decimals,
-        mint::authority = mint_authority,
-        mint::freeze_authority = mint_authority
-    )]
-    pub lp_token: Account<'info, Mint>,
-
-    /// CHECK: Autoridade do mint
-    #[account(
-        seeds = [b"mint_authority"],
-        bump
-    )]
-    pub mint_authority: AccountInfo<'info>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = lp_token,
-        associated_token::authority = signer
-    )]
-    pub user_lp_token_account: Account<'info, TokenAccount>,
-
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    /// CHECK
-    pub manager_address: AccountInfo<'info>,
-
     pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[derive(Accounts)]
@@ -288,9 +217,6 @@ pub struct RemoveLiquidity<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    /// CHECK:
-    pub manager_address: AccountInfo<'info>,
-
     pub token_program: Program<'info, Token>,
 }
 
@@ -308,9 +234,6 @@ pub struct TogglePause<'info> {
 
     #[account(mut)]
     pub signer: Signer<'info>,
-
-    /// CHECK: usado para validação
-    pub manager_address: AccountInfo<'info>,
 }
 
 #[derive(Accounts)]
@@ -327,7 +250,4 @@ pub struct PositionLiquidity<'info> {
 
     #[account(mut)]
     pub signer: Signer<'info>,
-
-    /// CHECK: usado para validação
-    pub manager_address: AccountInfo<'info>,
 }

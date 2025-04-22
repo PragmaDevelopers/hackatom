@@ -24,14 +24,16 @@ pub enum ErrorCode {
     SubAccountNotFound,
     #[msg("Account not linked to currency")]
     AccountNotLinkedToCurrency,
-    #[msg("Max Sub Accounts Reached")]
-    MaxSubAccountsReached,
-    #[msg("Invalid Sub Account Id")]
-    InvalidSubAccountId,
     #[msg("Strategy Not Linked")]
     StrategyNotLinked,
     #[msg("Strategy Balance Not Found")]
     StrategyBalanceNotFound,
     #[msg("Coin Not Linked")]
-    CoinNotLinked
+    CoinNotLinked,
+    #[msg("Status Must Be Different")]
+    StatusMustBeDifferent,
+    #[msg("Coin Not Registered")]
+    CoinNotRegistered,
+    #[msg("Invalid Coin")]
+    InvalidCoin
 }

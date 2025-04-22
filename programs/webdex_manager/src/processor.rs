@@ -4,14 +4,8 @@ use crate::error::ErrorCode;
 use anchor_lang::solana_program::{program::invoke, system_instruction};
 use anchor_spl::token::{MintTo, Burn, Mint, mint_to, burn,transfer,Transfer};
 
-pub fn _register(ctx: Context<Register>, manager: Pubkey) -> Result<()> {
+pub fn _register_manager(ctx: Context<RegisterManager>, manager: Pubkey) -> Result<()> {
     let user = &mut ctx.accounts.user;
-
-    if manager != Pubkey::default() {
-        if !user.status {
-            return Err(ErrorCode::UnregisteredManager.into());
-        }
-    }
 
     user.manager = manager;
     user.gas_balance = 0;
@@ -19,8 +13,35 @@ pub fn _register(ctx: Context<Register>, manager: Pubkey) -> Result<()> {
     user.status = true;
 
     emit!(RegisterEvent {
-        user: ctx.accounts.signer.key(),
+        user: user.key(),
         manager,
+    });
+
+    Ok(())
+}
+
+pub fn _register(ctx: Context<Register>, manager: Pubkey) -> Result<()> {
+    let user = &mut ctx.accounts.user;
+    let manager = &mut ctx.accounts.manager;
+
+    if manager.key() != Pubkey::default() {
+        if !manager.status {
+            return Err(ErrorCode::UnregisteredManager.into());
+        }
+    }
+
+    if user.status {
+        return Err(ErrorCode::UnregisteredUser.into());
+    }
+
+    user.manager = manager.key();
+    user.gas_balance = 0;
+    user.pass_balance = 0;
+    user.status = true;
+
+    emit!(RegisterEvent {
+        user: user.key(),
+        manager: manager.key(),
     });
 
     Ok(())
@@ -41,7 +62,7 @@ pub fn _get_info_user(ctx: Context<GetInfoUser>) -> Result<UserDisplay> {
 pub fn _remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
     let signer = &ctx.accounts.signer;
-    let treasury = &ctx.accounts.treasury;
+    let vault_account = &ctx.accounts.vault_account;
 
     require!(user.gas_balance >= amount, ErrorCode::InsufficientGasBalance);
 
@@ -49,7 +70,7 @@ pub fn _remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
 
     // Cria a instrução de transferência da SystemProgram
     let ix = system_instruction::transfer(
-        &treasury.key(),       // De quem vai sair o SOL
+        &vault_account.key(),       // De quem vai sair o SOL
         &signer.key(),         // Para quem vai
         amount,                // Quanto
     );
@@ -58,7 +79,7 @@ pub fn _remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
     invoke(
         &ix,
         &[
-            treasury.to_account_info(),
+            vault_account.to_account_info(),
             signer.to_account_info(),
         ],
     )?;
@@ -78,10 +99,10 @@ pub fn _remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
 pub fn _add_gas(ctx: Context<AddGas>, amount: u64) -> Result<()> {
     require!(amount > 0, ErrorCode::InvalidAmount);
 
-    // Executa a transferência de SOL para a treasury
+    // Executa a transferência de SOL para a vault_account
     let ix = system_instruction::transfer(
         &ctx.accounts.signer.key(),
-        &ctx.accounts.treasury.key(),
+        &ctx.accounts.vault_account.key(),
         amount,
     );
 
@@ -89,7 +110,7 @@ pub fn _add_gas(ctx: Context<AddGas>, amount: u64) -> Result<()> {
         &ix,
         &[
             ctx.accounts.signer.to_account_info(),
-            ctx.accounts.treasury.to_account_info(),
+            ctx.accounts.vault_account.to_account_info(),
         ],
     )?;
 
@@ -117,7 +138,7 @@ pub fn _pass_add(ctx: Context<PassAdd>, amount: u64) -> Result<()> {
     // 💸 Transfere o token do usuário para a vault (pode ser o próprio programa)
     let cpi_accounts = Transfer {
         from: ctx.accounts.signer.to_account_info(),
-        to: ctx.accounts.treasury.to_account_info(),
+        to: ctx.accounts.vault_account.to_account_info(),
         authority: ctx.accounts.signer.to_account_info(),
     };
     let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
@@ -150,7 +171,7 @@ pub fn _pass_remove(ctx: Context<PassRemove>, amount: u64) -> Result<()> {
     // 💸 Transfere os tokens para o usuário
     let cpi_accounts = Transfer {
          from: ctx.accounts.signer.to_account_info(),
-        to: ctx.accounts.treasury.to_account_info(),
+        to: ctx.accounts.vault_account.to_account_info(),
         authority: ctx.accounts.signer.to_account_info(), // ou PDA se for vault do programa
     };
     let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
@@ -168,12 +189,59 @@ pub fn _pass_remove(ctx: Context<PassRemove>, amount: u64) -> Result<()> {
     Ok(())
 }
 
-pub fn _rebalance_position(
-    ctx: Context<RebalancePosition>,
+pub fn _liquidity_add(
+    ctx: Context<LiquidityAdd>,
+    strategy_token: Pubkey,
+    _decimals: u8,
+    amount: u64,
+) -> Result<()> {
+    let strategy_list = &mut ctx.accounts.strategy_list;
+    let signer = &ctx.accounts.signer;
+    let token_program = &ctx.accounts.token_program;
+    let vault_account = &ctx.accounts.vault_account;
+
+    let strategy_opt = strategy_list
+        .strategies
+        .iter()
+        .find(|s| s.token_address == strategy_token);
+
+    match strategy_opt {
+        Some(strategy) => {
+            require!(strategy.is_active, ErrorCode::StrategyNotFound);
+        },
+        None => {
+            return Err(ErrorCode::StrategyNotFound.into());
+        }
+    }
+
+    // Transferência de token do usuário para a vault (subconta)
+    let transfer_accounts = Transfer {
+        from: ctx.accounts.signer.to_account_info(),
+        to: vault_account.to_account_info(),
+        authority: ctx.accounts.signer.to_account_info(),
+    };
+    let cpi_transfer_ctx = CpiContext::new(token_program.to_account_info(), transfer_accounts);
+    transfer(cpi_transfer_ctx, amount)?;
+
+    // Mint dos tokens LP para o usuário
+    let mint_to_accounts = MintTo {
+        mint: ctx.accounts.lp_token.to_account_info(),
+        to: ctx.accounts.user_token_account.to_account_info(),
+        authority: ctx.accounts.signer.to_account_info(),
+    };
+    let cpi_mint_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), mint_to_accounts);
+    mint_to(cpi_mint_ctx, amount)?;
+
+    Ok(())
+}
+
+pub fn _rebalance_position<'info>(
+    mut ctx: CpiContext<'_, '_, '_, 'info, RebalancePosition<'info>>,
     amount: i64,
     gas: u64,
     coin: Pubkey,
     fee: u64,
+    bump: u8,
 ) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
@@ -196,7 +264,6 @@ pub fn _rebalance_position(
     // Mint ou Burn LP Tokens
     let token_program = &ctx.accounts.token_program;
 
-    let bump = ctx.bumps.mint_authority;
     let seeds: &[&[u8]] = &[b"mint_authority", &[bump]];
     let signer_seeds: &[&[&[u8]]] = &[seeds];
 

@@ -1,12 +1,12 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexStrategy } from "../target/types/webdex_strategy";
+import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { expect } from "chai";
-import { sharedState } from "./setup";
+import { sharedState } from "../setup";
 
 describe("webdex_strategy", () => {
   const provider = anchor.AnchorProvider.env();

@@ -8,6 +8,8 @@ pub mod error;
 use crate::processor::*;
 use crate::state::*;
 
+use shared_sub_accounts::state::{BalanceStrategy};
+
 declare_id!("9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL");
 
 #[program]
@@ -28,24 +30,22 @@ pub mod webdex_sub_accounts {
 
     pub fn find_sub_account_index_by_id(
         ctx: Context<FindSubAccountIndex>,
-        contract_address: Pubkey,
         account_id: String,
     ) -> Result<i64> {
-        _find_sub_account_index_by_id(ctx,contract_address,account_id)
+        _find_sub_account_index_by_id(ctx,account_id)
     }
 
     pub fn add_liquidity(
         ctx: Context<AddLiquidity>,
-        account_id: String,
         strategy_token: Pubkey,
+        account_id: String,
         coin: Pubkey,
         amount: u64,
         coin_name: String,
         coin_ico: String,
         coin_decimals: u8,
-        sub_account_name: String,
     ) -> Result<()> {
-        _add_liquidity(ctx,account_id,strategy_token,coin,amount,coin_name,coin_ico,coin_decimals,sub_account_name)
+        _add_liquidity(ctx,strategy_token,account_id,coin,amount,coin_name,coin_ico,coin_decimals)
     }
 
     pub fn get_balance(
@@ -91,15 +91,5 @@ pub mod webdex_sub_accounts {
         paused: bool,
     ) -> Result<()> {
         _toggle_pause(ctx,account_id,strategy_token,coin,paused)
-    }
-
-    pub fn position_liquidity(
-        ctx: Context<PositionLiquidity>,
-        account_id: String,
-        strategy_token: Pubkey,
-        coin: Pubkey,
-        amount: i64, // pode ser positivo ou negativo
-    ) -> Result<u64> {
-        _position_liquidity(ctx,account_id,strategy_token,coin,amount)
     }
 }

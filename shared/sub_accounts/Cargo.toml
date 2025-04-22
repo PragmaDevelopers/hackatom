@@ -1,13 +1,13 @@
 [package]
-name = "webdex_factory"
+name = "shared_sub_accounts"
 version = "0.1.0"
 authors = ["Seu Nome seu@email.com"]
 description = "Created with Anchor"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib", "lib"]
-name = "webdex_factory"
+crate-type = ["lib"]
+name = "shared_sub_accounts"
 
 [features]
 default = []
@@ -19,5 +19,8 @@ idl-build = ["anchor-spl/idl-build"]
 
 [dependencies]
 anchor-lang = { version = "0.31.0", features = ["init-if-needed"] }
-anchor-spl = { version = "0.31.0" }
-shared_factory = { path = "../../shared/factory" }
+anchor-spl = { version = "0.31.0", features = ["metadata"] }
+anchor-attribute-program = "0.31.0"
+anchor-derive-accounts = "0.31.0"
+serde = { version = "1.0", features = ["derive"] }
+mpl-token-metadata = "5.1.0"

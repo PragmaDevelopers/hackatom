@@ -1,8 +1,11 @@
 use anchor_lang::prelude::*;
-use webdex_sub_accounts::state::*;
-use webdex_factory::state::*;
-use shared_manager::state::*;
+use webdex_strategy::state::{StrategyList};
+use shared_sub_accounts::state::{BalanceStrategy};
+use shared_factory::state::{Bot};
+use shared_manager::state::{User};
+use webdex_sub_accounts::state::{SubAccount};
 use anchor_spl::token::{Token,TokenAccount,Mint};
+use anchor_spl::associated_token::AssociatedToken;
 use crate::error::ErrorCode;
 
 #[account]
@@ -37,7 +40,23 @@ impl ManagerIndex {
 }
 
 #[derive(Accounts)]
-#[instruction(manager: Pubkey)]
+pub struct RegisterManager<'info> {
+    #[account(
+        init, 
+        payer = signer, 
+        space = User::SPACE, 
+        seeds = [b"manager", signer.key().as_ref()], 
+        bump
+    )]
+    pub user: Account<'info, User>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
 pub struct Register<'info> {
     #[account(
         init, 
@@ -47,6 +66,8 @@ pub struct Register<'info> {
         bump
     )]
     pub user: Account<'info, User>,
+
+    pub manager: Account<'info, User>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -86,7 +107,7 @@ pub struct RemoveGas<'info> {
 
     /// CHECK: Conta do programa que contém os fundos (ex: treasury)
     #[account(mut)]
-    pub treasury: AccountInfo<'info>,
+    pub vault_account: Account<'info, TokenAccount>,
 }
 
 #[derive(Accounts)]
@@ -104,7 +125,7 @@ pub struct AddGas<'info> {
 
     /// CHECK: Conta que vai receber o SOL (ex: treasury)
     #[account(mut)]
-    pub treasury: AccountInfo<'info>,
+    pub vault_account: Account<'info, TokenAccount>,
 }
 
 #[derive(Accounts)]
@@ -122,7 +143,7 @@ pub struct PassAdd<'info> {
 
     /// CHECK: Conta que vai receber o SOL (ex: treasury)
     #[account(mut)]
-    pub treasury: AccountInfo<'info>,
+    pub vault_account: Account<'info, TokenAccount>,
 
     pub token_mint: Account<'info, Mint>,
 
@@ -144,7 +165,7 @@ pub struct PassRemove<'info> {
 
     /// CHECK: Conta que vai receber o SOL (ex: treasury)
     #[account(mut)]
-    pub treasury: AccountInfo<'info>,
+    pub vault_account: Account<'info, TokenAccount>,
 
     pub token_mint: Account<'info, Mint>,
 
@@ -182,19 +203,57 @@ pub struct RebalancePosition<'info> {
     #[account(mut)]
     pub user_lp_token_account: Account<'info, TokenAccount>,
 
-    #[account(
-        seeds = [b"mint_authority"],
-        bump
-    )]
     /// CHECK: Apenas para seeds
     pub mint_authority: AccountInfo<'info>,
-
-    /// CHECK: Apenas para seeds
-    pub _user: AccountInfo<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+}
+
+#[derive(Accounts)]
+#[instruction(strategy_token: Pubkey, decimals: u8)]
+pub struct LiquidityAdd<'info> {
+    pub bot: Account<'info, Bot>,
+    pub user: Account<'info, User>,
+    pub strategy_list: Account<'info, StrategyList>,
+    pub sub_account: Account<'info, SubAccount>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = coin,
+        associated_token::authority = sub_account
+    )]
+    pub vault_account: Account<'info, TokenAccount>,
+
+    pub coin: Account<'info, Mint>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        seeds = [b"lp_token", sub_account.key().as_ref(), strategy_token.as_ref(), coin.key().as_ref()],
+        bump,
+        mint::decimals = decimals,
+        mint::authority = signer.key(),
+        mint::freeze_authority = signer.key()
+    )]
+    pub lp_token: Account<'info, Mint>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = lp_token,
+        associated_token::authority = signer
+    )]
+    pub user_token_account: Account<'info, TokenAccount>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
