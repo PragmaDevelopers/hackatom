@@ -136,9 +136,16 @@ pub fn _open_position(
 ) -> Result<()> {
     let bot = &ctx.accounts.bot;
     let payments = &ctx.accounts.payments;
+    let strategy_list = &ctx.accounts.strategy_list;
 
-    // 1. Verifica se estratégia está ativa
-    require!(ctx.accounts.strategy.is_active, ErrorCode::StrategyNotFound);
+    let strategy = strategy_list
+        .strategies
+        .iter()
+        .find(|s| s.token_address == strategy_token)
+        .ok_or(ErrorCode::StrategyNotFound)?;
+
+    // ✅ Verifica se está ativa
+    require!(strategy.is_active, ErrorCode::StrategyNotFound);
 
     // 2. Verifica moedas ativadas
     for pair in currrencys.iter() {
@@ -186,7 +193,6 @@ pub fn _open_position(
             bot: ctx.accounts.bot.clone(),
             lp_token: ctx.accounts.lp_token.clone(),
             token_program: ctx.accounts.token_program.clone(),
-            mint_authority: ctx.accounts.mint_authority.to_account_info(),
             user_lp_token_account: ctx.accounts.user_lp_token_account.clone(),
             signer: ctx.accounts.signer.clone(),
             system_program: ctx.accounts.system_program.clone(),
@@ -194,14 +200,12 @@ pub fn _open_position(
     );
 
     // 5. Chamada CPI → manager.rebalance_position()
-    let bump = ctx.bumps.mint_authority;
     _rebalance_position(
         cpi_ctx_manager,
         amount,
         gas,
         coin,
         fee,
-        bump
     )?;
 
     // 6. Emite eventos (Anchor Events ou logs)

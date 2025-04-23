@@ -400,7 +400,7 @@ pub fn _position_liquidity<'info>(
        return Err(ErrorCode::Unauthorized.into());
     }
 
-    if ctx.accounts.bot.payments_address != ctx.accounts.signer.key() {
+    if ctx.accounts.bot.payments_address == Pubkey::default() {
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 

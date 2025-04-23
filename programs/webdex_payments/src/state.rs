@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
 
-use webdex_strategy::state::{Strategy};
+use webdex_strategy::state::{StrategyList};
 use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
 
 use anchor_spl::token::{Token,TokenAccount,Mint};
@@ -86,9 +86,12 @@ pub struct RevokeOrAllowCurrency<'info> {
         bump
     )]
     pub payments: Account<'info, Payments>,
+
     #[account(mut)]
     pub signer: Signer<'info>,
+
     pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
 }
 
 #[derive(Accounts)]
@@ -105,7 +108,7 @@ pub struct OpenPosition<'info> {
 
     pub payments: Account<'info, Payments>,
 
-    pub strategy: Account<'info, Strategy>, 
+    pub strategy_list: Account<'info, StrategyList>, 
 
     pub sub_account: Account<'info, SubAccount>,
 
@@ -119,13 +122,6 @@ pub struct OpenPosition<'info> {
 
     #[account(mut)]
     pub user_lp_token_account: Account<'info, TokenAccount>, // ✅ Conta onde LP será creditado/debitado
-
-    /// CHECK: Autoridade de mint
-    #[account(
-        seeds = [b"mint_authority"],
-        bump
-    )]
-    pub mint_authority: AccountInfo<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,

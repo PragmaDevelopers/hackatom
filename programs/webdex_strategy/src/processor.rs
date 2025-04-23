@@ -32,7 +32,7 @@ pub fn _add_strategy(
         return Err(ErrorCode::MaxStrategiesReached.into());
     }
 
-    let token_address = ctx.accounts.token_mint.key();
+    let token_address = ctx.accounts.token_address.key();
 
     // Criar estrutura DataV2 para metadados
     let metadata_data = DataV2 {

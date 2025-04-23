@@ -18,8 +18,6 @@ export const sharedState = {
     subAccountId: null as null | PublicKey,
     strategyBalancePda: null as null | PublicKey,
     METADATA_PROGRAM_ID: null as null | PublicKey,
-    vaultAccount: null as null | PublicKey,
-    userLpTokenAccount: null as null | PublicKey,
     lpTokenPda: null as null | PublicKey,
-    mintAuthority: null as null | PublicKey,
+    userLpTokenAccountAta: null as null | PublicKey,
 };

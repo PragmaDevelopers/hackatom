@@ -2,11 +2,13 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexManager } from "../target/types/webdex_manager";
 import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
-import { PublicKey } from "@solana/web3.js";
+import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
 import {
     ASSOCIATED_TOKEN_PROGRAM_ID,
-    createMint, getAssociatedTokenAddress, getAssociatedTokenAddressSync, getOrCreateAssociatedTokenAccount, mintTo,
-    TOKEN_PROGRAM_ID
+    createMint, getAssociatedTokenAddress, getAssociatedTokenAddressSync, getAccount, getOrCreateAssociatedTokenAccount, mintTo,
+    TOKEN_2022_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    transfer
 } from "@solana/spl-token";
 import { sharedState } from "./setup";
 
@@ -22,46 +24,28 @@ describe("webdex_manager", () => {
     const amount = new anchor.BN(100_000);
 
     it("Liquidity Add", async () => {
-        // ✅ create coin mint (usado como base asset)
-        const coinMint = await createMint(
+        const userCoinAccount = await getOrCreateAssociatedTokenAccount(
             provider.connection,
             user.payer,
-            user.publicKey, // authority
-            user.publicKey,
-            sharedState.coin.decimals
-        );
+            sharedState.coin.pubkey,
+            user.publicKey
+        ); // QUANDO TIVER USANDO A CARTEIRA PHANTOM, NÃO PRECISA DESSA PARTE (EU ACHO KKKKKK)
 
-        // ✅ Derive lp_token PDA
-        const [lpToken] = PublicKey.findProgramAddressSync(
-            [
-                Buffer.from("lp_token"),
-                sharedState.subAccountPda.toBuffer(),
-                sharedState.strategyTokenAddress.toBuffer(),
-                coinMint.toBuffer(),
-            ],
-            managerProgram.programId
-        );
-        sharedState.lpTokenPda = lpToken;
-
-        // Deriva o endereço da conta de token associada do usuário
-        const userTokenAccount = getAssociatedTokenAddressSync(
-            lpToken, // Mint do token LP
-            user.publicKey,     // Endereço público do usuário
-            false,              // allowOwnerOffCurve
-            TOKEN_PROGRAM_ID,
-            ASSOCIATED_TOKEN_PROGRAM_ID
-        );
-        sharedState.userLpTokenAccount = userTokenAccount;
-
-        // ✅ mint coins para o user
+        // Mintar 1000 tokens para o usuário
         await mintTo(
             provider.connection,
             user.payer,
-            coinMint,
-            userTokenAccount,
+            sharedState.coin.pubkey,
+            userCoinAccount.address,
             user.publicKey,
-            1_000_000
+            amount.toNumber(),
+        ); // QUANDO TIVER USANDO A CARTEIRA PHANTOM, NÃO PRECISA DESSA PARTE (EU ACHO KKKKKK)
+
+        const [lpTokenPda, bump] = await PublicKey.findProgramAddressSync(
+            [Buffer.from('lp_token'), sharedState.subAccountPda.toBuffer(), sharedState.strategyTokenAddress.toBuffer(), sharedState.coin.pubkey.toBuffer()],
+            managerProgram.programId
         );
+        sharedState.lpTokenPda = lpTokenPda;
 
         const tx = await managerProgram.methods
             .liquidityAdd(sharedState.strategyTokenAddress, sharedState.coin.decimals, amount)
@@ -70,13 +54,18 @@ describe("webdex_manager", () => {
                 user: sharedState.userPda,
                 subAccount: sharedState.subAccountPda,
                 strategyList: sharedState.strategyListPda,
-                coin: coinMint,
+                coin: sharedState.coin.pubkey,
                 signer: user.publicKey,
             })
-            .signers([]) // ou passe o user.payer se necessário
             .rpc();
 
         console.log("✅ liquidityAdd tx:", tx);
+
+        const userLpTokenAccountAta = await getAssociatedTokenAddress(
+            lpTokenPda,
+            user.publicKey
+        );
+        sharedState.userLpTokenAccountAta = userLpTokenAccountAta;
     });
 
     it("Add Liquidity", async () => {

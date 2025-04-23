@@ -52,13 +52,11 @@ describe("webdex_strategy", () => {
             )
             .accounts({
                 bot: sharedState.botPda,
-                tokenMint: mint.publicKey,
+                tokenAddress: strategyTokenAddress,
                 metadataProgram: METADATA_PROGRAM_ID,
                 metadata: metadataPda,
-                tokenAuthority: user.publicKey, // pessoa que cria o token e poderá futuramente usá-lo para mintar ou transferir a autoridade se desejar.,
                 signer: user.publicKey,
             })
-            .signers([mint]) // mint precisa estar assinado se você usar anchor_mint macro
             .rpc();
 
         console.log("🚀 Strategy Added TX:", tx);
@@ -80,7 +78,7 @@ describe("webdex_strategy", () => {
         expect(strategies[0]).to.have.all.keys("name", "tokenAddress", "isActive");
     });
 
-    it("Update Strategy Status", async () => {
+    it("Update Strategy Status - Mudando para False", async () => {
         const strategyList = await strategyProgram.account.strategyList.fetch(strategyListPda);
         const tokenAddress = strategyList.strategies[0].tokenAddress;
 
@@ -105,5 +103,21 @@ describe("webdex_strategy", () => {
             .view();
 
         console.log("🔍 Strategy Found:", foundStrategy);
+    });
+
+    it("Update Strategy Status - Mudando para True", async () => {
+        const strategyList = await strategyProgram.account.strategyList.fetch(strategyListPda);
+        const tokenAddress = strategyList.strategies[0].tokenAddress;
+
+        const tx = await strategyProgram.methods
+            .updateStrategyStatus(sharedState.contractAddress, tokenAddress, true)
+            .accounts({
+                bot: sharedState.botPda,
+                strategyList: strategyListPda,
+                signer: user.publicKey,
+            })
+            .rpc();
+
+        console.log("🔄 Updated Strategy Status TX:", tx);
     });
 });

@@ -156,7 +156,6 @@ pub fn _pass_add(ctx: Context<PassAdd>, amount: u64) -> Result<()> {
     Ok(())
 }
 
-
 pub fn _pass_remove(ctx: Context<PassRemove>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
@@ -196,9 +195,6 @@ pub fn _liquidity_add(
     amount: u64,
 ) -> Result<()> {
     let strategy_list = &mut ctx.accounts.strategy_list;
-    let signer = &ctx.accounts.signer;
-    let token_program = &ctx.accounts.token_program;
-    let vault_account = &ctx.accounts.vault_account;
 
     let strategy_opt = strategy_list
         .strategies
@@ -214,22 +210,32 @@ pub fn _liquidity_add(
         }
     }
 
-    // Transferência de token do usuário para a vault (subconta)
+   // 1. Transferência do token base do usuário → vault
     let transfer_accounts = Transfer {
-        from: ctx.accounts.signer.to_account_info(),
-        to: vault_account.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
+        from: ctx.accounts.user_token_account.to_account_info(),
+        to: ctx.accounts.vault_account.to_account_info(),
+        authority: ctx.accounts.signer.to_account_info(), // ✅ o dono da conta `from`
     };
-    let cpi_transfer_ctx = CpiContext::new(token_program.to_account_info(), transfer_accounts);
+
+    let cpi_transfer_ctx = CpiContext::new(
+        ctx.accounts.token_program.to_account_info(),
+        transfer_accounts,
+    );
     transfer(cpi_transfer_ctx, amount)?;
 
-    // Mint dos tokens LP para o usuário
-    let mint_to_accounts = MintTo {
-        mint: ctx.accounts.lp_token.to_account_info(),
-        to: ctx.accounts.user_token_account.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
-    };
-    let cpi_mint_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), mint_to_accounts);
+    // 2. Mint LP token para o usuário
+    let bump = ctx.bumps.mint_authority;
+    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority", &[bump]]];
+
+    let cpi_mint_ctx = CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        MintTo {
+            mint: ctx.accounts.lp_token.to_account_info(),
+            to: ctx.accounts.user_lp_token_account.to_account_info(),
+            authority: ctx.accounts.mint_authority.to_account_info(),
+        },
+        signer_seeds,
+    );
     mint_to(cpi_mint_ctx, amount)?;
 
     Ok(())
@@ -241,7 +247,6 @@ pub fn _rebalance_position<'info>(
     gas: u64,
     coin: Pubkey,
     fee: u64,
-    bump: u8,
 ) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
@@ -264,31 +269,26 @@ pub fn _rebalance_position<'info>(
     // Mint ou Burn LP Tokens
     let token_program = &ctx.accounts.token_program;
 
-    let seeds: &[&[u8]] = &[b"mint_authority", &[bump]];
-    let signer_seeds: &[&[&[u8]]] = &[seeds];
-
     if amount > 0 {
         // Mint
-        let cpi_ctx = CpiContext::new_with_signer(
+        let cpi_ctx = CpiContext::new(
             token_program.to_account_info(),
             MintTo {
                 mint: ctx.accounts.lp_token.to_account_info(),
                 to: ctx.accounts.user_lp_token_account.to_account_info(),
-                authority: ctx.accounts.mint_authority.to_account_info(),
+                authority: ctx.accounts.signer.to_account_info(),
             },
-            signer_seeds,
         );
         mint_to(cpi_ctx, amount as u64)?;
     } else {
         // Burn
-        let cpi_ctx = CpiContext::new_with_signer(
+        let cpi_ctx = CpiContext::new(
             token_program.to_account_info(),
             Burn {
                 mint: ctx.accounts.lp_token.to_account_info(),
                 from: ctx.accounts.user_lp_token_account.to_account_info(),
                 authority: ctx.accounts.signer.to_account_info(),
             },
-            &[],
         );
         burn(cpi_ctx, (-amount) as u64)?;
     }

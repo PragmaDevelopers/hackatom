@@ -203,9 +203,6 @@ pub struct RebalancePosition<'info> {
     #[account(mut)]
     pub user_lp_token_account: Account<'info, TokenAccount>,
 
-    /// CHECK: Apenas para seeds
-    pub mint_authority: AccountInfo<'info>,
-
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -217,9 +214,23 @@ pub struct RebalancePosition<'info> {
 #[instruction(strategy_token: Pubkey, decimals: u8)]
 pub struct LiquidityAdd<'info> {
     pub bot: Account<'info, Bot>,
+
     pub user: Account<'info, User>,
-    pub strategy_list: Account<'info, StrategyList>,
+
+    pub strategy_list: Account<'info,StrategyList>,
+
     pub sub_account: Account<'info, SubAccount>,
+
+    /// CHECK: Apenas para seeds
+    pub coin: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = coin,
+        associated_token::authority = signer,
+    )]
+    pub user_token_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
         init_if_needed,
@@ -227,9 +238,7 @@ pub struct LiquidityAdd<'info> {
         associated_token::mint = coin,
         associated_token::authority = sub_account
     )]
-    pub vault_account: Account<'info, TokenAccount>,
-
-    pub coin: Account<'info, Mint>,
+    pub vault_account: Account<'info, TokenAccount>, // onde o token vai
 
     #[account(
         init_if_needed,
@@ -237,18 +246,25 @@ pub struct LiquidityAdd<'info> {
         seeds = [b"lp_token", sub_account.key().as_ref(), strategy_token.as_ref(), coin.key().as_ref()],
         bump,
         mint::decimals = decimals,
-        mint::authority = signer.key(),
-        mint::freeze_authority = signer.key()
+        mint::authority = mint_authority,
+        mint::freeze_authority = mint_authority
     )]
-    pub lp_token: Account<'info, Mint>,
+    pub lp_token: Account<'info, Mint>, // mint do LP
 
-    #[account(
+     #[account(
         init_if_needed,
         payer = signer,
         associated_token::mint = lp_token,
         associated_token::authority = signer
     )]
-    pub user_token_account: Account<'info, TokenAccount>,
+    pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
+
+    #[account(
+        seeds = [b"mint_authority"],
+        bump
+    )]
+    /// CHECK: É usado como signer programático
+    pub mint_authority: AccountInfo<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
