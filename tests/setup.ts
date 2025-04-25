@@ -5,10 +5,24 @@ export const sharedState = {
     botPda: null as null | PublicKey,
     paymentsPda: null as null | PublicKey,
     coin: {
-        pubkey: null as null | PublicKey,
-        name: null as null | string,
-        symbol: null as null | string,
-        decimals: null as null | number,
+        usdt: {
+            pubkey: null as null | PublicKey,
+            name: null as null | string,
+            symbol: null as null | string,
+            decimals: null as null | number,
+        },
+        webdex: {
+            pubkey: null as null | PublicKey,
+            name: null as null | string,
+            symbol: null as null | string,
+            decimals: null as null | number,
+        },
+        pol: {
+            pubkey: null as null | PublicKey,
+            name: null as null | string,
+            symbol: null as null | string,
+            decimals: null as null | number,
+        },
     },
     strategyListPda: null as null | PublicKey,
     strategyTokenAddress: null as null | PublicKey,
@@ -20,4 +34,5 @@ export const sharedState = {
     METADATA_PROGRAM_ID: null as null | PublicKey,
     lpTokenPda: null as null | PublicKey,
     userLpTokenAccountAta: null as null | PublicKey,
+    lpMintAuthority: null as null | PublicKey,
 };

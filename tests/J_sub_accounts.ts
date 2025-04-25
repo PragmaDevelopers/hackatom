@@ -17,7 +17,7 @@ describe("webdex_sub_accounts", () => {
 
     it("Get Balance", async () => {
         const result = await subAccountsProgram.methods
-            .getBalance(sharedState.subAccountId.toString(), sharedState.strategyTokenAddress, sharedState.coin.pubkey)
+            .getBalance(sharedState.subAccountId.toString(), sharedState.strategyTokenAddress, sharedState.coin.usdt.pubkey)
             .accounts({
                 subAccount: sharedState.subAccountPda,
                 strategyBalance: sharedState.strategyBalancePda,
@@ -30,7 +30,7 @@ describe("webdex_sub_accounts", () => {
 
         console.log("BalanceStrategy:", result);
 
-        expect(result.token.toBase58()).to.equal(sharedState.coin.pubkey.toBase58());
+        expect(result.token.toBase58()).to.equal(sharedState.coin.usdt.pubkey.toBase58());
         expect(result.status).to.be.true;
     });
 
@@ -54,7 +54,7 @@ describe("webdex_sub_accounts", () => {
             .togglePause(
                 sharedState.subAccountId.toString(),
                 sharedState.strategyTokenAddress,
-                sharedState.coin.pubkey,
+                sharedState.coin.usdt.pubkey,
                 !isPausedCoin
             )
             .accounts({

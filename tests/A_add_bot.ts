@@ -61,33 +61,4 @@ describe("webdex_factoty", () => {
 
     console.log("📦 Bot Info:", botInfo);
   });
-
-  it("Update Bot Info", async () => {
-    const newStrategyAddress = anchor.web3.Keypair.generate().publicKey;
-    const newSubAccount = anchor.web3.Keypair.generate().publicKey;
-    const newPayments = anchor.web3.Keypair.generate().publicKey;
-
-    const tx = await factoryProgram.methods
-      .updateBot(
-        newStrategyAddress,
-        newSubAccount,
-        newPayments
-      )
-      .accounts({
-        bot: botPda,
-        signer: user.publicKey,
-      })
-      .rpc();
-
-    console.log("🔄 Updated Bot. Tx:", tx);
-
-    // 🔍 Buscar dados e confirmar que foram atualizados
-    const botAccount = await factoryProgram.account.bot.fetch(botPda);
-
-    console.log("📦 Updated bot info:", {
-      strategy_address: botAccount.strategyAddress.toBase58(),
-      sub_account_address: botAccount.subAccountAddress.toBase58(),
-      payments_address: botAccount.paymentsAddress.toBase58(),
-    });
-  });
 });

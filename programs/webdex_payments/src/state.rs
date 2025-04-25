@@ -8,6 +8,7 @@ use webdex_strategy::state::{StrategyList};
 use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
 
 use anchor_spl::token::{Token,TokenAccount,Mint};
+use anchor_spl::associated_token::AssociatedToken;
 
 #[account]
 pub struct Payments {
@@ -91,7 +92,6 @@ pub struct RevokeOrAllowCurrency<'info> {
     pub signer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
 }
 
 #[derive(Accounts)]
@@ -103,7 +103,9 @@ pub struct RemoveCoin<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(decimals: u8)]
 pub struct OpenPosition<'info> {
+    #[account(mut)]
     pub bot: Account<'info, Bot>,
 
     pub payments: Account<'info, Payments>,
@@ -112,16 +114,27 @@ pub struct OpenPosition<'info> {
 
     pub sub_account: Account<'info, SubAccount>,
 
+    #[account(mut)]
     pub strategy_balance: Account<'info, StrategyBalanceList>, 
 
     #[account(mut)]
     pub user: Account<'info, User>,
 
     #[account(mut)]
-    pub lp_token: Account<'info, Mint>, // ✅ LP token necessário pra mint/burn
+    /// CHECK: PDA criada no programa `manager`
+    pub lp_token: AccountInfo<'info>,
 
     #[account(mut)]
-    pub user_lp_token_account: Account<'info, TokenAccount>, // ✅ Conta onde LP será creditado/debitado
+    /// CHECK: PDA criada no programa `manager`
+    pub user_lp_token_account: AccountInfo<'info>,
+
+    #[account(mut)]
+    /// CHECK: É usado como signer programático
+    pub bot_owner: AccountInfo<'info>,
+
+    #[account(mut)]
+    /// CHECK: É usado como signer programático
+    pub lp_mint_authority: AccountInfo<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -131,6 +144,7 @@ pub struct OpenPosition<'info> {
 
     /// CHECK: CPI calls
     pub sub_account_program: AccountInfo<'info>,
+
     /// CHECK: CPI calls
     pub manager_program: AccountInfo<'info>,
 }
@@ -145,7 +159,7 @@ pub struct OpenPositionEvent {
     pub old_balance: u64,
     pub fee: u64,
     pub gas: u64,
-    pub profit: i64,
+    pub profit: u64,
 }
 
 #[event]

@@ -24,10 +24,10 @@ describe("webdex_manager", () => {
     const amount = new anchor.BN(100_000);
 
     it("Liquidity Add", async () => {
-        const userCoinAccount = await getOrCreateAssociatedTokenAccount(
+        const userUsdtAccount = await getOrCreateAssociatedTokenAccount(
             provider.connection,
             user.payer,
-            sharedState.coin.pubkey,
+            sharedState.coin.usdt.pubkey,
             user.publicKey
         ); // QUANDO TIVER USANDO A CARTEIRA PHANTOM, NÃO PRECISA DESSA PARTE (EU ACHO KKKKKK)
 
@@ -35,37 +35,49 @@ describe("webdex_manager", () => {
         await mintTo(
             provider.connection,
             user.payer,
-            sharedState.coin.pubkey,
-            userCoinAccount.address,
+            sharedState.coin.usdt.pubkey,
+            userUsdtAccount.address,
             user.publicKey,
             amount.toNumber(),
         ); // QUANDO TIVER USANDO A CARTEIRA PHANTOM, NÃO PRECISA DESSA PARTE (EU ACHO KKKKKK)
 
-        const [lpTokenPda, bump] = await PublicKey.findProgramAddressSync(
-            [Buffer.from('lp_token'), sharedState.subAccountPda.toBuffer(), sharedState.strategyTokenAddress.toBuffer(), sharedState.coin.pubkey.toBuffer()],
-            managerProgram.programId
-        );
-        sharedState.lpTokenPda = lpTokenPda;
-
         const tx = await managerProgram.methods
-            .liquidityAdd(sharedState.strategyTokenAddress, sharedState.coin.decimals, amount)
+            .liquidityAdd(sharedState.strategyTokenAddress, sharedState.coin.usdt.decimals, amount)
             .accounts({
                 bot: sharedState.botPda,
                 user: sharedState.userPda,
                 subAccount: sharedState.subAccountPda,
                 strategyList: sharedState.strategyListPda,
-                coin: sharedState.coin.pubkey,
+                usdtMint: sharedState.coin.usdt.pubkey,
                 signer: user.publicKey,
             })
             .rpc();
 
         console.log("✅ liquidityAdd tx:", tx);
 
-        const userLpTokenAccountAta = await getAssociatedTokenAddress(
-            lpTokenPda,
-            user.publicKey
+        const [lpTokenPda] = await PublicKey.findProgramAddressSync(
+            [Buffer.from('lp_token')],
+            managerProgram.programId
         );
-        sharedState.userLpTokenAccountAta = userLpTokenAccountAta;
+        sharedState.lpTokenPda = lpTokenPda;
+
+        const [mintAuthorityPda, bump] = PublicKey.findProgramAddressSync(
+            [Buffer.from("mint_authority")],
+            managerProgram.programId
+        );
+        sharedState.lpMintAuthority = mintAuthorityPda;
+
+        const userLpTokenAccountAta = await getOrCreateAssociatedTokenAccount(
+            provider.connection,
+            user.payer,
+            lpTokenPda,
+            mintAuthorityPda,
+            true,
+        );
+        sharedState.userLpTokenAccountAta = userLpTokenAccountAta.address;
+
+        const ataInfo = await getAccount(provider.connection, userLpTokenAccountAta.address);
+        console.log("Owner da ATA:", ataInfo.owner.toBase58());
     });
 
     it("Add Liquidity", async () => {
@@ -79,11 +91,11 @@ describe("webdex_manager", () => {
             .addLiquidity(
                 sharedState.strategyTokenAddress,
                 sharedState.subAccountId.toString(),
-                sharedState.coin.pubkey,
+                sharedState.coin.usdt.pubkey,
                 amount,
-                sharedState.coin.name,
-                sharedState.coin.symbol,
-                sharedState.coin.decimals,
+                sharedState.coin.usdt.name,
+                sharedState.coin.usdt.symbol,
+                sharedState.coin.usdt.decimals,
             )
             .accounts({
                 user: sharedState.userPda,

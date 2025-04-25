@@ -35,5 +35,7 @@ pub enum ErrorCode {
     #[msg("Coin Not Registered")]
     CoinNotRegistered,
     #[msg("Invalid Coin")]
-    InvalidCoin
+    InvalidCoin,
+    #[msg("Invalid Coin")]
+    InvalidAuthority
 }

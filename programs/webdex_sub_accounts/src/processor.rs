@@ -158,7 +158,6 @@ pub fn _add_liquidity<'info>(
 
     // Emite evento
     emit!(BalanceLiquidityEvent {
-        signer: signer.key(),
         user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
@@ -374,7 +373,6 @@ pub fn _remove_liquidity(
 
     // ✅ Emite evento de saída
     emit!(BalanceLiquidityEvent {
-        signer: signer.key(),
         user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
@@ -392,7 +390,7 @@ pub fn _position_liquidity<'info>(
     account_id: String,
     strategy_token: Pubkey,
     coin: Pubkey,
-    amount: i64, // pode ser positivo ou negativo
+    amount: u64, // pode ser positivo ou negativo
 ) -> Result<u64> {
     let sub_account = &ctx.accounts.sub_account;
 
@@ -426,24 +424,22 @@ pub fn _position_liquidity<'info>(
 
     // ✅ Aplica a operação
     let new_balance = if amount >= 0 {
-        entry.amount.saturating_add(amount as u64)
+        entry.amount.saturating_add(amount)
     } else {
-        let sub = amount.unsigned_abs();
-        if entry.amount < sub {
+        if entry.amount < amount {
             return Err(ErrorCode::InsufficientFunds.into());
         }
-        entry.amount.saturating_sub(sub)
+        entry.amount.saturating_sub(amount)
     };
 
     entry.amount = new_balance;
 
     emit!(BalanceLiquidityEvent {
-        signer: ctx.accounts.signer.key(),
         user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
         coin,
-        amount: amount.unsigned_abs(),
+        amount: amount,
         increase: amount >= 0,
         is_operation: true,
     });

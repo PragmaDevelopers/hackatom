@@ -45,5 +45,7 @@ pub enum ErrorCode {
     #[msg("You must the WebDexPayments")]
     YouMustTheWebDexPayments,
     #[msg("Strategy Not Found")]
-    StrategyNotFound
+    StrategyNotFound,
+    #[msg("Invalid Authority")]
+    InvalidAuthority,
 }

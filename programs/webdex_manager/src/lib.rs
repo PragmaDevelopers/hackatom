@@ -23,6 +23,26 @@ pub mod webdex_manager {
         _register(ctx,manager)
     }
 
+    pub fn get_info_user(ctx: Context<GetInfoUser>) -> Result<UserDisplay> {
+        _get_info_user(ctx)
+    }
+
+    pub fn add_gas(ctx: Context<AddGas>, amount: u64) -> Result<()> {
+        _add_gas(ctx,amount)
+    }
+
+    pub fn remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
+        _remove_gas(ctx,amount)
+    }
+
+    pub fn pass_add(ctx: Context<PassAdd>, amount: u64) -> Result<()> {
+        _pass_add(ctx,amount)
+    }
+
+    pub fn pass_remove(ctx: Context<PassRemove>, amount: u64) -> Result<()> {
+        _pass_remove(ctx,amount)
+    }
+
     pub fn liquidity_add(
         ctx: Context<LiquidityAdd>,
         strategy_token: Pubkey,

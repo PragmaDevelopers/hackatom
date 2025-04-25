@@ -83,31 +83,7 @@ pub struct RegisterEvent {
 
 #[derive(Accounts)]
 pub struct GetInfoUser<'info> {
-    #[account(
-        seeds = [b"user", signer.key().as_ref()],
-        bump
-    )]
     pub user: Account<'info, User>,
-
-    pub signer: Signer<'info>,
-}
-
-#[derive(Accounts)]
-pub struct RemoveGas<'info> {
-    #[account(
-        mut,
-        seeds = [b"user", signer.key().as_ref()],
-        bump,
-        constraint = user.status @ ErrorCode::UnregisteredUser
-    )]
-    pub user: Account<'info, User>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    /// CHECK: Conta do programa que contém os fundos (ex: treasury)
-    #[account(mut)]
-    pub vault_account: Account<'info, TokenAccount>,
 }
 
 #[derive(Accounts)]
@@ -120,12 +96,65 @@ pub struct AddGas<'info> {
     )]
     pub user: Account<'info, User>,
 
+    /// CHECK: Apenas para seeds
+    pub pol_mint: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = pol_mint,
+        associated_token::authority = signer,
+    )]
+    pub user_pol_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = pol_mint,
+        associated_token::authority = signer
+    )]
+    pub vault_pol_account: Account<'info, TokenAccount>, // onde o token vai
+
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    /// CHECK: Conta que vai receber o SOL (ex: treasury)
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+pub struct RemoveGas<'info> {
+    #[account(
+        mut,
+        seeds = [b"user", signer.key().as_ref()],
+        bump,
+        constraint = user.status @ ErrorCode::UnregisteredUser
+    )]
+    pub user: Account<'info, User>,
+
+    /// CHECK: Apenas para seeds
+    pub pol_mint: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = pol_mint,
+        associated_token::authority = signer,
+    )]
+    pub user_pol_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(
+        mut,
+        associated_token::mint = pol_mint,
+        associated_token::authority = signer
+    )]
+    pub vault_pol_account: Account<'info, TokenAccount>, // onde o token vai
+
     #[account(mut)]
-    pub vault_account: Account<'info, TokenAccount>,
+    pub signer: Signer<'info>,
+
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[derive(Accounts)]
@@ -138,16 +167,31 @@ pub struct PassAdd<'info> {
     )]
     pub user: Account<'info, User>,
 
+    /// CHECK: Apenas para seeds
+    pub webdex_mint: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = webdex_mint,
+        associated_token::authority = signer,
+    )]
+    pub user_webdex_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = webdex_mint,
+        associated_token::authority = signer
+    )]
+    pub vault_webdex_account: Account<'info, TokenAccount>, // onde o token vai
+
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    /// CHECK: Conta que vai receber o SOL (ex: treasury)
-    #[account(mut)]
-    pub vault_account: Account<'info, TokenAccount>,
-
-    pub token_mint: Account<'info, Mint>,
-
+    pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[derive(Accounts)]
@@ -160,16 +204,28 @@ pub struct PassRemove<'info> {
     )]
     pub user: Account<'info, User>, // Guarda pass_balance
 
+    /// CHECK: Apenas para seeds
+    pub webdex_mint: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = webdex_mint,
+        associated_token::authority = signer,
+    )]
+    pub user_webdex_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(
+        mut,
+        associated_token::mint = webdex_mint,
+        associated_token::authority = signer
+    )]
+    pub vault_webdex_account: Account<'info, TokenAccount>, // onde o token vai
+
     #[account(mut)]
     pub signer: Signer<'info>, // quem está pedindo o saque
 
-    /// CHECK: Conta que vai receber o SOL (ex: treasury)
-    #[account(mut)]
-    pub vault_account: Account<'info, TokenAccount>,
-
-    pub token_mint: Account<'info, Mint>,
-
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[event]
@@ -191,26 +247,6 @@ pub struct BalancePassEvent {
 }
 
 #[derive(Accounts)]
-pub struct RebalancePosition<'info> {
-    #[account(mut)]
-    pub user: Account<'info, User>,
-
-    pub bot: Account<'info, Bot>,
-
-    #[account(mut)]
-    pub lp_token: Account<'info, Mint>,
-
-    #[account(mut)]
-    pub user_lp_token_account: Account<'info, TokenAccount>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
-}
-
-#[derive(Accounts)]
 #[instruction(strategy_token: Pubkey, decimals: u8)]
 pub struct LiquidityAdd<'info> {
     pub bot: Account<'info, Bot>,
@@ -222,32 +258,32 @@ pub struct LiquidityAdd<'info> {
     pub sub_account: Account<'info, SubAccount>,
 
     /// CHECK: Apenas para seeds
-    pub coin: AccountInfo<'info>,
+    pub usdt_mint: AccountInfo<'info>,
 
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = coin,
+        associated_token::mint = usdt_mint,
         associated_token::authority = signer,
     )]
-    pub user_token_account: Account<'info, TokenAccount>, // do SPL depositado
+    pub user_usdt_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = coin,
+        associated_token::mint = usdt_mint,
         associated_token::authority = sub_account
     )]
-    pub vault_account: Account<'info, TokenAccount>, // onde o token vai
+    pub vault_usdt_account: Account<'info, TokenAccount>, // onde o token vai
 
     #[account(
         init_if_needed,
         payer = signer,
-        seeds = [b"lp_token", sub_account.key().as_ref(), strategy_token.as_ref(), coin.key().as_ref()],
+        seeds = [b"lp_token"],
         bump,
         mint::decimals = decimals,
-        mint::authority = mint_authority,
-        mint::freeze_authority = mint_authority
+        mint::authority = lp_mint_authority,
+        mint::freeze_authority = lp_mint_authority
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
@@ -255,7 +291,7 @@ pub struct LiquidityAdd<'info> {
         init_if_needed,
         payer = signer,
         associated_token::mint = lp_token,
-        associated_token::authority = signer
+        associated_token::authority = lp_mint_authority
     )]
     pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
@@ -264,7 +300,7 @@ pub struct LiquidityAdd<'info> {
         bump
     )]
     /// CHECK: É usado como signer programático
-    pub mint_authority: AccountInfo<'info>,
+    pub lp_mint_authority: AccountInfo<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -272,4 +308,36 @@ pub struct LiquidityAdd<'info> {
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+#[instruction(decimals: u8)]
+pub struct RebalancePosition<'info> {
+    #[account(mut)]
+    pub user: Account<'info, User>,
+
+    #[account(mut)]
+    pub bot: Account<'info, Bot>,
+
+    #[account(mut)]
+    /// CHECK
+    pub bot_owner: AccountInfo<'info>,
+
+    #[account(mut)]
+    /// CHECK:
+    pub lp_token: AccountInfo<'info>, // mint do LP
+
+    #[account(mut)]
+     /// CHECK:
+    pub user_lp_token_account: AccountInfo<'info>, // recebe LP tokens
+
+    #[account(mut,signer)]
+    /// CHECK
+    pub lp_mint_authority: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
 }

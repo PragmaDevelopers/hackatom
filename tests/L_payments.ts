@@ -27,7 +27,7 @@ describe("webdex_payments", () => {
         // const { name, symbol, decimals } = await fetchTokenInfoFromChain(usdcMint);
 
         const tx = await paymentsProgram.methods
-            .currencyRevoke(sharedState.coin.pubkey, sharedState.coin.name, sharedState.coin.symbol, sharedState.coin.decimals)
+            .currencyRevoke(sharedState.coin.usdt.pubkey, sharedState.coin.usdt.name, sharedState.coin.usdt.symbol, sharedState.coin.usdt.decimals)
             .accounts({
                 bot: sharedState.botPda,
                 signer: user.publicKey,
@@ -82,58 +82,4 @@ describe("webdex_payments", () => {
 
         console.log("Fee Tiers:", feeTiers);
     });
-
-    /*it("Open Position", async () => {
-        const user = provider.wallet;
-
-        const accountId = "acc001";
-        const strategyToken = new PublicKey("STRATEGY_TOKEN_PUBLIC_KEY"); // substitua
-        const coin = new PublicKey("COIN_MINT_PUBLIC_KEY"); // substitua
-        const amount = new anchor.BN(100_000);
-        const gas = new anchor.BN(10_000);
-
-        // Mock de moedas aceitas no payments
-        const currencys = [
-            {
-                from: new PublicKey("TOKEN_A_PUBKEY"),
-                to: new PublicKey("TOKEN_B_PUBKEY"),
-            },
-        ];
-
-        const [mintAuthorityPda] = await PublicKey.findProgramAddressSync(
-            [Buffer.from("mint_authority")],
-            paymentsProgram.programId
-        );
-
-        const tx = await paymentsProgram.methods
-            .openPosition(
-                accountId,
-                strategyToken,
-                amount,
-                coin,
-                gas,
-                currencys
-            )
-            .accounts({
-                bot: sharedState.botPda,
-                payments: sharedState.paymentsPda,
-                strategy: STRATEGY_PUBKEY, // substitua
-                subAccountProgram: SUB_ACCOUNT_PROGRAM_ID,
-                subAccount: SUB_ACCOUNT_PUBKEY,
-                strategyBalance: STRATEGY_BALANCE_PUBKEY,
-                user: user.publicKey,
-                managerAddress: CONTRACT_ADDRESS,
-                managerProgram: MANAGER_PROGRAM_ID,
-                lpToken: LP_TOKEN_PUBKEY,
-                tokenProgram: anchor.utils.token.TOKEN_PROGRAM_ID,
-                mintAuthority: mintAuthorityPda,
-                userLpTokenAccount: USER_LP_TOKEN_ACCOUNT,
-                signer: user.publicKey,
-                systemProgram: SystemProgram.programId,
-            })
-            .signers([])
-            .rpc();
-
-        console.log("✅ open_position tx:", tx);
-    });*/
 });

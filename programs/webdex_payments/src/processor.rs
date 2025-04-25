@@ -4,7 +4,7 @@ use crate::state::*;
 use crate::error::ErrorCode;
 
 use webdex_manager::{state::RebalancePosition, processor::_rebalance_position};
-use webdex_sub_accounts::{state::PositionLiquidity, processor::_position_liquidity, program::WebdexSubAccounts};
+use webdex_sub_accounts::{state::PositionLiquidity, processor::_position_liquidity};
 
 pub fn _add_fee_tiers<'info>(
     ctx: Context<AddFeeTiers<'info>>,
@@ -127,9 +127,10 @@ pub fn _remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
 
 pub fn _open_position(
     ctx: Context<OpenPosition>,
+    _decimals: u8,
     account_id: String,
     strategy_token: Pubkey,
-    amount: i64,
+    amount: u64,
     coin: Pubkey,
     gas: u64,
     currrencys: Vec<Currencys>,
@@ -171,7 +172,6 @@ pub fn _open_position(
             user: ctx.accounts.user.clone(),
             sub_account: ctx.accounts.sub_account.clone(),
             strategy_balance: ctx.accounts.strategy_balance.clone(),
-            signer: ctx.accounts.signer.clone(),
         },
     );
 
@@ -191,9 +191,11 @@ pub fn _open_position(
         RebalancePosition {
             user: ctx.accounts.user.clone(),
             bot: ctx.accounts.bot.clone(),
+            bot_owner: ctx.accounts.bot_owner.clone(),
             lp_token: ctx.accounts.lp_token.clone(),
             token_program: ctx.accounts.token_program.clone(),
             user_lp_token_account: ctx.accounts.user_lp_token_account.clone(),
+            lp_mint_authority: ctx.accounts.lp_mint_authority.clone(),
             signer: ctx.accounts.signer.clone(),
             system_program: ctx.accounts.system_program.clone(),
         },
@@ -202,9 +204,9 @@ pub fn _open_position(
     // 5. Chamada CPI → manager.rebalance_position()
     _rebalance_position(
         cpi_ctx_manager,
+        _decimals,
         amount,
         gas,
-        coin,
         fee,
     )?;
 

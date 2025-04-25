@@ -8,7 +8,7 @@ import { expect } from "chai";
 import { sharedState } from "./setup";
 import { BN } from "bn.js";
 
-describe("webdex_payments", () => {
+describe("webdex_payments/manager", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
@@ -17,39 +17,50 @@ describe("webdex_payments", () => {
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const user = provider.wallet;
 
+    const amount = new BN(1_000_000);
+    const gas = new BN(1_000)
+
+    let fee;
+
     it("Open Position", async () => {
-        const amount = new BN(1_000_000);
-        const gas = new BN(1_000)
         const currencys = [
             {
-                from: sharedState.coin.pubkey,
-                to: sharedState.coin.pubkey,
+                from: sharedState.coin.pol.pubkey,
+                to: sharedState.coin.pol.pubkey,
             }
         ];
         const tx = await paymentsProgram.methods
             .openPosition(
+                sharedState.coin.usdt.decimals,
                 sharedState.subAccountId.toString(),
                 sharedState.strategyTokenAddress,
                 amount,
-                sharedState.coin.pubkey,
+                sharedState.coin.usdt.pubkey,
                 gas,
-                currencys
+                currencys,
             )
             .accounts({
                 bot: sharedState.botPda,
+                botOwner: user.publicKey,
                 payments: sharedState.paymentsPda,
                 strategyList: sharedState.strategyListPda,
                 strategyBalance: sharedState.strategyBalancePda,
                 subAccount: sharedState.subAccountPda,
                 user: sharedState.userPda,
-                signer: user.publicKey,
-                lpToken: sharedState.lpTokenPda,
-                userLpTokenAccount: sharedState.userLpTokenAccountAta,
                 managerProgram: managerProgram.programId,
                 subAccountProgram: subAccountsProgram.programId,
+                lpToken: sharedState.lpTokenPda,
+                userLpTokenAccount: sharedState.userLpTokenAccountAta,
+                lpMintAuthority: sharedState.lpMintAuthority,
             })
             .rpc();
 
         console.log("✅ Transação:", tx);
+
+        const txDetails = await provider.connection.getParsedTransaction(tx, {
+            commitment: "confirmed",
+        });
+
+        console.log(txDetails)
     });
 });

@@ -1,11 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexManager } from "../target/types/webdex_manager";
-import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
-import {
-    createMint, getOrCreateAssociatedTokenAccount, mintTo
-} from "@solana/spl-token";
 import { sharedState } from "./setup";
 
 describe("webdex_manager", () => {
@@ -47,9 +43,5 @@ describe("webdex_manager", () => {
             .rpc();
 
         console.log("✅ Transaction:", tx);
-
-        // Verifica que a conta user foi criada e populada
-        const userAccount = await managerProgram.account.user.fetch(userPda);
-        console.log("👤 User account:", userAccount);
     });
 });

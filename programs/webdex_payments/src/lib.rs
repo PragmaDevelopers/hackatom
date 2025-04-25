@@ -55,13 +55,14 @@ pub mod webdex_payments {
 
     pub fn open_position(
         ctx: Context<OpenPosition>,
+        _decimals: u8,
         account_id: String,
         strategy_token: Pubkey,
-        amount: i64,
+        amount: u64,
         coin: Pubkey,
         gas: u64,
         currrencys: Vec<Currencys>,
     ) -> Result<()> {
-        _open_position(ctx,account_id,strategy_token,amount,coin,gas,currrencys)
+        _open_position(ctx,_decimals,account_id,strategy_token,amount,coin,gas,currrencys)
     }
 }

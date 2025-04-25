@@ -78,7 +78,6 @@ pub struct CreateSubAccountEvent {
 
 #[event]
 pub struct BalanceLiquidityEvent {
-    pub signer: Pubkey,
     pub user: Pubkey,
     pub id: String,
     pub strategy_token: Pubkey,
@@ -239,15 +238,14 @@ pub struct TogglePause<'info> {
 #[derive(Accounts)]
 #[instruction(account_id: String, strategy_token: Pubkey)]
 pub struct PositionLiquidity<'info> {
+    #[account(mut)]
     pub bot: Account<'info, Bot>,
 
+    #[account(mut)]
     pub user: Account<'info, User>,
 
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(mut)]
     pub strategy_balance: Account<'info, StrategyBalanceList>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
 }
