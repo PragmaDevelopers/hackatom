@@ -16,7 +16,7 @@ describe("webdex_factoty", () => {
       .updateBot(
         sharedState.strategyTokenAddress,
         sharedState.subAccountPda,
-        sharedState.paymentsPda,
+        user.publicKey,
       )
       .accounts({
         bot: sharedState.botPda,

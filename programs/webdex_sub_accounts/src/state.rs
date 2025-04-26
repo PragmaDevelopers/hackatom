@@ -248,4 +248,7 @@ pub struct PositionLiquidity<'info> {
 
     #[account(mut)]
     pub strategy_balance: Account<'info, StrategyBalanceList>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
 }

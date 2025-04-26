@@ -26,8 +26,10 @@ pub mod webdex_factory {
         sub_account_address: Pubkey,
         payments_address: Pubkey,
         token_pass_address: Pubkey,
+        fee_withdraw_network: u64,
+        fee_collector_network_address: Pubkey,
     ) -> Result<()> {
-        _add_bot(ctx,name,prefix,owner,contract_address,strategy_address,sub_account_address,payments_address,token_pass_address)
+        _add_bot(ctx,name,prefix,owner,contract_address,strategy_address,sub_account_address,payments_address,token_pass_address,fee_withdraw_network,fee_collector_network_address)
     }
 
     pub fn get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Result<BotInfo> {

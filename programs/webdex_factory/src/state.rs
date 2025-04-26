@@ -11,6 +11,8 @@ pub struct BotInfo {
     pub sub_account_address: Pubkey,
     pub payments_address: Pubkey,
     pub token_pass_address: Pubkey,
+    pub fee_withdraw_network: u64,
+    pub fee_collector_network_address: Pubkey,
 }
 
 #[event]

@@ -11,7 +11,7 @@ describe("webdex_manager", () => {
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const user = provider.wallet;
 
-    it("Register", async () => {
+    it("Register User", async () => {
         // Deriva o PDA do manager
         const [managerPda] = PublicKey.findProgramAddressSync(
             [Buffer.from("manager"), user.publicKey.toBuffer()],
@@ -43,5 +43,17 @@ describe("webdex_manager", () => {
             .rpc();
 
         console.log("✅ Transaction:", tx);
+    });
+
+    it("Get User", async () => {
+        // REGISTRANDO USER
+        const user = await managerProgram.methods
+            .getInfoUser()
+            .accounts({
+                user: sharedState.userPda,
+            })
+            .view();
+
+        console.log("📦 User:", user);
     });
 });

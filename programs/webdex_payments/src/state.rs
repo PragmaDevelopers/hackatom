@@ -132,7 +132,7 @@ pub struct OpenPosition<'info> {
     /// CHECK: É usado como signer programático
     pub bot_owner: AccountInfo<'info>,
 
-    #[account(mut)]
+    #[account(mut,signer)]
     /// CHECK: É usado como signer programático
     pub lp_mint_authority: AccountInfo<'info>,
 

@@ -52,6 +52,8 @@ describe("webdex_payments/manager", () => {
                 lpToken: sharedState.lpTokenPda,
                 userLpTokenAccount: sharedState.userLpTokenAccountAta,
                 lpMintAuthority: sharedState.lpMintAuthority,
+                signer: user.publicKey,
+
             })
             .rpc();
 

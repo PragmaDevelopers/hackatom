@@ -3,6 +3,7 @@ import { Program } from "@coral-xyz/anchor";
 import { WebdexFactory } from "../target/types/webdex_factory";
 import { PublicKey } from "@solana/web3.js";
 import { sharedState } from "./setup";
+import { BN } from "bn.js";
 
 describe("webdex_factoty", () => {
   const provider = anchor.AnchorProvider.env();
@@ -20,6 +21,8 @@ describe("webdex_factoty", () => {
     const subAccountAddress = PublicKey.default;
     const tokenPassAddress = PublicKey.default;
     const paymentsAddress = PublicKey.default;
+    const fee_withdraw_network = new BN(0.05);
+    const fee_collector_network_address = user.publicKey;
 
     // 🔀 contractAddress aleatório
     contractAddress = anchor.web3.Keypair.generate().publicKey;
@@ -41,6 +44,8 @@ describe("webdex_factoty", () => {
         subAccountAddress,
         paymentsAddress,
         tokenPassAddress,
+        fee_withdraw_network,
+        fee_collector_network_address,
       )
       .accounts({
         signer: user.publicKey, // owner é quem paga

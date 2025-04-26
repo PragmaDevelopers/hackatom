@@ -172,6 +172,7 @@ pub fn _open_position(
             user: ctx.accounts.user.clone(),
             sub_account: ctx.accounts.sub_account.clone(),
             strategy_balance: ctx.accounts.strategy_balance.clone(),
+            signer: ctx.accounts.signer.clone(),
         },
     );
 
@@ -196,8 +197,8 @@ pub fn _open_position(
             token_program: ctx.accounts.token_program.clone(),
             user_lp_token_account: ctx.accounts.user_lp_token_account.clone(),
             lp_mint_authority: ctx.accounts.lp_mint_authority.clone(),
-            signer: ctx.accounts.signer.clone(),
             system_program: ctx.accounts.system_program.clone(),
+            signer: ctx.accounts.signer.clone(),
         },
     );
 

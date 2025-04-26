@@ -5,6 +5,7 @@ members = [
     "programs/webdex_strategy",
     "programs/webdex_sub_accounts",
     "programs/webdex_manager",
+    "programs/webdex_network",
     "shared/factory",
     "shared/payments",
     "shared/manager",

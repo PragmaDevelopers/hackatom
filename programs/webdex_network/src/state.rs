@@ -1,0 +1,117 @@
+use anchor_lang::prelude::*;
+use anchor_spl::token::{Token,TokenAccount,Mint};
+use anchor_spl::associated_token::AssociatedToken;
+use shared_factory::state::{Bot};
+use shared_manager::state::{User};
+
+#[account]
+pub struct BalanceInfo {
+    pub balance: u64,
+    pub token: Pubkey,
+    pub user: Pubkey,
+    pub contract_address: Pubkey,
+}
+
+#[account]
+pub struct BalanceInfoList {
+    pub balances: Vec<BalanceInfo>,
+}
+
+#[event]
+pub struct BalanceNetworkAdd {
+    pub contract_address: Pubkey,
+    pub user: Pubkey,
+    pub id: String,
+    pub token: Pubkey,
+    pub new_balance: u64,
+    pub amount: u64,
+}
+
+#[event]
+pub struct BalanceNetworkRemove {
+    pub contract_address: Pubkey,
+    pub user: Pubkey,
+    pub token: Pubkey,
+    pub new_balance: u64,
+    pub amount: u64,
+    pub fee: u64,
+}
+
+#[derive(Accounts)]
+#[instruction(contract_address: Pubkey)]
+pub struct PayFee<'info> {
+    #[account(mut)]
+    pub user: Account<'info, User>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = 8 + std::mem::size_of::<BalanceInfo>(),
+        seeds = [b"balance_info", contract_address.key().as_ref(), user.key().as_ref(), usdt_mint.key().as_ref()],
+        bump
+    )]
+    pub balance_info: Account<'info, BalanceInfo>,
+
+    /// CHECK: Apenas para seeds
+    pub usdt_mint: Account<'info, Mint>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+}
+
+#[derive(Accounts)]
+#[instruction(contract_address: Pubkey)]
+pub struct Withdrawal<'info> {
+    #[account(mut)]
+    pub user: Account<'info, User>,
+
+    #[account(mut)]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        mut,
+        seeds = [b"balance_info", contract_address.key().as_ref(), user.key().as_ref(), usdt_mint.key().as_ref()],
+        bump
+    )]
+    pub balance_info: Account<'info, BalanceInfo>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = usdt_mint,
+        associated_token::authority = signer,
+    )]
+    pub user_network_account: Account<'info, TokenAccount>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = usdt_mint,
+        associated_token::authority = fee_collector_network_address,
+    )]
+    pub vault_network_account: Account<'info, TokenAccount>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = usdt_mint,
+        associated_token::authority = fee_collector_network_address,
+    )]
+    pub fee_collector_network_account: Account<'info, TokenAccount>,
+
+    #[account(mut,signer)]
+    /// CHECK:
+    pub fee_collector_network_address: AccountInfo<'info>,
+
+    /// CHECK: Apenas para seeds
+    pub usdt_mint: Account<'info, Mint>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+}

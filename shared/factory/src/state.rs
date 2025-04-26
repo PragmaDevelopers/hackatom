@@ -10,8 +10,10 @@ pub struct Bot {
     pub sub_account_address: Pubkey,
     pub payments_address: Pubkey,
     pub token_pass_address: Pubkey,
+    pub fee_withdraw_network: u64,
+    pub fee_collector_network_address: Pubkey,
 }
 
 impl Bot {
-    pub const INIT_SPACE: usize = 8 + 36 + 14 + 32 * 6;
+    pub const INIT_SPACE: usize = 8 + 36 + 14 + 32 * 8 + 8;
 }

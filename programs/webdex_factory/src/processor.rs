@@ -12,6 +12,8 @@ pub fn _add_bot(
     sub_account_address: Pubkey,
     payments_address: Pubkey,
     token_pass_address: Pubkey,
+    fee_withdraw_network: u64,
+    fee_collector_network_address: Pubkey,
 ) -> Result<()> {
     let bot = &mut ctx.accounts.bot;
 
@@ -28,6 +30,8 @@ pub fn _add_bot(
     bot.sub_account_address = sub_account_address;
     bot.payments_address = payments_address;
     bot.token_pass_address = token_pass_address;
+    bot.fee_withdraw_network = fee_withdraw_network;
+    bot.fee_collector_network_address = fee_collector_network_address;
 
     emit!(BotCreated {
         contract_address,
@@ -54,6 +58,8 @@ pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Resu
         sub_account_address: bot.sub_account_address,
         payments_address: bot.payments_address,
         token_pass_address: bot.token_pass_address,
+        fee_withdraw_network: bot.fee_withdraw_network,
+        fee_collector_network_address: bot.fee_collector_network_address,
     })
 }
 

@@ -240,8 +240,9 @@ pub fn _rebalance_position<'info>(
     fee: u64,
 ) -> Result<()> {
     let user = &mut ctx.accounts.user;
+    let signer = &mut ctx.accounts.signer;
 
-    if ctx.accounts.bot.payments_address == Pubkey::default() {
+    if ctx.accounts.bot.payments_address != signer.key() {
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 

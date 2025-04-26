@@ -3063,6 +3063,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "webdex_network"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "shared_factory",
+ "shared_manager",
+]
+
+[[package]]
 name = "webdex_payments"
 version = "0.1.0"
 dependencies = [

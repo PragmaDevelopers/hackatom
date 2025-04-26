@@ -393,12 +393,13 @@ pub fn _position_liquidity<'info>(
     amount: u64, // pode ser positivo ou negativo
 ) -> Result<u64> {
     let sub_account = &ctx.accounts.sub_account;
+    let signer = &ctx.accounts.signer;
 
     if ctx.accounts.bot.manager_address == Pubkey::default() {
        return Err(ErrorCode::Unauthorized.into());
     }
 
-    if ctx.accounts.bot.payments_address == Pubkey::default() {
+    if ctx.accounts.bot.payments_address != signer.key() {
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 
