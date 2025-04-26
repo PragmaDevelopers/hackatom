@@ -42,7 +42,11 @@ describe("webdex_manager", () => {
         ); // QUANDO TIVER USANDO A CARTEIRA PHANTOM, NÃO PRECISA DESSA PARTE (EU ACHO KKKKKK)
 
         const tx = await managerProgram.methods
-            .liquidityAdd(sharedState.strategyTokenAddress, sharedState.coin.usdt.decimals, amount)
+            .liquidityAdd(
+                sharedState.strategyTokenAddress,
+                sharedState.coin.usdt.decimals,
+                amount
+            )
             .accounts({
                 bot: sharedState.botPda,
                 user: sharedState.userPda,
@@ -56,7 +60,7 @@ describe("webdex_manager", () => {
         console.log("✅ liquidityAdd tx:", tx);
 
         const [lpTokenPda] = await PublicKey.findProgramAddressSync(
-            [Buffer.from('lp_token')],
+            [Buffer.from('lp_token'), sharedState.strategyTokenAddress.toBuffer(), sharedState.subAccountPda.toBuffer(), sharedState.coin.usdt.pubkey.toBuffer()],
             managerProgram.programId
         );
         sharedState.lpTokenPda = lpTokenPda;

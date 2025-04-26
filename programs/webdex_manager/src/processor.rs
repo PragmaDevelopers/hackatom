@@ -4,7 +4,7 @@ use crate::error::ErrorCode;
 use anchor_lang::solana_program::{program::invoke_signed, system_instruction};
 use anchor_lang::system_program::{self};
 use anchor_spl::token::{MintTo, Burn, Mint, mint_to, burn, transfer, Transfer};
-use webdex_sub_accounts::{state::AddLiquidity, processor::_add_liquidity, program::WebdexSubAccounts};
+use webdex_sub_accounts::{state::RemoveLiquidity, processor::_remove_liquidity};
 
 pub fn _register_manager(ctx: Context<RegisterManager>, manager: Pubkey) -> Result<()> {
     let user = &mut ctx.accounts.user;
@@ -228,6 +228,78 @@ pub fn _liquidity_add(
         signer_seeds,
     );
     mint_to(cpi_mint_ctx, amount)?;
+
+    Ok(())
+}
+
+pub fn _liquidity_remove(
+    ctx: Context<LiquidityRemove>,
+    account_id: String,
+    strategy_token: Pubkey,
+    coin: Pubkey, // Token base, por exemplo, USDT
+    amount: u64,
+) -> Result<()> {
+    let strategy_list = &mut ctx.accounts.strategy_list;
+
+    // Verifique se a estratégia está ativa
+    let strategy_opt = strategy_list
+        .strategies
+        .iter()
+        .find(|s| s.token_address == strategy_token);
+
+    match strategy_opt {
+        Some(strategy) => {
+            require!(strategy.is_active, ErrorCode::StrategyNotFound);
+        },
+        None => {
+            return Err(ErrorCode::StrategyNotFound.into());
+        }
+    }
+
+    // 1. Remover a liquidez da subconta
+    let cpi_ctx_sub_accounts = CpiContext::new(
+        ctx.accounts.sub_account_program.clone(),
+        RemoveLiquidity {
+            bot: ctx.accounts.bot.clone(),
+            sub_account: ctx.accounts.sub_account.clone(),
+            strategy_balance: ctx.accounts.strategy_balance.clone(),
+            signer: ctx.accounts.signer.clone(),
+        },
+    );
+
+     _remove_liquidity(
+        cpi_ctx_sub_accounts,
+        account_id.clone(),
+        strategy_token,
+        coin,
+        amount,
+    )?;
+
+    // 2. Burn LP token
+    let bump = ctx.bumps.lp_mint_authority;
+    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority", &[bump]]];
+
+    let cpi_burn_ctx = CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        Burn {
+            mint: ctx.accounts.lp_token.to_account_info(),
+            from: ctx.accounts.user_lp_token_account.to_account_info(),
+            authority: ctx.accounts.lp_mint_authority.to_account_info(),
+        },
+        signer_seeds,
+    );
+    burn(cpi_burn_ctx, amount)?;
+
+    // 3. Transferir o token base de volta para o usuário
+    let cpi_transfer_ctx = CpiContext::new(
+        ctx.accounts.token_program.to_account_info(),
+        Transfer {
+            from: ctx.accounts.vault_usdt_account.to_account_info(),
+            to: ctx.accounts.user_usdt_account.to_account_info(),
+            authority: ctx.accounts.sub_account.to_account_info(),
+        },
+    );
+    transfer(cpi_transfer_ctx, amount)?;
 
     Ok(())
 }

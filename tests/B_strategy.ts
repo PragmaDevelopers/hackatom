@@ -45,8 +45,8 @@ describe("webdex_strategy", () => {
         // 🧪 Executa o método de adicionar strategy
         const tx = await strategyProgram.methods
             .addStrategy(
-                "Strategy NFT",
-                "SNFT",
+                "Moderate",
+                "MODERATE",
                 "https://example.com/nft.json",
                 sharedState.contractAddress
             )

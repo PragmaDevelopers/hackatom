@@ -51,4 +51,14 @@ pub mod webdex_manager {
     ) -> Result<()> {
         _liquidity_add(ctx,strategy_token,_decimals,amount)
     }
+
+    pub fn liquidity_remove(
+        ctx: Context<LiquidityRemove>,
+        account_id: String,
+        strategy_token: Pubkey,
+        coin: Pubkey, // Token base, por exemplo, USDT
+        amount: u64,
+    ) -> Result<()> {
+        _liquidity_remove(ctx,account_id,strategy_token,coin,amount)
+    }
 }

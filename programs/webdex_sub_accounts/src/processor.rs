@@ -158,7 +158,6 @@ pub fn _add_liquidity<'info>(
 
     // Emite evento
     emit!(BalanceLiquidityEvent {
-        user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
         coin,
@@ -292,20 +291,15 @@ pub fn _toggle_pause(
     Ok(())
 }
 
-pub fn _remove_liquidity(
-    ctx: Context<RemoveLiquidity>,
+pub fn _remove_liquidity<'info>(
+    mut ctx: CpiContext<'_, '_, '_, 'info, RemoveLiquidity<'info>>,
     account_id: String,
     strategy_token: Pubkey,
     coin: Pubkey,
     amount: u64,
-    _sub_account_name: String,
 ) -> Result<()> {
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
-    let signer = &ctx.accounts.signer;
-    let token_program = &ctx.accounts.token_program;
-    let user = ctx.accounts.user.key();
-    let bot = ctx.accounts.bot.key();
 
     if ctx.accounts.bot.manager_address == Pubkey::default() {
        return Err(ErrorCode::Unauthorized.into());
@@ -338,42 +332,8 @@ pub fn _remove_liquidity(
     // ✅ Atualiza o saldo
     balance_entry.amount = balance_entry.amount.saturating_sub(amount);
 
-    // ✅ Queima os tokens LP do usuário
-    let burn_accounts = Burn {
-        mint: ctx.accounts.lp_token.to_account_info(),
-        from: ctx.accounts.user_lp_token_account.to_account_info(),
-        authority: signer.to_account_info(),
-    };
-    let cpi_burn_ctx = CpiContext::new(token_program.to_account_info(), burn_accounts);
-    burn(cpi_burn_ctx, amount)?;
-
-    // ✅ Transfere o token original da vault para o usuário
-    let transfer_accounts = Transfer {
-        from: ctx.accounts.vault_account.to_account_info(),
-        to: ctx.accounts.user_token_account.to_account_info(),
-        authority: ctx.accounts.sub_account.to_account_info(), // vault authority
-    };
-
-    let vault_bump = ctx.bumps.sub_account;
-    let vault_seeds: &[&[u8]] = &[
-        b"sub_account",
-        bot.as_ref(),
-        user.as_ref(),
-        sub_account.name.as_bytes(),
-        &[vault_bump],
-    ];
-    let signer_seeds: &[&[&[u8]]] = &[vault_seeds];
-
-    let cpi_transfer_ctx = CpiContext::new_with_signer(
-        token_program.to_account_info(),
-        transfer_accounts,
-        signer_seeds,
-    );
-    transfer(cpi_transfer_ctx, amount)?;
-
     // ✅ Emite evento de saída
     emit!(BalanceLiquidityEvent {
-        user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
         coin,
@@ -436,7 +396,6 @@ pub fn _position_liquidity<'info>(
     entry.amount = new_balance;
 
     emit!(BalanceLiquidityEvent {
-        user: ctx.accounts.user.key(),
         id: account_id,
         strategy_token,
         coin,

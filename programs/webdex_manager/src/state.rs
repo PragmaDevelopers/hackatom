@@ -3,7 +3,7 @@ use webdex_strategy::state::{StrategyList};
 use shared_sub_accounts::state::{BalanceStrategy};
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
-use webdex_sub_accounts::state::{SubAccount};
+use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
 use anchor_spl::token::{Token,TokenAccount,Mint};
 use anchor_spl::associated_token::AssociatedToken;
 use crate::error::ErrorCode;
@@ -279,7 +279,7 @@ pub struct LiquidityAdd<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        seeds = [b"lp_token"],
+        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),usdt_mint.key().as_ref()],
         bump,
         mint::decimals = decimals,
         mint::authority = lp_mint_authority,
@@ -308,6 +308,45 @@ pub struct LiquidityAdd<'info> {
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+pub struct LiquidityRemove<'info> {
+    pub bot: Account<'info, Bot>,
+
+    pub sub_account: Account<'info, SubAccount>,
+    
+    pub strategy_list: Account<'info,StrategyList>,
+
+    #[account(mut)]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+
+    #[account(mut)]
+    pub user_usdt_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(mut)]
+    pub vault_usdt_account: Account<'info, TokenAccount>, // onde o token vai
+
+    #[account(mut)]
+    pub lp_token: Account<'info, Mint>, // mint do LP
+
+    #[account(mut)]
+    pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
+
+    #[account(
+        seeds = [b"mint_authority"],
+        bump
+    )]
+    /// CHECK: É usado como signer programático
+    pub lp_mint_authority: AccountInfo<'info>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    /// CHECK: CPI calls
+    pub sub_account_program: AccountInfo<'info>,
+
+    pub token_program: Program<'info, Token>,
 }
 
 #[derive(Accounts)]

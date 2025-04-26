@@ -58,11 +58,5 @@ describe("webdex_payments/manager", () => {
             .rpc();
 
         console.log("✅ Transação:", tx);
-
-        const txDetails = await provider.connection.getParsedTransaction(tx, {
-            commitment: "confirmed",
-        });
-
-        console.log(txDetails)
     });
 });

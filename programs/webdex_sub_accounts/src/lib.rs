@@ -72,17 +72,6 @@ pub mod webdex_sub_accounts {
         _get_sub_account_strategies(ctx,account_id)
     }
 
-    pub fn remove_liquidity(
-        ctx: Context<RemoveLiquidity>,
-        account_id: String,
-        strategy_token: Pubkey,
-        coin: Pubkey,
-        amount: u64,
-        sub_account_name: String,
-    ) -> Result<()> {
-        _remove_liquidity(ctx,account_id,strategy_token,coin,amount,sub_account_name)
-    }
-
     pub fn toggle_pause(
         ctx: Context<TogglePause>,
         account_id: String,

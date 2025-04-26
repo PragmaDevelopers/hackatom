@@ -78,7 +78,6 @@ pub struct CreateSubAccountEvent {
 
 #[event]
 pub struct BalanceLiquidityEvent {
-    pub user: Pubkey,
     pub id: String,
     pub strategy_token: Pubkey,
     pub coin: Pubkey,
@@ -186,41 +185,20 @@ pub struct GetSubAccountStrategies<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(account_id: String, strategy_token: Pubkey, coin: Pubkey,sub_account_name:String)]
 pub struct RemoveLiquidity<'info> {
     pub bot: Account<'info, Bot>,
-    pub user: Account<'info, User>,
 
-    #[account(
-        mut,
-        seeds = [b"sub_account", user.key().as_ref(), sub_account_name.as_bytes()],
-        bump,
-    )]
+    #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(mut)]
     pub strategy_balance: Account<'info, StrategyBalanceList>,
 
     #[account(mut)]
-    pub lp_token: Account<'info, Mint>,
-
-    #[account(mut)]
-    pub user_lp_token_account: Account<'info, TokenAccount>, // LP token do usuário
-
-    #[account(mut)]
-    pub vault_account: Account<'info, TokenAccount>, // Vault da subconta
-
-    #[account(mut)]
-    pub user_token_account: Account<'info, TokenAccount>, // Conta do usuário pra receber os tokens de volta
-
-    #[account(mut)]
     pub signer: Signer<'info>,
-
-    pub token_program: Program<'info, Token>,
 }
 
 #[derive(Accounts)]
-#[instruction(account_id: String, strategy_token: Pubkey)]
 pub struct TogglePause<'info> {
     pub bot: Account<'info, Bot>,
 
@@ -236,7 +214,6 @@ pub struct TogglePause<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(account_id: String, strategy_token: Pubkey)]
 pub struct PositionLiquidity<'info> {
     #[account(mut)]
     pub bot: Account<'info, Bot>,
