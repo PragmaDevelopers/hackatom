@@ -3,6 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 export const sharedState = {
     contractAddress: null as null | PublicKey,
     botPda: null as null | PublicKey,
+    feeCollectorNetworkAddress: null as null | PublicKey,
     paymentsPda: null as null | PublicKey,
     coin: {
         usdt: {
@@ -28,6 +29,7 @@ export const sharedState = {
     strategyTokenAddress: null as null | PublicKey,
     userPda: null as null | PublicKey,
     subAccountListPda: null as null | PublicKey,
+    balanceInfoPda: null as null | PublicKey,
     subAccountPda: null as null | PublicKey,
     subAccountId: null as null | PublicKey,
     strategyBalancePda: null as null | PublicKey,

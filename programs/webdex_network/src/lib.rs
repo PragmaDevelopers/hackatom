@@ -20,16 +20,20 @@ pub mod webdex_network {
         ctx: Context<PayFee>,
         contract_address: Pubkey,
         amount: u64,
-        id: String,
     ) -> Result<()> {
-        _pay_fee(ctx,contract_address,amount,id)
+        _pay_fee(ctx,contract_address,amount)
     }
 
     pub fn withdrawal(
         ctx: Context<Withdrawal>, 
-        contract_address: Pubkey, 
         amount: u64
     ) -> Result<()> {
-        _withdrawal(ctx,contract_address,amount)
+        _withdrawal(ctx,amount)
+    }
+
+    pub fn get_balance(
+        ctx: Context<GetBalance>, 
+    ) -> Result<BalanceData> {
+        _get_balance(ctx)
     }
 }

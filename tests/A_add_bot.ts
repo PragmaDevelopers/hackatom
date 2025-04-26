@@ -22,7 +22,9 @@ describe("webdex_factoty", () => {
     const tokenPassAddress = PublicKey.default;
     const paymentsAddress = PublicKey.default;
     const fee_withdraw_network = new BN(0.05);
+
     const fee_collector_network_address = user.publicKey;
+    sharedState.feeCollectorNetworkAddress = fee_collector_network_address;
 
     // 🔀 contractAddress aleatório
     contractAddress = anchor.web3.Keypair.generate().publicKey;

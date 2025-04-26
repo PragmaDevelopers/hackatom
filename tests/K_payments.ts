@@ -22,32 +22,6 @@ describe("webdex_payments", () => {
 
     // 👉 Variáveis compartilhadas entre os testes
 
-
-    it("Currency Revoke", async () => {
-        // const { name, symbol, decimals } = await fetchTokenInfoFromChain(usdcMint);
-
-        const tx = await paymentsProgram.methods
-            .currencyRevoke(sharedState.coin.usdt.pubkey, sharedState.coin.usdt.name, sharedState.coin.usdt.symbol, sharedState.coin.usdt.decimals)
-            .accounts({
-                bot: sharedState.botPda,
-                signer: user.publicKey,
-            })
-            .rpc();
-
-        console.log("🧯 Revoke Coin TX:", tx);
-
-        // ✅ Validação opcional
-        const paymentsData = await paymentsProgram.account.payments.fetch(sharedState.paymentsPda);
-        paymentsData.coins.forEach((c, i) => {
-            console.log(`🔹 Coin #${i + 1}`);
-            console.log("   🪙 Pubkey:", c.pubkey.toBase58());
-            console.log("   💵 Name:", c.coin.name);
-            console.log("   ✳️ Symbol:", c.coin.symbol);
-            console.log("   🔢 Decimals:", c.coin.decimals);
-            console.log("   ✅ Status:", c.coin.status);
-        });
-    });
-
     it("Add Feer Tiers", async () => {
         const feeTiers = [
             {
@@ -81,5 +55,30 @@ describe("webdex_payments", () => {
             .view(); // 👈 importante: view() quando retorno != void
 
         console.log("Fee Tiers:", feeTiers);
+    });
+
+    it("Currency Revoke", async () => {
+        // const { name, symbol, decimals } = await fetchTokenInfoFromChain(usdcMint);
+
+        const tx = await paymentsProgram.methods
+            .currencyRevoke(sharedState.coin.usdt.pubkey, sharedState.coin.usdt.name, sharedState.coin.usdt.symbol, sharedState.coin.usdt.decimals)
+            .accounts({
+                bot: sharedState.botPda,
+                signer: user.publicKey,
+            })
+            .rpc();
+
+        console.log("🧯 Revoke Coin TX:", tx);
+
+        // ✅ Validação opcional
+        const paymentsData = await paymentsProgram.account.payments.fetch(sharedState.paymentsPda);
+        paymentsData.coins.forEach((c, i) => {
+            console.log(`🔹 Coin #${i + 1}`);
+            console.log("   🪙 Pubkey:", c.pubkey.toBase58());
+            console.log("   💵 Name:", c.coin.name);
+            console.log("   ✳️ Symbol:", c.coin.symbol);
+            console.log("   🔢 Decimals:", c.coin.decimals);
+            console.log("   ✅ Status:", c.coin.status);
+        });
     });
 });

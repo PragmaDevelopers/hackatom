@@ -12,16 +12,15 @@ pub struct BalanceInfo {
     pub contract_address: Pubkey,
 }
 
-#[account]
-pub struct BalanceInfoList {
-    pub balances: Vec<BalanceInfo>,
+#[derive(AnchorSerialize, AnchorDeserialize)]
+pub struct BalanceData {
+    pub balance: u64,
 }
 
 #[event]
 pub struct BalanceNetworkAdd {
     pub contract_address: Pubkey,
     pub user: Pubkey,
-    pub id: String,
     pub token: Pubkey,
     pub new_balance: u64,
     pub amount: u64,
@@ -38,7 +37,6 @@ pub struct BalanceNetworkRemove {
 }
 
 #[derive(Accounts)]
-#[instruction(contract_address: Pubkey)]
 pub struct PayFee<'info> {
     #[account(mut)]
     pub user: Account<'info, User>,
@@ -55,6 +53,9 @@ pub struct PayFee<'info> {
     /// CHECK: Apenas para seeds
     pub usdt_mint: Account<'info, Mint>,
 
+    /// CHECK: Apenas para seeds
+    pub contract_address: AccountInfo<'info>,
+
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -62,7 +63,6 @@ pub struct PayFee<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(contract_address: Pubkey)]
 pub struct Withdrawal<'info> {
     #[account(mut)]
     pub user: Account<'info, User>,
@@ -70,11 +70,7 @@ pub struct Withdrawal<'info> {
     #[account(mut)]
     pub bot: Account<'info, Bot>,
 
-    #[account(
-        mut,
-        seeds = [b"balance_info", contract_address.key().as_ref(), user.key().as_ref(), usdt_mint.key().as_ref()],
-        bump
-    )]
+    #[account(mut)]
     pub balance_info: Account<'info, BalanceInfo>,
 
     #[account(
@@ -114,4 +110,10 @@ pub struct Withdrawal<'info> {
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
+pub struct GetBalance<'info> {
+    #[account()]
+    pub balance_info: Account<'info, BalanceInfo>,
 }

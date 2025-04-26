@@ -7,7 +7,6 @@ pub fn _pay_fee(
     ctx: Context<PayFee>,
     contract_address: Pubkey,
     amount: u64,
-    id: String,
 ) -> Result<()> {
     let balance_info = &mut ctx.accounts.balance_info;
 
@@ -26,7 +25,6 @@ pub fn _pay_fee(
     emit!(BalanceNetworkAdd {
         contract_address: contract_address,
         user: ctx.accounts.user.key(),
-        id,
         token: ctx.accounts.usdt_mint.key(),
         new_balance: balance_info.balance,
         amount
@@ -35,12 +33,12 @@ pub fn _pay_fee(
     Ok(())
 }
 
-pub fn _withdrawal(ctx: Context<Withdrawal>, contract_address: Pubkey, amount: u64) -> Result<()> {
-    let balance = &mut ctx.accounts.balance_info;
+pub fn _withdrawal(ctx: Context<Withdrawal>, amount: u64) -> Result<()> {
+    let balance_info = &mut ctx.accounts.balance_info;
     let bot = &ctx.accounts.bot;
 
     require!(
-        balance.balance >= amount,
+        balance_info.balance >= amount,
         ErrorCode::InsufficientBalance
     );
 
@@ -52,7 +50,7 @@ pub fn _withdrawal(ctx: Context<Withdrawal>, contract_address: Pubkey, amount: u
 
     let amount_after_fee = amount.checked_sub(fee).unwrap();
 
-    balance.balance = balance.balance.checked_sub(amount).unwrap();
+    balance_info.balance = balance_info.balance.checked_sub(amount).unwrap();
 
     // Transfere para usuário
     let cpi_ctx = CpiContext::new(
@@ -77,13 +75,22 @@ pub fn _withdrawal(ctx: Context<Withdrawal>, contract_address: Pubkey, amount: u
     transfer(cpi_ctx_fee, fee)?;
 
     emit!(BalanceNetworkRemove {
-        contract_address: contract_address,
-        user: ctx.accounts.signer.key(),
-        token: ctx.accounts.usdt_mint.key(),
-        new_balance: balance.balance,
+        contract_address: balance_info.contract_address,
+        user: balance_info.user,
+        token: balance_info.token,
+        new_balance: balance_info.balance,
         amount,
         fee,
     });
 
     Ok(())
+}
+
+pub fn _get_balance(
+    ctx: Context<GetBalance>,
+) -> Result<BalanceData> {
+    let balance_info = &mut ctx.accounts.balance_info;
+    Ok(BalanceData {
+        balance: balance_info.balance,
+    })
 }

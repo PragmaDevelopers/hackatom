@@ -298,7 +298,7 @@ pub fn _rebalance_position<'info>(
     let owner_clone = &ctx.accounts.bot.owner;
 
     // Transfera gas para o owner do bot
-     let transfer_instruction = system_instruction::transfer(signer_clone, owner_clone, gas);
+    let transfer_instruction = system_instruction::transfer(signer_clone, owner_clone, gas);
 
     // Invoke the transfer instruction
     invoke_signed(
