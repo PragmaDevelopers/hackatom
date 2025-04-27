@@ -234,13 +234,16 @@ pub fn _liquidity_add(
 
 pub fn _liquidity_remove(
     ctx: Context<LiquidityRemove>,
-    account_id: String,
     strategy_token: Pubkey,
+    _decimals: u8,
+    account_id: String,
     coin: Pubkey, // Token base, por exemplo, USDT
     amount: u64,
 ) -> Result<()> {
     let strategy_list = &mut ctx.accounts.strategy_list;
-
+    let sub_account = &mut ctx.accounts.sub_account;
+    let sub_account_key = sub_account.key();
+    
     // Verifique se a estratégia está ativa
     let strategy_opt = strategy_list
         .strategies
@@ -261,9 +264,8 @@ pub fn _liquidity_remove(
         ctx.accounts.sub_account_program.clone(),
         RemoveLiquidity {
             bot: ctx.accounts.bot.clone(),
-            sub_account: ctx.accounts.sub_account.clone(),
+            sub_account: sub_account.clone(),
             strategy_balance: ctx.accounts.strategy_balance.clone(),
-            signer: ctx.accounts.signer.clone(),
         },
     );
 
@@ -291,13 +293,22 @@ pub fn _liquidity_remove(
     burn(cpi_burn_ctx, amount)?;
 
     // 3. Transferir o token base de volta para o usuário
-    let cpi_transfer_ctx = CpiContext::new(
+    let bump = ctx.bumps.sub_account_authority;
+
+    let signer_seeds: &[&[&[u8]]] = &[&[
+        b"sub_account",
+        sub_account_key.as_ref(),
+        &[bump],
+    ]];
+
+    let cpi_transfer_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
             from: ctx.accounts.vault_usdt_account.to_account_info(),
             to: ctx.accounts.user_usdt_account.to_account_info(),
-            authority: ctx.accounts.sub_account.to_account_info(),
+            authority: ctx.accounts.sub_account_authority.to_account_info(),
         },
+        signer_seeds
     );
     transfer(cpi_transfer_ctx, amount)?;
 
@@ -306,6 +317,7 @@ pub fn _liquidity_remove(
 
 pub fn _rebalance_position<'info>(
     mut ctx: CpiContext<'_, '_, '_, 'info, RebalancePosition<'info>>,
+    _strategy_token: Pubkey,
     _decimals: u8, // USADO NA STRUCT EM lp_token
     amount: u64,
     gas: u64,

@@ -1,17 +1,8 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexPayments } from "../target/types/webdex_payments";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
 import { sharedState } from "./setup";
-import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
-import {
-    fetchMetadata,
-    findMetadataPda,
-    mplTokenMetadata,
-} from "@metaplex-foundation/mpl-token-metadata";
-import { fetchMint } from "@metaplex-foundation/mpl-toolbox";
-import { publicKey } from "@metaplex-foundation/umi";
 
 describe("webdex_payments", () => {
     const provider = anchor.AnchorProvider.env();

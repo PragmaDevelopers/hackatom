@@ -191,12 +191,14 @@ pub fn _open_position(
         ctx.accounts.manager_program.clone(),
         RebalancePosition {
             user: ctx.accounts.user.clone(),
+            sub_account: ctx.accounts.sub_account.clone(),
             bot: ctx.accounts.bot.clone(),
             bot_owner: ctx.accounts.bot_owner.clone(),
+            usdt_mint: ctx.accounts.usdt_mint.clone(),
             lp_token: ctx.accounts.lp_token.clone(),
-            token_program: ctx.accounts.token_program.clone(),
             user_lp_token_account: ctx.accounts.user_lp_token_account.clone(),
             lp_mint_authority: ctx.accounts.lp_mint_authority.clone(),
+            token_program: ctx.accounts.token_program.clone(),
             system_program: ctx.accounts.system_program.clone(),
             signer: ctx.accounts.signer.clone(),
         },
@@ -205,6 +207,7 @@ pub fn _open_position(
     // 5. Chamada CPI → manager.rebalance_position()
     _rebalance_position(
         cpi_ctx_manager,
+        strategy_token,
         _decimals,
         amount,
         gas,

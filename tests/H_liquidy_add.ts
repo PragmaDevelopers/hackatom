@@ -23,13 +23,14 @@ describe("webdex_manager", () => {
     // 👉 Variáveis compartilhadas entre os testes
     const amount = new anchor.BN(100_000);
 
-    it("Liquidity Add", async () => {
+    it("Liquidity Add - Transfer And Mint ", async () => {
         const userUsdtAccount = await getOrCreateAssociatedTokenAccount(
             provider.connection,
             user.payer,
             sharedState.coin.usdt.pubkey,
             user.publicKey
         ); // QUANDO TIVER USANDO A CARTEIRA PHANTOM, NÃO PRECISA DESSA PARTE (EU ACHO KKKKKK)
+        sharedState.userUsdtAccount = userUsdtAccount.address;
 
         // Mintar 1000 tokens para o usuário
         await mintTo(
@@ -80,11 +81,20 @@ describe("webdex_manager", () => {
         );
         sharedState.userLpTokenAccountAta = userLpTokenAccountAta.address;
 
+        const vaultUsdtAccount = await getOrCreateAssociatedTokenAccount(
+            provider.connection,
+            user.payer,
+            sharedState.coin.usdt.pubkey,
+            sharedState.subAccountPda,
+            true,
+        );
+        sharedState.vaultUsdtAccount = vaultUsdtAccount.address;
+
         const ataInfo = await getAccount(provider.connection, userLpTokenAccountAta.address);
         console.log("Owner da ATA:", ataInfo.owner.toBase58());
     });
 
-    it("Add Liquidity", async () => {
+    it("Add Liquidity - Atualiza os valores", async () => {
         const [strategyBalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_balance"), sharedState.userPda.toBuffer(), sharedState.subAccountPda.toBuffer(), sharedState.strategyTokenAddress.toBuffer()],
             subAccountProgram.programId

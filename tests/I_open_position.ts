@@ -47,6 +47,7 @@ describe("webdex_payments/manager", () => {
                 strategyBalance: sharedState.strategyBalancePda,
                 subAccount: sharedState.subAccountPda,
                 user: sharedState.userPda,
+                usdtMint: sharedState.coin.usdt.pubkey,
                 managerProgram: managerProgram.programId,
                 subAccountProgram: subAccountsProgram.programId,
                 lpToken: sharedState.lpTokenPda,

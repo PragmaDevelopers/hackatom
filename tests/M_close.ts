@@ -4,7 +4,7 @@ import { WebdexFactory } from "../target/types/webdex_factory";
 import { WebdexPayments } from "../target/types/webdex_payments";
 import { WebdexStrategy } from "../target/types/webdex_strategy";
 import { WebdexManager } from "../target/types/webdex_manager";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
 import { sharedState } from "./setup";
 import { BN } from "bn.js";
 
@@ -16,7 +16,33 @@ describe("webdex_close", () => {
     const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
+    const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
+
+    it("Liquidity Remove - Burn And Transfer", async () => {
+        const amount = new anchor.BN(100_000);
+        const tx = await managerProgram.methods
+            .liquidityRemove(
+                sharedState.strategyTokenAddress,
+                sharedState.coin.usdt.decimals,
+                sharedState.subAccountId.toString(),
+                sharedState.coin.usdt.pubkey,
+                amount,
+            )
+            .accounts({
+                bot: sharedState.botPda,
+                user: sharedState.userPda,
+                subAccount: sharedState.subAccountPda,
+                strategyList: sharedState.strategyListPda,
+                strategyBalance: sharedState.strategyBalancePda,
+                usdtMint: sharedState.coin.usdt.pubkey,
+                signer: user.publicKey,
+                subAccountProgram: subAccountsProgram.programId,
+            })
+            .rpc();
+
+        console.log("✅ liquidityRemove tx:", tx);
+    });
 
     it("Remove Gas", async () => {
         const polAmout = new BN(1_000_000);

@@ -4,6 +4,7 @@ import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 import { sharedState } from "./setup";
+import { getAccount } from "@solana/spl-token";
 
 describe("webdex_sub_accounts", () => {
     const provider = anchor.AnchorProvider.env();
@@ -15,10 +16,10 @@ describe("webdex_sub_accounts", () => {
     // 👉 Variáveis compartilhadas entre os testes
     let subAccountListPda: PublicKey;
     let subAccountPda: PublicKey;
-    let subAccountId: PublicKey;
 
     it("Create SubAccount", async () => {
         const name = "Main Account";
+
 
         [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
             [Buffer.from("sub_account_list"), sharedState.userPda.toBuffer()],
@@ -30,7 +31,7 @@ describe("webdex_sub_accounts", () => {
             [Buffer.from("sub_account"), sharedState.userPda.toBuffer(), Buffer.from(name)],
             subAccountsProgram.programId
         );
-        sharedState.subAccountPda = subAccountPda;;
+        sharedState.subAccountPda = subAccountPda;
 
         const tx = await subAccountsProgram.methods
             .createSubAccount(name)
@@ -66,8 +67,8 @@ describe("webdex_sub_accounts", () => {
         expect(first).to.have.all.keys("id", "name", "subAccountAddress");
 
         // Passando o ID para o "Add Liquidity to SubAccount" encontrar a conta
-        subAccountId = first.id;
-        sharedState.subAccountId = subAccountId;
+        sharedState.subAccountId = first.id;
+        sharedState.subAccountName = first.name;
 
         console.log("📦 SubAccounts:", subAccounts);
     });

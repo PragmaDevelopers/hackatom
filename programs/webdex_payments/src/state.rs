@@ -122,17 +122,20 @@ pub struct OpenPosition<'info> {
 
     #[account(mut)]
     /// CHECK: PDA criada no programa `manager`
-    pub lp_token: AccountInfo<'info>,
+    pub lp_token: Account<'info, Mint>,
 
     #[account(mut)]
     /// CHECK: PDA criada no programa `manager`
-    pub user_lp_token_account: AccountInfo<'info>,
+    pub user_lp_token_account: Account<'info, TokenAccount>,
 
     #[account(mut)]
     /// CHECK: É usado como signer programático
     pub bot_owner: AccountInfo<'info>,
 
-    #[account(mut,signer)]
+    /// CHECK: Apenas para seeds
+    pub usdt_mint: AccountInfo<'info>,
+
+    #[account(mut)]
     /// CHECK: É usado como signer programático
     pub lp_mint_authority: AccountInfo<'info>,
 
