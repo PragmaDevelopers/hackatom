@@ -5,6 +5,10 @@ target/**
 !target/idl/
 !target/idl/**
 
+# Mas liberar (não ignorar) apenas a pasta target/idl e seus arquivos
+!target/types/
+!target/types/**
+
 # Ignorar outros padrões normais
 .anchor
 .DS_Store
