@@ -1,0 +1,944 @@
+{
+  "address": "9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL",
+  "metadata": {
+    "name": "webdex_sub_accounts",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "add_liquidity",
+      "discriminator": [
+        181,
+        157,
+        89,
+        67,
+        143,
+        182,
+        52,
+        72
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "sub_account",
+          "writable": true
+        },
+        {
+          "name": "strategy_balance",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              },
+              {
+                "kind": "arg",
+                "path": "strategy_token"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "strategy_token",
+          "type": "pubkey"
+        },
+        {
+          "name": "account_id",
+          "type": "string"
+        },
+        {
+          "name": "coin",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "coin_name",
+          "type": "string"
+        },
+        {
+          "name": "coin_ico",
+          "type": "string"
+        },
+        {
+          "name": "coin_decimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "create_sub_account",
+      "discriminator": [
+        230,
+        148,
+        237,
+        115,
+        126,
+        55,
+        226,
+        172
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "sub_account_list",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  95,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "sub_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "find_sub_account_index_by_id",
+      "discriminator": [
+        148,
+        160,
+        82,
+        235,
+        60,
+        6,
+        225,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "sub_account_list"
+        }
+      ],
+      "args": [
+        {
+          "name": "account_id",
+          "type": "string"
+        }
+      ],
+      "returns": "i64"
+    },
+    {
+      "name": "get_balance",
+      "discriminator": [
+        5,
+        173,
+        180,
+        151,
+        243,
+        81,
+        233,
+        55
+      ],
+      "accounts": [
+        {
+          "name": "sub_account"
+        },
+        {
+          "name": "strategy_balance"
+        }
+      ],
+      "args": [
+        {
+          "name": "account_id",
+          "type": "string"
+        },
+        {
+          "name": "strategy_token",
+          "type": "pubkey"
+        },
+        {
+          "name": "coin",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "BalanceStrategy"
+        }
+      }
+    },
+    {
+      "name": "get_balances",
+      "discriminator": [
+        7,
+        176,
+        166,
+        37,
+        177,
+        24,
+        146,
+        160
+      ],
+      "accounts": [
+        {
+          "name": "sub_account"
+        },
+        {
+          "name": "strategy_balance"
+        }
+      ],
+      "args": [
+        {
+          "name": "account_id",
+          "type": "string"
+        },
+        {
+          "name": "strategy_token",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "BalanceStrategy"
+          }
+        }
+      }
+    },
+    {
+      "name": "get_sub_account_strategies",
+      "discriminator": [
+        206,
+        224,
+        140,
+        8,
+        122,
+        76,
+        250,
+        125
+      ],
+      "accounts": [
+        {
+          "name": "sub_account"
+        }
+      ],
+      "args": [
+        {
+          "name": "account_id",
+          "type": "string"
+        }
+      ],
+      "returns": {
+        "vec": "pubkey"
+      }
+    },
+    {
+      "name": "get_sub_accounts",
+      "discriminator": [
+        28,
+        197,
+        164,
+        187,
+        19,
+        229,
+        3,
+        247
+      ],
+      "accounts": [
+        {
+          "name": "sub_account_list"
+        }
+      ],
+      "args": [
+        {
+          "name": "contract_address",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "SimpleSubAccount"
+          }
+        }
+      }
+    },
+    {
+      "name": "toggle_pause",
+      "discriminator": [
+        238,
+        237,
+        206,
+        27,
+        255,
+        95,
+        123,
+        229
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "sub_account"
+        },
+        {
+          "name": "strategy_balance",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "account_id",
+          "type": "string"
+        },
+        {
+          "name": "strategy_token",
+          "type": "pubkey"
+        },
+        {
+          "name": "coin",
+          "type": "pubkey"
+        },
+        {
+          "name": "paused",
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Bot",
+      "discriminator": [
+        122,
+        136,
+        3,
+        241,
+        243,
+        138,
+        195,
+        52
+      ]
+    },
+    {
+      "name": "StrategyBalanceList",
+      "discriminator": [
+        101,
+        190,
+        24,
+        107,
+        186,
+        122,
+        101,
+        70
+      ]
+    },
+    {
+      "name": "SubAccount",
+      "discriminator": [
+        227,
+        47,
+        166,
+        42,
+        242,
+        171,
+        32,
+        114
+      ]
+    },
+    {
+      "name": "SubAccountList",
+      "discriminator": [
+        38,
+        246,
+        153,
+        110,
+        100,
+        224,
+        230,
+        98
+      ]
+    },
+    {
+      "name": "User",
+      "discriminator": [
+        159,
+        117,
+        95,
+        227,
+        239,
+        151,
+        58,
+        236
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "BalanceLiquidityEvent",
+      "discriminator": [
+        110,
+        172,
+        183,
+        118,
+        187,
+        90,
+        2,
+        139
+      ]
+    },
+    {
+      "name": "ChangePausedEvent",
+      "discriminator": [
+        97,
+        143,
+        220,
+        187,
+        52,
+        2,
+        123,
+        241
+      ]
+    },
+    {
+      "name": "CreateSubAccountEvent",
+      "discriminator": [
+        50,
+        188,
+        230,
+        37,
+        53,
+        212,
+        46,
+        2
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidContractAddress",
+      "msg": "O endereço do contrato fornecido é inválido."
+    },
+    {
+      "code": 6001,
+      "name": "BotNotFound",
+      "msg": "Bot not found"
+    },
+    {
+      "code": 6002,
+      "name": "BotAlreadyRegistered",
+      "msg": "Bot already registered"
+    },
+    {
+      "code": 6003,
+      "name": "StrategyNotFound",
+      "msg": "Strategy not found"
+    },
+    {
+      "code": 6004,
+      "name": "YouMustTheWebDexPayments",
+      "msg": "You must the WebDexPayments"
+    },
+    {
+      "code": 6005,
+      "name": "MaxStrategiesReached",
+      "msg": "Max strategies reached"
+    },
+    {
+      "code": 6006,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6007,
+      "name": "UnauthorizedSubAccount",
+      "msg": "Você não tem permissão para acessar esta subconta."
+    },
+    {
+      "code": 6008,
+      "name": "SubAccountNotFound",
+      "msg": "SubAccount not found"
+    },
+    {
+      "code": 6009,
+      "name": "AccountNotLinkedToCurrency",
+      "msg": "Account not linked to currency"
+    },
+    {
+      "code": 6010,
+      "name": "MaxSubAccountsReached",
+      "msg": "Max Sub Accounts Reached"
+    },
+    {
+      "code": 6011,
+      "name": "InvalidSubAccountId",
+      "msg": "Invalid Sub Account Id"
+    },
+    {
+      "code": 6012,
+      "name": "StrategyNotLinked",
+      "msg": "Strategy Not Linked"
+    },
+    {
+      "code": 6013,
+      "name": "StrategyBalanceNotFound",
+      "msg": "Strategy Balance Not Found"
+    },
+    {
+      "code": 6014,
+      "name": "CoinNotLinked",
+      "msg": "Coin Not Linked"
+    },
+    {
+      "code": 6015,
+      "name": "MustPauseBeforeWithdraw",
+      "msg": "Liquidity must be paused before removal"
+    },
+    {
+      "code": 6016,
+      "name": "CoinNotFound",
+      "msg": "Coin not found"
+    },
+    {
+      "code": 6017,
+      "name": "CoinNotLinkedToStrategy",
+      "msg": "Coin not linked to strategy"
+    },
+    {
+      "code": 6018,
+      "name": "PauseStateUnchanged",
+      "msg": "The paused state must be different"
+    },
+    {
+      "code": 6019,
+      "name": "UnauthorizedPaymentsCaller",
+      "msg": "Only the registered Payments program can call this"
+    },
+    {
+      "code": 6020,
+      "name": "InsufficientFunds",
+      "msg": "Insufficient funds to subtract"
+    }
+  ],
+  "types": [
+    {
+      "name": "BalanceLiquidityEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "strategy_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "increase",
+            "type": "bool"
+          },
+          {
+            "name": "is_operation",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BalanceStrategy",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "ico",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Bot",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "prefix",
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "manager_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "strategy_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "sub_account_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "payments_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_pass_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_network",
+            "type": "u64"
+          },
+          {
+            "name": "fee_collector_network_address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "ChangePausedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "signer",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "strategy_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "paused",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateSubAccountEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "signer",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SimpleSubAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "sub_account_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StrategyBalanceList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strategy_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          },
+          {
+            "name": "list_coins",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "balance",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "BalanceStrategy"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "list_strategies",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "strategies",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubAccountList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contract_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "sub_accounts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "SimpleSubAccount"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "User",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "manager",
+            "type": "pubkey"
+          },
+          {
+            "name": "gas_balance",
+            "type": "u64"
+          },
+          {
+            "name": "pass_balance",
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ]
+}

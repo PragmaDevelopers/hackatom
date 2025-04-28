@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react";
-import { getProgram } from "../utils/anchorConfig";
+import { getProgram, IDLPrograms } from "../utils/anchorConfig";
 import { PublicKey } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 
@@ -11,7 +11,7 @@ export const CheckBot = () => {
 
     const handleCheck = async () => {
         try {
-            const program = getProgram({ publicKey, signTransaction, signAllTransactions });
+            const program = getProgram({ publicKey, signTransaction, signAllTransactions }, IDLPrograms.factor);
             const botsAccount = new PublicKey("ENDEREÇO_DA_CONTA_BOT_REGISTRY"); // Defina o endereço correto
 
             await program.methods
