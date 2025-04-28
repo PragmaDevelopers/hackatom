@@ -1,10 +1,11 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
-use anchor_lang::solana_program::{program::invoke_signed, system_instruction};
+use anchor_lang::solana_program::{program::invoke, system_instruction};
 use anchor_lang::system_program::{self};
-use anchor_spl::token::{MintTo, Burn, Mint, mint_to, burn, transfer, Transfer};
+use anchor_spl::token::{MintTo, Burn, mint_to, burn, transfer, Transfer};
 use webdex_sub_accounts::{state::RemoveLiquidity, processor::_remove_liquidity};
+use crate::ID as PROGRAM_ID;
 
 pub fn _register_manager(ctx: Context<RegisterManager>, manager: Pubkey) -> Result<()> {
     let user = &mut ctx.accounts.user;
@@ -315,16 +316,16 @@ pub fn _liquidity_remove(
     Ok(())
 }
 
-pub fn _rebalance_position<'info>(
-    mut ctx: CpiContext<'_, '_, '_, 'info, RebalancePosition<'info>>,
+pub fn _rebalance_position(
+    ctx: Context<RebalancePosition>,
     _strategy_token: Pubkey,
     _decimals: u8, // USADO NA STRUCT EM lp_token
     amount: u64,
     gas: u64,
-    fee: u64,
 ) -> Result<()> {
     let user = &mut ctx.accounts.user;
     let signer = &mut ctx.accounts.signer;
+    let temporary_fee_account = ctx.accounts.temporary_fee_account.fee;
 
     if ctx.accounts.bot.payments_address != signer.key() {
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
@@ -334,22 +335,15 @@ pub fn _rebalance_position<'info>(
     if user.gas_balance < gas {
         return Err(ErrorCode::InsufficientGasBalance.into());
     }
-    if user.pass_balance < fee {
+    if user.pass_balance < temporary_fee_account {
         return Err(ErrorCode::InsufficientPassBalance.into());
     }
 
     // Atualiza saldos
     user.gas_balance = user.gas_balance.saturating_sub(gas);
-    user.pass_balance = user.pass_balance.saturating_sub(fee);
+    user.pass_balance = user.pass_balance.saturating_sub(temporary_fee_account);
 
-    let (expected, bump) = Pubkey::find_program_address(
-        &[b"mint_authority"],
-        &crate::ID, // <- ou PROGRAM_ID importado de crate
-    );
-    require!(
-        ctx.accounts.lp_mint_authority.key() == expected,
-        ErrorCode::InvalidAuthority
-    );
+    let bump = ctx.bumps.lp_mint_authority;
     let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority", &[bump]]];
 
     if amount > 0 {
@@ -385,14 +379,13 @@ pub fn _rebalance_position<'info>(
     let transfer_instruction = system_instruction::transfer(signer_clone, owner_clone, gas);
 
     // Invoke the transfer instruction
-    invoke_signed(
+    invoke(
         &transfer_instruction,
         &[
             ctx.accounts.signer.to_account_info(),
             ctx.accounts.bot_owner.clone(),
             ctx.accounts.system_program.to_account_info(),
         ],
-        &[],
     )?;
 
     // Emite eventos (você pode adaptar para seus eventos atuais)
@@ -407,7 +400,7 @@ pub fn _rebalance_position<'info>(
     emit!(BalancePassEvent {
         user: user.key(),
         balance: user.pass_balance,
-        value: fee,
+        value: temporary_fee_account,
         increase: false,
         is_operation: true,
     });

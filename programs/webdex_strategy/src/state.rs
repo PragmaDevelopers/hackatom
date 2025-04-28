@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::{Mint, Token};
+use anchor_spl::token::{Token};
 use shared_factory::state::{Bot};
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]

@@ -40,4 +40,5 @@ export const sharedState = {
     lpMintAuthority: null as null | PublicKey,
     userUsdtAccount: null as null | PublicKey,
     vaultUsdtAccount: null as null | PublicKey,
+    temporaryFeePda: null as null | PublicKey,
 };

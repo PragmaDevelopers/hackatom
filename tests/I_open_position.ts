@@ -7,12 +7,12 @@ import { Keypair, PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 import { sharedState } from "./setup";
 import { BN } from "bn.js";
+import { disableCpiGuard } from '@solana/spl-token';
 
 describe("webdex_payments/manager", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
-    const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const user = provider.wallet;
@@ -20,15 +20,14 @@ describe("webdex_payments/manager", () => {
     const amount = new BN(1_000_000);
     const gas = new BN(1_000)
 
-    let fee;
-
     it("Open Position", async () => {
         const currencys = [
             {
                 from: sharedState.coin.pol.pubkey,
-                to: sharedState.coin.pol.pubkey,
+                to: sharedState.coin.webdex.pubkey,
             }
         ];
+
         const tx = await paymentsProgram.methods
             .openPosition(
                 sharedState.coin.usdt.decimals,
@@ -41,20 +40,40 @@ describe("webdex_payments/manager", () => {
             )
             .accounts({
                 bot: sharedState.botPda,
-                botOwner: user.publicKey,
                 payments: sharedState.paymentsPda,
                 strategyList: sharedState.strategyListPda,
                 strategyBalance: sharedState.strategyBalancePda,
                 subAccount: sharedState.subAccountPda,
                 user: sharedState.userPda,
-                usdtMint: sharedState.coin.usdt.pubkey,
-                managerProgram: managerProgram.programId,
-                subAccountProgram: subAccountsProgram.programId,
-                lpToken: sharedState.lpTokenPda,
-                userLpTokenAccount: sharedState.userLpTokenAccountAta,
-                lpMintAuthority: sharedState.lpMintAuthority,
                 signer: user.publicKey,
+            })
+            .rpc();
 
+        console.log("✅ Transação:", tx);
+
+        const [temporaryFee, bump] = PublicKey.findProgramAddressSync(
+            [Buffer.from("temporary_fee"), sharedState.botPda.toBuffer(), sharedState.userPda.toBuffer(), sharedState.subAccountPda.toBuffer(), sharedState.strategyBalancePda.toBuffer(), sharedState.paymentsPda.toBuffer()],
+            paymentsProgram.programId
+        );
+        sharedState.temporaryFeePda = temporaryFee;
+    });
+
+    it("Rebalance Position", async () => {
+        const tx = await managerProgram.methods
+            .rebalancePosition(
+                sharedState.strategyTokenAddress,
+                sharedState.coin.usdt.decimals,
+                amount,
+                gas,
+            )
+            .accounts({
+                bot: sharedState.botPda,
+                botOwner: user.publicKey,
+                subAccount: sharedState.subAccountPda,
+                user: sharedState.userPda,
+                temporaryFeeAccount: sharedState.temporaryFeePda,
+                usdtMint: sharedState.coin.usdt.pubkey,
+                signer: user.publicKey,
             })
             .rpc();
 

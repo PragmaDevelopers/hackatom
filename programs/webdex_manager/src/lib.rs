@@ -62,4 +62,14 @@ pub mod webdex_manager {
     ) -> Result<()> {
         _liquidity_remove(ctx,strategy_token,_decimals,account_id,coin,amount)
     }
+
+    pub fn rebalance_position(
+        ctx: Context<RebalancePosition>,
+        _strategy_token: Pubkey,
+        _decimals: u8, // USADO NA STRUCT EM lp_token
+        amount: u64,
+        gas: u64,
+    ) -> Result<()> {
+        _rebalance_position(ctx,_strategy_token,_decimals,amount,gas)
+    }
 }

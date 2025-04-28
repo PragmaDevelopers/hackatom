@@ -4,6 +4,7 @@ use shared_sub_accounts::state::{BalanceStrategy};
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
 use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
+use webdex_payments::state::{FeeAccount};
 use anchor_spl::token::{Token,TokenAccount,Mint};
 use anchor_spl::associated_token::AssociatedToken;
 use crate::error::ErrorCode;
@@ -294,7 +295,7 @@ pub struct LiquidityAdd<'info> {
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
-     #[account(
+    #[account(
         init_if_needed,
         payer = signer,
         associated_token::mint = lp_token,
@@ -403,6 +404,8 @@ pub struct RebalancePosition<'info> {
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(mut)]
+    pub temporary_fee_account: Account<'info, FeeAccount>,
+
     /// CHECK
     pub bot_owner: AccountInfo<'info>,
 
@@ -438,4 +441,5 @@ pub struct RebalancePosition<'info> {
 
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }

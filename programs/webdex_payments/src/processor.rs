@@ -3,7 +3,6 @@ use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
 
-use webdex_manager::{state::RebalancePosition, processor::_rebalance_position};
 use webdex_sub_accounts::{state::PositionLiquidity, processor::_position_liquidity};
 
 pub fn _add_fee_tiers<'info>(
@@ -135,9 +134,9 @@ pub fn _open_position(
     gas: u64,
     currrencys: Vec<Currencys>,
 ) -> Result<()> {
-    let bot = &ctx.accounts.bot;
     let payments = &ctx.accounts.payments;
     let strategy_list = &ctx.accounts.strategy_list;
+    let temp_fee_account = &mut ctx.accounts.temporary_fee_account;
 
     let strategy = strategy_list
         .strategies
@@ -166,7 +165,7 @@ pub fn _open_position(
 
     // 3. Chamada CPI → sub_account.position()
     let cpi_ctx_sub_accounts = CpiContext::new(
-        ctx.accounts.sub_account_program.clone(),
+        ctx.accounts.sub_account_program.to_account_info(),
         PositionLiquidity {
             bot: ctx.accounts.bot.clone(),
             user: ctx.accounts.user.clone(),
@@ -187,34 +186,10 @@ pub fn _open_position(
     // 4. Calcula a fee
     let fee = _calculate_fee(&payments, old_balance);
 
-    let cpi_ctx_manager = CpiContext::new(
-        ctx.accounts.manager_program.clone(),
-        RebalancePosition {
-            user: ctx.accounts.user.clone(),
-            sub_account: ctx.accounts.sub_account.clone(),
-            bot: ctx.accounts.bot.clone(),
-            bot_owner: ctx.accounts.bot_owner.clone(),
-            usdt_mint: ctx.accounts.usdt_mint.clone(),
-            lp_token: ctx.accounts.lp_token.clone(),
-            user_lp_token_account: ctx.accounts.user_lp_token_account.clone(),
-            lp_mint_authority: ctx.accounts.lp_mint_authority.clone(),
-            token_program: ctx.accounts.token_program.clone(),
-            system_program: ctx.accounts.system_program.clone(),
-            signer: ctx.accounts.signer.clone(),
-        },
-    );
+    // Armazena a fee no PDA temporário
+    temp_fee_account.fee = fee;
 
-    // 5. Chamada CPI → manager.rebalance_position()
-    _rebalance_position(
-        cpi_ctx_manager,
-        strategy_token,
-        _decimals,
-        amount,
-        gas,
-        fee,
-    )?;
-
-    // 6. Emite eventos (Anchor Events ou logs)
+    // 5. Emite eventos (Anchor Events ou logs)
     emit!(OpenPositionEvent {
         contract_address: ctx.accounts.bot.manager_address.key(),
         user: ctx.accounts.user.key(),

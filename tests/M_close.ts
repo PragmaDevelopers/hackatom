@@ -45,7 +45,7 @@ describe("webdex_close", () => {
     });
 
     it("Remove Gas", async () => {
-        const polAmout = new BN(1_000_000);
+        const polAmout = new BN(1_000);
 
         const tx = await managerProgram.methods
             .removeGas(polAmout)
@@ -58,7 +58,7 @@ describe("webdex_close", () => {
         console.log("✅ Transaction:", tx);
 
         const updated = await managerProgram.account.user.fetch(sharedState.userPda);
-        console.log("📦 After Delete:", updated.gasBalance);
+        console.log("📦 After Delete:", updated.gasBalance.toNumber());
     });
 
     it("Pass Remove", async () => {

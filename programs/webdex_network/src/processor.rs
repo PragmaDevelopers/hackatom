@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
-use anchor_spl::token::{MintTo, Burn, Mint, mint_to, burn, transfer, Transfer};
+use anchor_spl::token::{transfer, Transfer};
 
 pub fn _pay_fee(
     ctx: Context<PayFee>,

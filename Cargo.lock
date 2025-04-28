@@ -3058,6 +3058,7 @@ dependencies = [
  "shared_factory",
  "shared_manager",
  "shared_sub_accounts",
+ "webdex_payments",
  "webdex_strategy",
  "webdex_sub_accounts",
 ]
@@ -3081,7 +3082,6 @@ dependencies = [
  "serde",
  "shared_factory",
  "shared_manager",
- "webdex_manager",
  "webdex_strategy",
  "webdex_sub_accounts",
 ]

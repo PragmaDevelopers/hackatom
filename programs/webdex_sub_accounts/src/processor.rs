@@ -113,7 +113,6 @@ pub fn _add_liquidity<'info>(
 ) -> Result<()> {
     let sub_account = &mut ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
-    let signer = &ctx.accounts.signer;
 
     // Verificação de permissão
     if ctx.accounts.bot.manager_address == Pubkey::default() {

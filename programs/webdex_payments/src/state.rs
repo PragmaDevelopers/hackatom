@@ -4,10 +4,12 @@ use serde::{Deserialize, Serialize};
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
 
+use webdex_sub_accounts::program::WebdexSubAccounts;
+
 use webdex_strategy::state::{StrategyList};
 use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
 
-use anchor_spl::token::{Token,TokenAccount,Mint};
+use anchor_spl::token::{Token};
 use anchor_spl::associated_token::AssociatedToken;
 
 #[account]
@@ -25,6 +27,11 @@ impl Payments {
         + 32                         // contract_address
         + 4 + MAX_FEE_TIERS * 64     // Vec<FeeTier>: 4 + n * 64
         + 4 + MAX_COINS * (32 + 52); // coins (Pubkey + Coins)
+}
+
+#[account]
+pub struct FeeAccount {
+    pub fee: u64, // Armazena o valor do fee
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Serialize, Deserialize, Clone, Default)]
@@ -112,6 +119,7 @@ pub struct OpenPosition<'info> {
 
     pub strategy_list: Account<'info, StrategyList>, 
 
+    #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(mut)]
@@ -120,36 +128,24 @@ pub struct OpenPosition<'info> {
     #[account(mut)]
     pub user: Account<'info, User>,
 
-    #[account(mut)]
-    /// CHECK: PDA criada no programa `manager`
-    pub lp_token: Account<'info, Mint>,
-
-    #[account(mut)]
-    /// CHECK: PDA criada no programa `manager`
-    pub user_lp_token_account: Account<'info, TokenAccount>,
-
-    #[account(mut)]
-    /// CHECK: É usado como signer programático
-    pub bot_owner: AccountInfo<'info>,
-
-    /// CHECK: Apenas para seeds
-    pub usdt_mint: AccountInfo<'info>,
-
-    #[account(mut)]
-    /// CHECK: É usado como signer programático
-    pub lp_mint_authority: AccountInfo<'info>,
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = 8 + std::mem::size_of::<FeeAccount>(),
+        seeds = [b"temporary_fee", bot.key().as_ref(), user.key().as_ref(), sub_account.key().as_ref(), strategy_balance.key().as_ref(), payments.key().as_ref()],
+        bump
+    )]
+    pub temporary_fee_account: Account<'info, FeeAccount>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
     pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 
     /// CHECK: CPI calls
-    pub sub_account_program: AccountInfo<'info>,
-
-    /// CHECK: CPI calls
-    pub manager_program: AccountInfo<'info>,
+    pub sub_account_program: Program<'info, WebdexSubAccounts>,
 }
 
 #[event]

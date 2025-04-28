@@ -2,13 +2,9 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexManager } from "../target/types/webdex_manager";
 import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
-import { clusterApiUrl, Connection, PublicKey } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import {
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-    createMint, getAssociatedTokenAddress, getAssociatedTokenAddressSync, getAccount, getOrCreateAssociatedTokenAccount, mintTo,
-    TOKEN_2022_PROGRAM_ID,
-    TOKEN_PROGRAM_ID,
-    transfer
+    getAccount, getOrCreateAssociatedTokenAccount, mintTo,
 } from "@solana/spl-token";
 import { sharedState } from "./setup";
 
