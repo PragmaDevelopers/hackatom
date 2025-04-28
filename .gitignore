@@ -1,6 +1,13 @@
+# Ignorar tudo dentro de target/
+target/**
+
+# Mas liberar (não ignorar) apenas a pasta target/idl e seus arquivos
+!target/idl/
+!target/idl/**
+
+# Ignorar outros padrões normais
 .anchor
 .DS_Store
-target
 **/*.rs.bk
 node_modules
 test-ledger
