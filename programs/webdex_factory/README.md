@@ -11,11 +11,11 @@ Este documento descreve a migração do contrato inteligente `WEbdEXFactoryV4` d
 
 ### Funções do Contrato:
 1. `addBot(...)`
-2. `getBotInfo(address)`
+2. `getBotInfo(...)`
 3. `updateBot(...)`
-4. `removeBot(address)`
-5. `currencyAllow(address,address)`
-6. `currencyRevoke(address,address)`
+4. `removeBot(...)`
+5. `currencyAllow(...)`
+6. `currencyRevoke(...)`
 7. `addStrategy(...)`
 8. `updateStrategyStatus(...)`
 
@@ -90,17 +90,16 @@ pub struct AddBot<'info> {
 ---
 
 ## Integração entre Contratos via CPI
-As funcionalidades auxiliares removidas deste contrato devem ser acessadas por meio de chamadas CPI. Exemplo:
+As funcionalidades auxiliares removidas deste contrato podem ser acessadas por meio de chamadas CPI quando não envolvem inicialização de contas. Exemplo:
 ```rust
 let cpi_ctx = CpiContext::new(
     ctx.accounts.payments_program.to_account_info(),
     RevokeOrAllowCurrency {
-        authority: ctx.accounts.authority.to_account_info(),
-        bot: ctx.accounts.bot.to_account_info(),
+        payments: ctx.accounts.payments.to_account_info(),
         // ... outros campos
     }
 );
-payments::cpi::revoke_or_allow_currency(cpi_ctx, true)?;
+revoke_or_allow_currency(cpi_ctx, true)?;
 ```
 
 ---

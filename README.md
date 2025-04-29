@@ -10,25 +10,27 @@ Este projeto é estruturado em **Anchor** sobre a **blockchain Solana**, com foc
 .
 ├── Anchor.toml
 ├── Cargo.toml
+├── app/ # Front-end do projeto
 ├── programs/
-│   ├── webdex_factory/         # Lida com criação e gerenciamento de bots
-│   ├── webdex_payments/        # Controle de moedas aceitas e fee tiers
-│   ├── webdex_strategy/        # Estratégias vinculadas aos bots
-│   └── webdex_sub_accounts/    # Subcontas, saldos e estratégias do usuário
+│   ├── webdex_factory/ # Lida com criação e gerenciamento de bots
+│   ├── webdex_manager/ # Gerencia usuários, saldos e chamadas para outros contratos
+│   ├── webdex_network/ # Lida com networks e indicações
+│   ├── webdex_payments/ # Controle de moedas aceitas e fee tiers
+│   ├── webdex_strategy/ # Estratégias vinculadas aos bots
+│   └── webdex_sub_accounts/ # Subcontas, saldos e estratégias do usuário
 ├── shared/
-│   ├── factory/                # Structs e tipos compartilhados do factory
-│   ├── payments/               # Structs e tipos compartilhados do payments
-│   ├── strategy/               # Structs e tipos compartilhados do strategy
-│   └── sub_accounts/           # Structs e tipos compartilhados do sub_accounts
-├── tests/                      # Testes em TypeScript (Mocha + Anchor)
-│   ├── 01_webdex_factory.ts
-│   ├── 02_webdex_payments.ts
-│   ├── 03_webdex_strategy.ts
-│   ├── 04_webdex_sub_accounts.ts
-│   ├── 05_webdex_close.ts
-│   └── setup.ts
+│   ├── factory/ # Structs e tipos compartilhados do factory
+│   ├── manager/ # Structs e tipos compartilhados do manager
+│   ├── payments/ # Structs e tipos compartilhados do payments
+│   └── sub_accounts/ # Structs e tipos compartilhados do sub_accounts
+├── tests/ # Testes em TypeScript (Mocha + Anchor)
+│   ├── A_add_bot # Adiciona Bot e Get Bot 
+│   ├── B_strategy.ts # Adicionar Strategy, Get Strategies, Update Strategy Status e Find Strategy
+│   ├── C_currency_allow.ts # Currency Allow (USDT,WEBDEX,POL)
+│   ├── ...
+│   └── setup.ts # Gerencia as variáveis globais
 └── target/
-    └── idl/                    # IDLs geradas automaticamente pelo Anchor
+    └── idl/ # IDLs geradas automaticamente pelo Anchor
 ```
 
 ---
@@ -40,6 +42,16 @@ Este projeto é estruturado em **Anchor** sobre a **blockchain Solana**, com foc
 - Registro de endereços de outros módulos (payments, sub_accounts, strategy)
 - Controle de autoridade do bot
 - Seeds: `["bot", contract_address]`
+
+### `webdex_manager`
+- Criação de users (`CoinData`)
+- Adicionar ou Subtrair `gas` e `pass`
+- Seeds: `["user", signer]`
+
+### `webdex_network`
+- Gerencia a taxa de pagamento das indicações
+- Faz a retirada de saldo, transferindo para `user` e `fee_collector`
+- Seeds: `["user", signer]`
 
 ### `webdex_payments`
 - Adição de moedas aceitas (`CoinData`)
@@ -67,7 +79,6 @@ Os programas se comunicam entre si via:
 - **Accounts compartilhadas (PDAs)**
 - **Seeds determinísticas**
 - **Chaves cruzadas validadas manualmente**
-- `seeds::program = ...` para validar PDAs criadas por outros programas
 
 ---
 
@@ -118,6 +129,8 @@ As IDLs geradas são exportadas automaticamente para `target/idl`, uma por progr
 
 ```ts
 anchor.workspace.WebdexFactory
+anchor.workspace.WebdexManager
+anchor.workspace.WebdexNetwork
 anchor.workspace.WebdexPayments
 anchor.workspace.WebdexStrategy
 anchor.workspace.WebdexSubAccounts
@@ -129,7 +142,7 @@ anchor.workspace.WebdexSubAccounts
 
 - Estrutura modular facilita upgrades independentes por domínio
 - Separação entre lógica (`processor.rs`) e contexto (`state.rs`) em cada programa
-- Utiliza derivação de PDA segura com `seeds::program = FACTORY_ID` quando necessário
+- Impossibilidade de chamar funções que façam o `init` ou `init-if-need` entre os contratos via CPI 
 
 ---
 

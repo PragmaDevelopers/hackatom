@@ -1,9 +1,9 @@
-**Documentação Técnica: Migração do Contrato WEbdEXFactoryV4 (EVM) para Anchor/Solana**
+**Documentação Técnica: Migração do Contrato WEbdEXNetworkV4 (EVM) para Anchor/Solana**
 
 ---
 
 ## Objetivo
-Este documento descreve a migração do contrato inteligente `WEbdEXFactoryV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
+Este documento descreve a migração do contrato inteligente `WEbdEXNetworkV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
 
 ---
 
@@ -111,4 +111,4 @@ payments::cpi::revoke_or_allow_currency(cpi_ctx, true)?;
 ---
 
 ## Conclusão
-A adaptação do contrato `WEbdEXFactoryV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.
+A adaptação do contrato `WEbdEXNetworkV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.

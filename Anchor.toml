@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-webdex_factory = "AZpLbd9HonogrHXnLqy4YSkc2Zf6BvTv1Qpn4jZrpXfM"
+webdex_factory = "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc"
 webdex_manager = "6RuoSrSkzbTyMTdVzXp1xn2gyH4h9FtdZ8iQa12jmZqp"
 webdex_payments = "AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1"
 webdex_strategy = "BW8NiUW7jpcKmwFtBLVdgBwxNA4QR5CydPbKWb5oSkna"
