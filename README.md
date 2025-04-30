@@ -2,7 +2,24 @@
 
 Este projeto é estruturado em **Anchor** sobre a **blockchain Solana**, com foco em **modularidade, extensibilidade** e organização por domínios. Ele simula uma plataforma descentralizada de estratégias com bots, pagamentos e subcontas.
 
----
+## 🧰 Tecnologias necessárias
+
+Antes de compilar ou rodar os programas, você precisa ter os seguintes componentes instalados no seu sistema:
+
+| Tecnologia        | Versão recomendada            | Instalação                                                                 |
+|-------------------|-------------------------------|----------------------------------------------------------------------------|
+| **Rust (nightly)**| `rustup default nightly`      | [Instalar Rust](https://www.rust-lang.org/tools/install)                  |
+| **Solana CLI**    | `>=1.18.4`                    | `sh -c "$(curl -sSfL https://release.solana.com/v1.18.4/install)"`        |
+| **Anchor CLI**    | `v0.31.0`                     | `cargo install --git https://github.com/coral-xyz/anchor --tag v0.31.0 anchor-cli` |
+| **Node.js**       | `>=18`                        | [Instalar Node.js](https://nodejs.org)                                    |
+| **Yarn**          | `>=1.22`                      | `npm install -g yarn`                                                     |
+| **ts-mocha**      | `latest`                      | `yarn add ts-mocha --dev` (ou via `package.json`)                         |
+
+### 🔗 Extras úteis
+
+- **VSCode** com extensões para Solana, Rust e Anchor
+- Solana wallet local: `solana-keygen new --outfile ~/.config/solana/id.json`
+- Configure devnet como padrão: `solana config set --url https://api.devnet.solana.com`
 
 ## 📁 Estrutura do Projeto
 
@@ -32,8 +49,6 @@ Este projeto é estruturado em **Anchor** sobre a **blockchain Solana**, com foc
 └── target/
     └── idl/ # IDLs geradas automaticamente pelo Anchor
 ```
-
----
 
 ## 🧹 Módulos e Programas
 
@@ -76,8 +91,6 @@ Este projeto é estruturado em **Anchor** sobre a **blockchain Solana**, com foc
   - `["strategy_balance", bot, sub_account, strategy_token]`
   - Link para a documentação: [Webdex Sub Accounts](./programs/webdex_sub_accounts/README.md)
 
----
-
 ## 🔄 Integração entre Programas
 
 Os programas se comunicam entre si via:
@@ -85,8 +98,6 @@ Os programas se comunicam entre si via:
 - **Accounts compartilhadas (PDAs)**
 - **Seeds determinísticas**
 - **Chaves cruzadas validadas manualmente**
-
----
 
 ## 🧲 Testes
 
@@ -98,8 +109,6 @@ Rodar testes:
 yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**.ts # roda todos os testes
 yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/A_add_bot.ts  # roda um arquivo específico
 ```
-
----
 
 ## 🔧 Como Rodar
 
@@ -121,14 +130,6 @@ anchor build
 anchor deploy
 ```
 
-4. Teste:
-
-```bash
-anchor run test
-```
-
----
-
 ## 🗂️ IDLs
 
 As IDLs geradas são exportadas automaticamente para `target/idl`, uma por programa, e consumidas no front-end via:
@@ -142,15 +143,11 @@ anchor.workspace.WebdexStrategy
 anchor.workspace.WebdexSubAccounts
 ```
 
----
-
 ## 📌 Observações
 
 - Estrutura modular facilita upgrades independentes por domínio
 - Separação entre lógica (`processor.rs`) e contexto (`state.rs`) em cada programa
 - Impossibilidade de chamar funções que façam o `init` ou `init-if-need` entre os contratos via CPI 
-
----
 
 ## ✨ Feito com:
 
