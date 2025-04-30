@@ -42,25 +42,30 @@ Este projeto é estruturado em **Anchor** sobre a **blockchain Solana**, com foc
 - Registro de endereços de outros módulos (payments, sub_accounts, strategy)
 - Controle de autoridade do bot
 - Seeds: `["bot", contract_address]`
+- Link para a documentação: [Webdex Factory](./programs/webdex_factory/README.md)
 
 ### `webdex_manager`
 - Criação de users (`CoinData`)
 - Adicionar ou Subtrair `gas` e `pass`
 - Seeds: `["user", signer]`
+- Link para a documentação: [Webdex Manager](./programs/webdex_manager/README.md)
 
 ### `webdex_network`
 - Gerencia a taxa de pagamento das indicações
 - Faz a retirada de saldo, transferindo para `user` e `fee_collector`
 - Seeds: `["user", signer]`
+- Link para a documentação: [Webdex Network](./programs/webdex_network/README.md)
 
 ### `webdex_payments`
 - Adição de moedas aceitas (`CoinData`)
 - Controle de `FeeTier` por contrato
 - Seeds: `["payments", bot_pda]`
+- Link para a documentação: [Webdex Payments](./programs/webdex_payments/README.md)
 
 ### `webdex_strategy`
 - Lista e gerenciamento de estratégias para um bot
 - Seeds: `["strategy_list", bot_pda]`
+- Link para a documentação: [Webdex Strategy](./programs/webdex_strategy/README.md)
 
 ### `webdex_sub_accounts`
 - Criação de subcontas por usuário
@@ -69,6 +74,7 @@ Este projeto é estruturado em **Anchor** sobre a **blockchain Solana**, com foc
   - `["sub_account_list", bot, user]`
   - `["sub_account", bot, user, name]`
   - `["strategy_balance", bot, sub_account, strategy_token]`
+  - Link para a documentação: [Webdex Sub Accounts](./programs/webdex_sub_accounts/README.md)
 
 ---
 
