@@ -34,7 +34,7 @@ pub fn _register(ctx: Context<Register>, manager: Pubkey) -> Result<()> {
     }
 
     if user.status {
-        return Err(ErrorCode::UnregisteredUser.into());
+        return Err(ErrorCode::RegisteredUser.into());
     }
 
     user.manager = manager.key();

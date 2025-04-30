@@ -7,11 +7,19 @@ skip-lint = false
 
 [programs.localnet]
 webdex_factory = "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc"
-webdex_manager = "6RuoSrSkzbTyMTdVzXp1xn2gyH4h9FtdZ8iQa12jmZqp"
-webdex_payments = "AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1"
-webdex_strategy = "BW8NiUW7jpcKmwFtBLVdgBwxNA4QR5CydPbKWb5oSkna"
-webdex_sub_accounts = "9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL"
-webdex_network = "CFGdoedbnF9ar7WaEvubtSmXpoTx8o3CpafhAdsVCuhK"
+webdex_manager = "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH"
+webdex_network = "EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE"
+webdex_payments = "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5"
+webdex_strategy = "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH"
+webdex_sub_accounts = "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
+
+[programs.devnet]
+webdex_factory = "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc"
+webdex_manager = "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH"
+webdex_network = "EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE"
+webdex_payments = "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5"
+webdex_strategy = "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH"
+webdex_sub_accounts = "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
 
 [registry]
 url = "https://api.apr.dev"
@@ -19,6 +27,3 @@ url = "https://api.apr.dev"
 [provider]
 cluster = "devnet"
 wallet = "~/.config/solana/id.json"
-
-[scripts]
-test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/*.ts"

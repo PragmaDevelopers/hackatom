@@ -49,6 +49,10 @@ describe("webdex_sub_accounts", () => {
 
         expect(subAccountList.subAccounts.length).to.be.greaterThan(0);
         expect(subAccount.name).to.equal(name);
+
+        // Passando o ID para o "Add Liquidity to SubAccount" encontrar a conta
+        sharedState.subAccountId = subAccount.id;
+        sharedState.subAccountName = subAccount.name;
     });
 
     it("Get Sub Accounts", async () => {
@@ -65,10 +69,6 @@ describe("webdex_sub_accounts", () => {
 
         const first = subAccounts[0];
         expect(first).to.have.all.keys("id", "name", "subAccountAddress");
-
-        // Passando o ID para o "Add Liquidity to SubAccount" encontrar a conta
-        sharedState.subAccountId = first.id;
-        sharedState.subAccountName = first.name;
 
         console.log("📦 SubAccounts:", subAccounts);
     });

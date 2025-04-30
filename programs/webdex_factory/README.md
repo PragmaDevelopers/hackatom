@@ -50,12 +50,12 @@ pub mod webdex_factory {
 ```
 
 ### Mudanças de Paradigma:
-| Conceito EVM         | Equivalente Solana (Anchor)                 |
-|----------------------|---------------------------------------------|
-| `mapping`            | `Account` com seeds/PDA                     |
-| `msg.sender`         | `ctx.accounts.signer.key`               |
-| `require(...)`       | `require!(cond, ErrorCode::X)`             |
-| `onlyOwner` modifier | Verificação manual via `signer`         |
+| Conceito EVM         | Equivalente Solana (Anchor)     |
+|----------------------|---------------------------------|
+| `mapping`            | `Account` com seeds/PDA         |
+| `msg.sender`         | `ctx.accounts.signer.key`       |
+| `require(...)`       | `require!(cond, ErrorCode::X)`  |
+| `onlyOwner` modifier | Verificação manual via `signer` |
 
 ### Exemplo de Contexto AddBot
 ```rust
@@ -83,7 +83,6 @@ pub struct AddBot<'info> {
 ---
 
 ## Considerações de Segurança
-- Todas as chamadas são restritas ao `authority` (equivalente ao `onlyOwner`)
 - Armazenamento de bots em PDAs com seed determinístico
 - Funções auxiliares foram desacopladas em contratos dedicados, fortalecendo a separação de responsabilidades
 

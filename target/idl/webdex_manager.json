@@ -1,5 +1,5 @@
 {
-  "address": "6RuoSrSkzbTyMTdVzXp1xn2gyH4h9FtdZ8iQa12jmZqp",
+  "address": "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH",
   "metadata": {
     "name": "webdex_manager",
     "version": "0.1.0",
@@ -2374,8 +2374,8 @@
     },
     {
       "code": 6016,
-      "name": "UnregisteredUser",
-      "msg": "Unregistered User"
+      "name": "RegisteredUser",
+      "msg": "User already registered"
     },
     {
       "code": 6017,

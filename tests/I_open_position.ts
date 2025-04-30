@@ -28,10 +28,16 @@ describe("webdex_payments/manager", () => {
             }
         ];
 
+        const [temporaryFee, bump] = PublicKey.findProgramAddressSync(
+            [Buffer.from("temporary_fee"), sharedState.botPda.toBuffer(), sharedState.userPda.toBuffer(), sharedState.subAccountPda.toBuffer(), sharedState.strategyBalancePda.toBuffer(), sharedState.paymentsPda.toBuffer()],
+            paymentsProgram.programId
+        );
+        sharedState.temporaryFeePda = temporaryFee;
+
         const tx = await paymentsProgram.methods
             .openPosition(
                 sharedState.coin.usdt.decimals,
-                sharedState.subAccountId.toString(),
+                sharedState.subAccountId,
                 sharedState.strategyTokenAddress,
                 amount,
                 sharedState.coin.usdt.pubkey,
@@ -50,12 +56,6 @@ describe("webdex_payments/manager", () => {
             .rpc();
 
         console.log("✅ Transação:", tx);
-
-        const [temporaryFee, bump] = PublicKey.findProgramAddressSync(
-            [Buffer.from("temporary_fee"), sharedState.botPda.toBuffer(), sharedState.userPda.toBuffer(), sharedState.subAccountPda.toBuffer(), sharedState.strategyBalancePda.toBuffer(), sharedState.paymentsPda.toBuffer()],
-            paymentsProgram.programId
-        );
-        sharedState.temporaryFeePda = temporaryFee;
     });
 
     it("Rebalance Position", async () => {

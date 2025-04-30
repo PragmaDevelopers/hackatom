@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_factory.json`.
  */
 export type WebdexFactory = {
-  "address": "AZpLbd9HonogrHXnLqy4YSkc2Zf6BvTv1Qpn4jZrpXfM",
+  "address": "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc",
   "metadata": {
     "name": "webdexFactory",
     "version": "0.1.0",

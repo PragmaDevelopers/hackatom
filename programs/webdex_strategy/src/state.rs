@@ -1,6 +1,7 @@
 use anchor_lang::prelude::*;
 use anchor_spl::token::{Token};
 use shared_factory::state::{Bot};
+use anchor_spl::token::{Mint};
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
 pub struct Strategy {
@@ -53,6 +54,9 @@ pub struct AddStrategy<'info> {
     )]
     pub strategy_list: Account<'info, StrategyList>,
 
+    #[account(init_if_needed, payer = signer, mint::decimals = 0, mint::authority = token_authority)]
+    pub token_mint: Account<'info, Mint>,
+
     /// CHECK: Esta conta é verificada pelo programa Metaplex
     pub token_address: AccountInfo<'info>,
 
@@ -61,6 +65,9 @@ pub struct AddStrategy<'info> {
     /// CHECK: Esta conta é verificada pelo programa Metaplex
     #[account(mut)]
     pub metadata: UncheckedAccount<'info>,
+
+    #[account(mut)]
+    pub token_authority: Signer<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,

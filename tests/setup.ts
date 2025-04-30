@@ -31,7 +31,7 @@ export const sharedState = {
     subAccountListPda: null as null | PublicKey,
     balanceInfoPda: null as null | PublicKey,
     subAccountPda: null as null | PublicKey,
-    subAccountId: null as null | PublicKey,
+    subAccountId: null as null | string,
     subAccountName: null as null | string,
     strategyBalancePda: null as null | PublicKey,
     METADATA_PROGRAM_ID: null as null | PublicKey,

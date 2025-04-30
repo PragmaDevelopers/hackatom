@@ -17,7 +17,7 @@ describe("webdex_sub_accounts", () => {
 
     it("Get Balance", async () => {
         const result = await subAccountsProgram.methods
-            .getBalance(sharedState.subAccountId.toString(), sharedState.strategyTokenAddress, sharedState.coin.usdt.pubkey)
+            .getBalance(sharedState.subAccountId, sharedState.strategyTokenAddress, sharedState.coin.usdt.pubkey)
             .accounts({
                 subAccount: sharedState.subAccountPda,
                 strategyBalance: sharedState.strategyBalancePda,
@@ -36,7 +36,7 @@ describe("webdex_sub_accounts", () => {
 
     it("Get Sub Account Strategies", async () => {
         const result = await subAccountsProgram.methods
-            .getSubAccountStrategies(sharedState.subAccountId.toString())
+            .getSubAccountStrategies(sharedState.subAccountId)
             .accounts({
                 subAccount: sharedState.subAccountPda,
             })
@@ -52,7 +52,7 @@ describe("webdex_sub_accounts", () => {
     it("Toggle Pause", async () => {
         const tx = await subAccountsProgram.methods
             .togglePause(
-                sharedState.subAccountId.toString(),
+                sharedState.subAccountId,
                 sharedState.strategyTokenAddress,
                 sharedState.coin.usdt.pubkey,
                 !isPausedCoin
@@ -71,7 +71,7 @@ describe("webdex_sub_accounts", () => {
 
     it("Get Balances", async () => {
         const result = await subAccountsProgram.methods
-            .getBalances(sharedState.subAccountId.toString(), sharedState.strategyTokenAddress)
+            .getBalances(sharedState.subAccountId, sharedState.strategyTokenAddress)
             .accounts({
                 subAccount: sharedState.subAccountPda,
                 strategyBalance: sharedState.strategyBalancePda,
@@ -86,7 +86,7 @@ describe("webdex_sub_accounts", () => {
     it("Find Sub Account Index By Id", async () => {
         // Chamada da função get_sub_accounts
         const subAccountsIndex = await subAccountsProgram.methods
-            .findSubAccountIndexById(sharedState.subAccountId.toString())
+            .findSubAccountIndexById(sharedState.subAccountId)
             .accounts({
                 subAccountList: sharedState.subAccountListPda,
             })

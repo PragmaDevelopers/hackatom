@@ -55,18 +55,18 @@ Este documento descreve a migração do contrato inteligente `WEbdEXManagerV4` d
 ### Declaração do Programa:
 ```rust
 #[program]
-pub mod webdex_factory {
+pub mod webdex_manager {
     // ...
 }
 ```
 
 ### Mudanças de Paradigma:
-| Conceito EVM         | Equivalente Solana (Anchor)                 |
-|----------------------|---------------------------------------------|
-| `mapping`            | `Account` com seeds/PDA                     |
-| `msg.sender`         | `ctx.accounts.signer.key`               |
-| `require(...)`       | `require!(cond, ErrorCode::X)`             |
-| `onlyPayments` modifier | Verificação manual via `signer`         |
+| Conceito EVM            | Equivalente Solana (Anchor)     |
+|-------------------------|---------------------------------|
+| `mapping`               | `Account` com seeds/PDA         |
+| `msg.sender`            | `ctx.accounts.signer.key`       |
+| `require(...)`          | `require!(cond, ErrorCode::X)`  |
+| `onlyPayments` modifier | Verificação manual via `signer` |
 
 ### Exemplo de Contexto AddBot
 ```rust
@@ -76,7 +76,7 @@ pub struct AddGas<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::UnregisteredUser
+        constraint = user.status @ ErrorCode::RegisteredUser
     )]
     pub user: Account<'info, User>,
 

@@ -89,8 +89,8 @@ Os testes são feitos com `ts-mocha`, utilizando `anchor.workspace` para interag
 Rodar testes:
 
 ```bash
-anchor test                   # roda todos os testes
-anchor run test -- tests/x.ts  # roda um arquivo específico
+yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**.ts # roda todos os testes
+yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/A_add_bot.ts  # roda um arquivo específico
 ```
 
 ---

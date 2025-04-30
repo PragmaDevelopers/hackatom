@@ -9,7 +9,7 @@ pub mod error;
 use crate::state::*;
 use crate::processor::*;
 
-declare_id!("CFGdoedbnF9ar7WaEvubtSmXpoTx8o3CpafhAdsVCuhK");
+declare_id!("EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE");
 
 #[program]
 pub mod webdex_network {

@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_network.json`.
  */
 export type WebdexNetwork = {
-  "address": "CFGdoedbnF9ar7WaEvubtSmXpoTx8o3CpafhAdsVCuhK",
+  "address": "EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE",
   "metadata": {
     "name": "webdexNetwork",
     "version": "0.1.0",
