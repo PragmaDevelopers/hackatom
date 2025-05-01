@@ -99,6 +99,37 @@ Os programas se comunicam entre si via:
 - **Seeds determinísticas**
 - **Chaves cruzadas validadas manualmente**
 
+## 🔐 Geração da Wallet Solana (id.json)
+
+Para que o Anchor e o Solana CLI possam assinar transações e deployar programas, é necessário ter uma **carteira Solana local** configurada.
+
+O Anchor utiliza, por padrão, a variável de ambiente `ANCHOR_WALLET`, crie a carteira através do comando:
+
+```bash
+solana-keygen new --outfile ~/.config/solana/id.json
+```
+
+🔍 Verificar se foi criada com sucesso
+
+```bash
+solana address
+```
+
+Depois de gerar a carteira, envie SOL de teste com:
+
+```bash
+solana airdrop 2 --url https://api.devnet.solana.com
+```
+
+## 🌐 Configuração de Ambiente Anchor (Devnet)
+
+Antes de rodar os testes ou interagir com os programas via scripts TypeScript, você precisa configurar duas variáveis de ambiente no seu terminal:
+
+```bash
+export ANCHOR_PROVIDER_URL=https://api.devnet.solana.com
+export ANCHOR_WALLET=~/.config/solana/id.json
+```
+
 ## 🧲 Testes
 
 Os testes são feitos com `ts-mocha`, utilizando `anchor.workspace` para interagir com cada programa de forma isolada.
