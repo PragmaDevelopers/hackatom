@@ -113,7 +113,7 @@ pub struct CreateSubAccount<'info> {
     pub sub_account_list: Account<'info, SubAccountList>,
 
     #[account(
-        init,
+        init_if_needed,
         payer = signer,
         space = SubAccount::SPACE,
         seeds = [b"sub_account", user.key().as_ref(), name.as_bytes()],

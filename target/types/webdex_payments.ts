@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_payments.json`.
  */
 export type WebdexPayments = {
-  "address": "AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1",
+  "address": "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5",
   "metadata": {
     "name": "webdexPayments",
     "version": "0.1.0",
@@ -318,7 +318,7 @@ export type WebdexPayments = {
         },
         {
           "name": "subAccountProgram",
-          "address": "9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL"
+          "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
         }
       ],
       "args": [

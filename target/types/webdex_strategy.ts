@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_strategy.json`.
  */
 export type WebdexStrategy = {
-  "address": "BW8NiUW7jpcKmwFtBLVdgBwxNA4QR5CydPbKWb5oSkna",
+  "address": "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH",
   "metadata": {
     "name": "webdexStrategy",
     "version": "0.1.0",
@@ -60,6 +60,11 @@ export type WebdexStrategy = {
           }
         },
         {
+          "name": "tokenMint",
+          "writable": true,
+          "signer": true
+        },
+        {
           "name": "tokenAddress"
         },
         {
@@ -68,6 +73,11 @@ export type WebdexStrategy = {
         {
           "name": "metadata",
           "writable": true
+        },
+        {
+          "name": "tokenAuthority",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "signer",

@@ -34,8 +34,8 @@ pub enum ErrorCode {
     InsufficientFunds,
     #[msg("Unregistered Manager")]
     UnregisteredManager,
-    #[msg("Unregistered User")]
-    UnregisteredUser,
+    #[msg("User already registered")]
+    RegisteredUser,
     #[msg("Insufficient Gas Balance")]
     InsufficientGasBalance,
     #[msg("Invalid Amount")]

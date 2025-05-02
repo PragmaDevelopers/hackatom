@@ -1,69 +1,95 @@
-# Integração Solana ↔ Solidity – Estratégias
-
-## Visão Geral
-Nesta integração, o contrato **WEbdEXStrategiesV4** em Solidity foi adaptado para um equivalente no ambiente Solana com Anchor, responsável pela criação e gerenciamento de estratégias (NFTs) associadas a bots. O gerenciamento das estratégias foi separado do contrato `WEbdEXFactoryV4` para manter responsabilidades separadas.
+**Documentação Técnica: Migração do Contrato WEbdEXStrategiesV4 (EVM) para Anchor/Solana**
 
 ---
 
-## Solidity – WEbdEXStrategiesV4
-O contrato em Solidity:
-- Recebe chamadas apenas do contrato `Factory`, garantindo controle de acesso.
-- Permite adicionar estratégias com NFTs personalizados (via contrato `NFT`).
-- Atualiza o status das estratégias (ativas ou não).
-- Permite busca e listagem de estratégias por contrato.
-
-### Principais Estruturas
-```solidity
-struct Strategy {
-    string name;
-    address tokenAddress;
-    bool isActive;
-}
-```
+## Objetivo
+Este documento descreve a migração do contrato inteligente `WEbdEXStrategiesV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
 
 ---
 
-## Anchor (Solana) – Módulo de Estratégias
-A lógica correspondente foi implementada como funções auxiliares (`_add_strategy`, `_update_strategy_status`, etc.) em Rust/Anchor.
+## Estrutura Original (EVM)
 
-### 📌 Função `add_strategy`
-Registra uma nova estratégia associada ao bot.
+### Funções do Contrato:
+1. `addStrategy(...)`
+2. `updateStrategyStatus(...)`
+3. `getStrategies(...)`
+4. `findStrategy(...)`
 
-- Valida que o chamador é o dono do bot
-- Verifica se o contrato informado é válido
-- Cria metadados para o token (estrutura `DataV2`, padrão do Metaplex)
-- Adiciona à lista de estratégias (`strategy_list`)
-- Emite evento `StrategyAddedEvent`
-
-### 📌 Função `update_strategy_status`
-Permite ativar/desativar estratégias.
-
-- Busca a estratégia por `token_address`
-- Atualiza o status
-- Emite evento `StrategyStatusUpdatedEvent`
-
-### 📌 Função `get_strategies`
-Retorna todas as estratégias registradas para um determinado contrato.
-
-### 📌 Função `find_strategy`
-Retorna os dados de uma estratégia específica com base em seu `token_address`.
-
-### 📌 Função `delete_strategy`
-Remove uma estratégia da lista vinculada ao contrato do bot.
+### Armazenamento:
+- Mapeamento: `mapping(address => Bot) internal bots;`
+- Estrutura `Bot` com campos:
+  - `contractAddress`, `strategies`
 
 ---
 
-## Estrutura Compartilhada: `StrategyList`
-No Solana, usamos a conta `StrategyList` com a estrutura:
+## Adaptação Solana (Anchor Framework)
+
+### Módulos:
+- `state.rs`: define a estrutura `Strategy`, conta principal e dados persistentes
+- `processor.rs`: implementação da lógica das instruções
+- `error.rs`: definição de erros personalizados com Anchor
+
+### Instruções Migradas:
+1. `add_strategy`  → Cria uma estrategia vinculada a um bot, cria metadados NFT usando a metaplex 
+2. `update_strategy_status` → Atualiza o status da estrategia
+3. `get_strategies` → Faz o get de `StrategyList`
+4. `find_strategy` → Faz o get de um `Strategy` em especifico
+5. `delete_strategy` → Deleta uma `Strategy` em especifico
+
+### Declaração do Programa:
 ```rust
-pub struct StrategyList {
-    pub contract_address: Pubkey,
-    pub strategies: Vec<Strategy>,
+#[program]
+pub mod webdex_strategy {
+    // ...
 }
 ```
 
-- `contract_address`: usado para validar a posse da lista
-- `strategies`: vetor contendo todas as estratégias
+### Mudanças de Paradigma:
+| Conceito EVM         | Equivalente Solana (Anchor)     |
+|----------------------|---------------------------------|
+| `mapping`            | `Account` com seeds/PDA         |
+| `msg.sender`         | `ctx.accounts.signer.key`       |
+| `require(...)`       | `require!(cond, ErrorCode::X)`  |
+| `onlyOwner` modifier | Verificação manual via `signer` |
+
+### Exemplo de Contexto AddBot
+```rust
+#[derive(Accounts)]
+pub struct AddStrategy<'info> {
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = StrategyList::INIT_SPACE,
+        seeds = [b"strategy_list", bot.key().as_ref()],
+        bump
+    )]
+    pub strategy_list: Account<'info, StrategyList>,
+
+    #[account(init, payer = signer, mint::decimals = 0, mint::authority = token_authority)]
+    pub token_mint: Account<'info, Mint>,
+
+    /// CHECK: Esta conta é verificada pelo programa Metaplex
+    pub token_address: AccountInfo<'info>,
+
+    /// CHECK: Esta conta é verificada pelo programa Metaplex
+    pub metadata_program: AccountInfo<'info>,
+    /// CHECK: Esta conta é verificada pelo programa Metaplex
+    #[account(mut)]
+    pub metadata: UncheckedAccount<'info>,
+
+    #[account(mut)]
+    pub token_authority: Signer<'info>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
+    pub token_program: Program<'info, Token>,
+}
+```
 
 ---
 
@@ -73,16 +99,6 @@ A criação de metadados NFT no Anchor utiliza:
 - `create_metadata_accounts_v3`
 
 A chamada está preparada mas comentada para personalização futura.
-
-```rust
-// create_metadata_accounts_v3(cpi_ctx, metadata_data, true, false, None)?;
-```
-
----
-
-## Controle de Acesso
-- Em Solidity, o controle é feito via `onlyOwner()` com base no `Factory`.
-- Em Anchor, verificamos se `ctx.accounts.signer` é o dono do `bot`.
 
 ---
 
@@ -94,4 +110,4 @@ Em ambientes multi-programa:
 ---
 
 ## Conclusão
-Este módulo implementa com sucesso a separação de responsabilidades entre `Factory` e `Strategies`, mantendo segurança, escalabilidade e modularidade. Com isso, é possível evoluir cada componente de forma independente e segura em ambas as blockchains.
+A adaptação do contrato `WEbdEXStrategiesV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.

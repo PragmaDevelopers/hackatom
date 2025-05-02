@@ -25,7 +25,7 @@ describe("webdex_close", () => {
             .liquidityRemove(
                 sharedState.strategyTokenAddress,
                 sharedState.coin.usdt.decimals,
-                sharedState.subAccountId.toString(),
+                sharedState.subAccountId,
                 sharedState.coin.usdt.pubkey,
                 amount,
             )

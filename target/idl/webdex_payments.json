@@ -1,5 +1,5 @@
 {
-  "address": "AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1",
+  "address": "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5",
   "metadata": {
     "name": "webdex_payments",
     "version": "0.1.0",
@@ -312,7 +312,7 @@
         },
         {
           "name": "sub_account_program",
-          "address": "9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL"
+          "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
         }
       ],
       "args": [

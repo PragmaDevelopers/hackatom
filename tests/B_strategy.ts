@@ -56,7 +56,10 @@ describe("webdex_strategy", () => {
                 metadataProgram: METADATA_PROGRAM_ID,
                 metadata: metadataPda,
                 signer: user.publicKey,
+                tokenAuthority: user.publicKey,
+                tokenMint: strategyTokenAddress,
             })
+            .signers([mint])
             .rpc();
 
         console.log("🚀 Strategy Added TX:", tx);

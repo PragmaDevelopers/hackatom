@@ -43,7 +43,7 @@ impl ManagerIndex {
 #[derive(Accounts)]
 pub struct RegisterManager<'info> {
     #[account(
-        init, 
+        init_if_needed, 
         payer = signer, 
         space = User::SPACE, 
         seeds = [b"manager", signer.key().as_ref()], 
@@ -60,7 +60,7 @@ pub struct RegisterManager<'info> {
 #[derive(Accounts)]
 pub struct Register<'info> {
     #[account(
-        init, 
+        init_if_needed, 
         payer = signer, 
         space = User::SPACE, 
         seeds = [b"user", signer.key().as_ref()], 
@@ -93,7 +93,7 @@ pub struct AddGas<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::UnregisteredUser
+        constraint = user.status @ ErrorCode::RegisteredUser
     )]
     pub user: Account<'info, User>,
 
@@ -130,7 +130,7 @@ pub struct RemoveGas<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::UnregisteredUser
+        constraint = user.status @ ErrorCode::RegisteredUser
     )]
     pub user: Account<'info, User>,
 
@@ -164,7 +164,7 @@ pub struct PassAdd<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::UnregisteredUser
+        constraint = user.status @ ErrorCode::RegisteredUser
     )]
     pub user: Account<'info, User>,
 
@@ -201,7 +201,7 @@ pub struct PassRemove<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::UnregisteredUser
+        constraint = user.status @ ErrorCode::RegisteredUser
     )]
     pub user: Account<'info, User>, // Guarda pass_balance
 

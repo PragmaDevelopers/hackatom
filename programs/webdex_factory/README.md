@@ -11,11 +11,11 @@ Este documento descreve a migração do contrato inteligente `WEbdEXFactoryV4` d
 
 ### Funções do Contrato:
 1. `addBot(...)`
-2. `getBotInfo(address)`
+2. `getBotInfo(...)`
 3. `updateBot(...)`
-4. `removeBot(address)`
-5. `currencyAllow(address,address)`
-6. `currencyRevoke(address,address)`
+4. `removeBot(...)`
+5. `currencyAllow(...)`
+6. `currencyRevoke(...)`
 7. `addStrategy(...)`
 8. `updateStrategyStatus(...)`
 
@@ -50,12 +50,12 @@ pub mod webdex_factory {
 ```
 
 ### Mudanças de Paradigma:
-| Conceito EVM         | Equivalente Solana (Anchor)                 |
-|----------------------|---------------------------------------------|
-| `mapping`            | `Account` com seeds/PDA                     |
-| `msg.sender`         | `ctx.accounts.signer.key`               |
-| `require(...)`       | `require!(cond, ErrorCode::X)`             |
-| `onlyOwner` modifier | Verificação manual via `signer`         |
+| Conceito EVM         | Equivalente Solana (Anchor)     |
+|----------------------|---------------------------------|
+| `mapping`            | `Account` com seeds/PDA         |
+| `msg.sender`         | `ctx.accounts.signer.key`       |
+| `require(...)`       | `require!(cond, ErrorCode::X)`  |
+| `onlyOwner` modifier | Verificação manual via `signer` |
 
 ### Exemplo de Contexto AddBot
 ```rust
@@ -83,24 +83,22 @@ pub struct AddBot<'info> {
 ---
 
 ## Considerações de Segurança
-- Todas as chamadas são restritas ao `authority` (equivalente ao `onlyOwner`)
 - Armazenamento de bots em PDAs com seed determinístico
 - Funções auxiliares foram desacopladas em contratos dedicados, fortalecendo a separação de responsabilidades
 
 ---
 
 ## Integração entre Contratos via CPI
-As funcionalidades auxiliares removidas deste contrato devem ser acessadas por meio de chamadas CPI. Exemplo:
+As funcionalidades auxiliares removidas deste contrato podem ser acessadas por meio de chamadas CPI quando não envolvem inicialização de contas. Exemplo:
 ```rust
 let cpi_ctx = CpiContext::new(
     ctx.accounts.payments_program.to_account_info(),
     RevokeOrAllowCurrency {
-        authority: ctx.accounts.authority.to_account_info(),
-        bot: ctx.accounts.bot.to_account_info(),
+        payments: ctx.accounts.payments.to_account_info(),
         // ... outros campos
     }
 );
-payments::cpi::revoke_or_allow_currency(cpi_ctx, true)?;
+revoke_or_allow_currency(cpi_ctx, true)?;
 ```
 
 ---

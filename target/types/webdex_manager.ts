@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_manager.json`.
  */
 export type WebdexManager = {
-  "address": "6RuoSrSkzbTyMTdVzXp1xn2gyH4h9FtdZ8iQa12jmZqp",
+  "address": "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH",
   "metadata": {
     "name": "webdexManager",
     "version": "0.1.0",
@@ -2380,8 +2380,8 @@ export type WebdexManager = {
     },
     {
       "code": 6016,
-      "name": "unregisteredUser",
-      "msg": "Unregistered User"
+      "name": "registeredUser",
+      "msg": "User already registered"
     },
     {
       "code": 6017,
