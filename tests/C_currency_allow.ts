@@ -16,7 +16,6 @@ import { createMint } from "@solana/spl-token";
 export async function fetchTokenInfoFromChain(mint: String): Promise<{ name: string; symbol: string; decimals: number }> {
     const umi = createUmi('http://127.0.0.1:8899').use(mplTokenMetadata())
 
-    // Obtém as informações da conta do mint
     const mintAccount = await fetchMint(umi, publicKey(`${mint}`));
     const decimals = mintAccount.decimals;
 

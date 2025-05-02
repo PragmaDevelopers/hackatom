@@ -11,12 +11,12 @@ import sub_accounts_idl from "./IDLs/webdex_sub_accounts.json"; // IDL gerado pe
 const NETWORK = "https://api.devnet.solana.com"; // ou mainnet, dependendo
 
 export const IDLPrograms: {
-factor: Idl,
-manager: Idl,
-network: Idl,
-payments: Idl,
-strategy: Idl,
-sub_accounts: Idl,
+    factor: Idl,
+    manager: Idl,
+    network: Idl,
+    payments: Idl,
+    strategy: Idl,
+    sub_accounts: Idl,
 } = {
     factor: factor_idl as Idl, 
     manager: manager_idl as Idl,
