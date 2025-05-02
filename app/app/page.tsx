@@ -52,7 +52,6 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import { fetchMint } from "@metaplex-foundation/mpl-toolbox";
 import { publicKey } from "@metaplex-foundation/umi";
-import { createMint } from "@solana/spl-token";
 
 
 /**
@@ -1056,19 +1055,19 @@ function StrategyPage(): ReactNode {
 }
 
 function CurrencyAllowPage(): ReactNode {
-    
+
     const fetchTokenInfoFromChain = async (mint: String): Promise<{ name: string; symbol: string; decimals: number }> => {
         const umi = createUmi('http://127.0.0.1:8899').use(mplTokenMetadata())
-    
+
         const mintAccount = await fetchMint(umi, publicKey(`${mint}`));
         const decimals = mintAccount.decimals;
-    
+
         // Deriva o PDA do metadata
         const metadataPda = findMetadataPda(umi, { mint: publicKey(`${mint}`) });
-    
+
         // Busca os dados de metadata
         const metadata = await fetchMetadata(umi, metadataPda);
-    
+
         return {
             name: metadata.name.trim(),
             symbol: metadata.symbol.trim(),
