@@ -51,8 +51,10 @@ export type WebdexNetwork = {
       ],
       "accounts": [
         {
-          "name": "user",
-          "writable": true
+          "name": "user"
+        },
+        {
+          "name": "subAccount"
         },
         {
           "name": "balanceInfo",
@@ -108,6 +110,10 @@ export type WebdexNetwork = {
         }
       ],
       "args": [
+        {
+          "name": "subAccountName",
+          "type": "string"
+        },
         {
           "name": "contractAddress",
           "type": "pubkey"
@@ -475,6 +481,19 @@ export type WebdexNetwork = {
       ]
     },
     {
+      "name": "subAccount",
+      "discriminator": [
+        227,
+        47,
+        166,
+        42,
+        242,
+        171,
+        32,
+        114
+      ]
+    },
+    {
       "name": "user",
       "discriminator": [
         159,
@@ -519,11 +538,16 @@ export type WebdexNetwork = {
   "errors": [
     {
       "code": 6000,
+      "name": "unauthorized",
+      "msg": "unauthorized"
+    },
+    {
+      "code": 6001,
       "name": "insufficientBalance",
       "msg": "Insufficient Balance"
     },
     {
-      "code": 6001,
+      "code": 6002,
       "name": "overflow",
       "msg": "overflow"
     }
@@ -643,6 +667,22 @@ export type WebdexNetwork = {
             "type": "pubkey"
           },
           {
+            "name": "collector1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector4",
+            "type": "pubkey"
+          },
+          {
             "name": "managerAddress",
             "type": "pubkey"
           },
@@ -669,6 +709,34 @@ export type WebdexNetwork = {
           {
             "name": "feeCollectorNetworkAddress",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "subAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "listStrategies",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "strategies",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }

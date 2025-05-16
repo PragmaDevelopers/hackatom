@@ -2,6 +2,7 @@ use anchor_lang::prelude::*;
 
 pub mod processor;
 pub mod state;
+pub mod authority;
 
 pub mod error;
 
@@ -15,12 +16,12 @@ pub mod webdex_manager {
 
     use super::*;
 
-    pub fn register_manager(ctx: Context<RegisterManager>, manager: Pubkey) -> Result<()> {
-        _register_manager(ctx,manager)
+    pub fn register_manager(ctx: Context<RegisterManager>) -> Result<()> {
+        _register_manager(ctx)
     }
 
-    pub fn register(ctx: Context<Register>, manager: Pubkey) -> Result<()> {
-        _register(ctx,manager)
+    pub fn register(ctx: Context<Register>) -> Result<()> {
+        _register(ctx)
     }
 
     pub fn get_info_user(ctx: Context<GetInfoUser>) -> Result<UserDisplay> {

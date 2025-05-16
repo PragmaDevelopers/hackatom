@@ -97,31 +97,17 @@ pub struct AddGas<'info> {
     )]
     pub user: Account<'info, User>,
 
-    /// CHECK: Apenas para seeds
-    pub pol_mint: AccountInfo<'info>,
-
     #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = pol_mint,
-        associated_token::authority = signer,
+        mut,
+        seeds = [b"vault_sol_account", user.key().as_ref()],
+        bump,
     )]
-    pub user_pol_account: Account<'info, TokenAccount>, // do SPL depositado
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = pol_mint,
-        associated_token::authority = signer
-    )]
-    pub vault_pol_account: Account<'info, TokenAccount>, // onde o token vai
+    pub vault_sol_account: SystemAccount<'info>, // onde o token vai
 
     #[account(mut)]
     pub signer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[derive(Accounts)]
@@ -134,28 +120,17 @@ pub struct RemoveGas<'info> {
     )]
     pub user: Account<'info, User>,
 
-    /// CHECK: Apenas para seeds
-    pub pol_mint: AccountInfo<'info>,
-
     #[account(
         mut,
-        associated_token::mint = pol_mint,
-        associated_token::authority = signer,
+        seeds = [b"vault_sol_account", user.key().as_ref()],
+        bump
     )]
-    pub user_pol_account: Account<'info, TokenAccount>, // do SPL depositado
-
-    #[account(
-        mut,
-        associated_token::mint = pol_mint,
-        associated_token::authority = signer
-    )]
-    pub vault_pol_account: Account<'info, TokenAccount>, // onde o token vai
+    pub vault_sol_account: SystemAccount<'info>, // onde o token vai
 
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
@@ -295,16 +270,19 @@ pub struct LiquidityAdd<'info> {
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
+    /// CHECK: A autoridade do user
+    pub user_authority: AccountInfo<'info>,
+
     #[account(
         init_if_needed,
         payer = signer,
         associated_token::mint = lp_token,
-        associated_token::authority = lp_mint_authority
+        associated_token::authority = user_authority
     )]
     pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
     #[account(
-        seeds = [b"mint_authority"],
+        seeds = [b"mint_authority", strategy_token.key().as_ref()],
         bump
     )]
     /// CHECK: É usado como signer programático
@@ -367,15 +345,18 @@ pub struct LiquidityRemove<'info> {
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
+    /// CHECK: A autoridade do user
+    pub user_authority: AccountInfo<'info>,
+
      #[account(
         mut,
         associated_token::mint = lp_token,
-        associated_token::authority = lp_mint_authority
+        associated_token::authority = user_authority
     )]
     pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
     #[account(
-        seeds = [b"mint_authority"],
+        seeds = [b"mint_authority", strategy_token.key().as_ref()],
         bump
     )]
     /// CHECK: É usado como signer programático
@@ -406,9 +387,6 @@ pub struct RebalancePosition<'info> {
     #[account(mut)]
     pub temporary_fee_account: Account<'info, FeeAccount>,
 
-    /// CHECK
-    pub bot_owner: AccountInfo<'info>,
-
     /// CHECK: Apenas para seeds
     pub usdt_mint: AccountInfo<'info>,
 
@@ -422,19 +400,81 @@ pub struct RebalancePosition<'info> {
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
+    /// CHECK: A autoridade do user
+    pub user_authority: AccountInfo<'info>,
+
     #[account(
         mut,
         associated_token::mint = lp_token,
-        associated_token::authority = lp_mint_authority
+        associated_token::authority = user_authority
     )]
     pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
+    /// CHECK: A autoridade do bot (dono)
+    pub bot_owner: AccountInfo<'info>,
+
     #[account(
-        seeds = [b"mint_authority"],
+        init_if_needed,
+        payer = user,
+        associated_token::mint = lp_token,
+        associated_token::authority = bot_owner
+    )]
+    pub bot_owner_lp_account: Box<Account<'info, TokenAccount>>,
+
+    /// CHECK: Coletore
+    pub collector_1: AccountInfo<'info>,
+    /// CHECK: Coletore
+    pub collector_2: AccountInfo<'info>,
+    /// CHECK: Coletore
+    pub collector_3: AccountInfo<'info>,
+    /// CHECK: Coletore
+    pub collector_4: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = user,
+        associated_token::mint = lp_token,
+        associated_token::authority = collector_1
+    )]
+    pub collector_1_lp_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        init_if_needed,
+        payer = user,
+        associated_token::mint = lp_token,
+        associated_token::authority = collector_2
+    )]
+    pub collector_2_lp_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        init_if_needed,
+        payer = user,
+        associated_token::mint = lp_token,
+        associated_token::authority = collector_3
+    )]
+    pub collector_3_lp_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        init_if_needed,
+        payer = user,
+        associated_token::mint = lp_token,
+        associated_token::authority = collector_4
+    )]
+    pub collector_4_lp_account: Box<Account<'info, TokenAccount>>,
+
+    #[account(
+        seeds = [b"mint_authority", strategy_token.key().as_ref()],
         bump
     )]
     /// CHECK: É usado como signer programático
     pub lp_mint_authority: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        seeds = [b"vault_sol_account", user.key().as_ref()],
+        bump
+    )]
+    pub vault_sol_account: SystemAccount<'info>, // onde o token vai
 
     #[account(mut)]
     pub signer: Signer<'info>,

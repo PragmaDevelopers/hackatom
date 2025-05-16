@@ -3,6 +3,7 @@ use anchor_spl::token::{Token,TokenAccount,Mint};
 use anchor_spl::associated_token::AssociatedToken;
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
+use webdex_sub_accounts::state::{SubAccount};
 
 #[account]
 pub struct BalanceInfo {
@@ -38,8 +39,9 @@ pub struct BalanceNetworkRemove {
 
 #[derive(Accounts)]
 pub struct PayFee<'info> {
-    #[account(mut)]
     pub user: Account<'info, User>,
+
+    pub sub_account: Account<'info, SubAccount>,
 
     #[account(
         init_if_needed,

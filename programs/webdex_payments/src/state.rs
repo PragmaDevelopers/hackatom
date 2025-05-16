@@ -67,11 +67,13 @@ pub struct PositionDetails {
     pub old_balance: u64,
     pub fee: u64,
     pub gas: u64,
-    pub profit: i64,
+    pub profit: u64,
 }
 
 #[derive(Accounts)]
 pub struct AddFeeTiers<'info> {
+    pub bot: Account<'info, Bot>,
+    
     #[account(mut)]
     pub payments: Account<'info, Payments>,
 
@@ -153,12 +155,7 @@ pub struct OpenPositionEvent {
     pub contract_address: Pubkey,
     pub user: Pubkey,
     pub id: String,
-    pub strategy_token: Pubkey,
-    pub coin: Pubkey,
-    pub old_balance: u64,
-    pub fee: u64,
-    pub gas: u64,
-    pub profit: u64,
+    pub details: PositionDetails,
 }
 
 #[event]

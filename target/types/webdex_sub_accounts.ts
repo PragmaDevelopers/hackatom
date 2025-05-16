@@ -734,6 +734,22 @@ export type WebdexSubAccounts = {
             "type": "pubkey"
           },
           {
+            "name": "collector1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector4",
+            "type": "pubkey"
+          },
+          {
             "name": "managerAddress",
             "type": "pubkey"
           },

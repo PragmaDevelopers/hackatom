@@ -18,10 +18,11 @@ pub mod webdex_network {
 
     pub fn pay_fee(
         ctx: Context<PayFee>,
+        sub_account_name: String,
         contract_address: Pubkey,
         amount: u64,
     ) -> Result<()> {
-        _pay_fee(ctx,contract_address,amount)
+        _pay_fee(ctx,sub_account_name,contract_address,amount)
     }
 
     pub fn withdrawal(

@@ -27,6 +27,9 @@ export type WebdexPayments = {
       ],
       "accounts": [
         {
+          "name": "bot"
+        },
+        {
           "name": "payments",
           "writable": true
         },
@@ -659,6 +662,22 @@ export type WebdexPayments = {
             "type": "pubkey"
           },
           {
+            "name": "collector1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector4",
+            "type": "pubkey"
+          },
+          {
             "name": "managerAddress",
             "type": "pubkey"
           },
@@ -795,28 +814,12 @@ export type WebdexPayments = {
             "type": "string"
           },
           {
-            "name": "strategyToken",
-            "type": "pubkey"
-          },
-          {
-            "name": "coin",
-            "type": "pubkey"
-          },
-          {
-            "name": "oldBalance",
-            "type": "u64"
-          },
-          {
-            "name": "fee",
-            "type": "u64"
-          },
-          {
-            "name": "gas",
-            "type": "u64"
-          },
-          {
-            "name": "profit",
-            "type": "u64"
+            "name": "details",
+            "type": {
+              "defined": {
+                "name": "positionDetails"
+              }
+            }
           }
         ]
       }
@@ -849,6 +852,38 @@ export type WebdexPayments = {
                 }
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "positionDetails",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strategy",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "oldBalance",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "gas",
+            "type": "u64"
+          },
+          {
+            "name": "profit",
+            "type": "u64"
           }
         ]
       }

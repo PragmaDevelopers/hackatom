@@ -45,8 +45,10 @@
       ],
       "accounts": [
         {
-          "name": "user",
-          "writable": true
+          "name": "user"
+        },
+        {
+          "name": "sub_account"
         },
         {
           "name": "balance_info",
@@ -102,6 +104,10 @@
         }
       ],
       "args": [
+        {
+          "name": "sub_account_name",
+          "type": "string"
+        },
         {
           "name": "contract_address",
           "type": "pubkey"
@@ -469,6 +475,19 @@
       ]
     },
     {
+      "name": "SubAccount",
+      "discriminator": [
+        227,
+        47,
+        166,
+        42,
+        242,
+        171,
+        32,
+        114
+      ]
+    },
+    {
       "name": "User",
       "discriminator": [
         159,
@@ -513,11 +532,16 @@
   "errors": [
     {
       "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6001,
       "name": "InsufficientBalance",
       "msg": "Insufficient Balance"
     },
     {
-      "code": 6001,
+      "code": 6002,
       "name": "Overflow",
       "msg": "Overflow"
     }
@@ -637,6 +661,22 @@
             "type": "pubkey"
           },
           {
+            "name": "collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_4",
+            "type": "pubkey"
+          },
+          {
             "name": "manager_address",
             "type": "pubkey"
           },
@@ -663,6 +703,34 @@
           {
             "name": "fee_collector_network_address",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "list_strategies",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "strategies",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }

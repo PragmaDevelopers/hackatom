@@ -30,6 +30,7 @@ describe("webdex_payments", () => {
                 feeTiers,
             )
             .accounts({
+                bot: sharedState.botPda,
                 payments: sharedState.paymentsPda,
                 signer: user.publicKey,
             })

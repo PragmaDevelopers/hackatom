@@ -4,12 +4,23 @@ use crate::state::*;
 use crate::error::ErrorCode;
 
 use webdex_sub_accounts::{state::PositionLiquidity, processor::_position_liquidity};
+use shared_factory::state::{Bot};
+
+pub fn assert_only_owner(signer: &Pubkey, bot: &Account<Bot>) -> Result<()> {
+    require!(
+        *signer == bot.owner,
+        ErrorCode::Unauthorized
+    );
+    Ok(())
+}
 
 pub fn _add_fee_tiers<'info>(
     ctx: Context<AddFeeTiers<'info>>,
     contract_address: Pubkey,
     new_fee_tiers: Vec<FeeTier>,
 ) -> Result<()> {
+    assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
+
     let payments = &mut ctx.accounts.payments;
 
     // Verifica se o bot está registrado
@@ -53,6 +64,8 @@ pub fn _revoke_or_allow_currency(
     symbol: String,
     decimals: u8,
 ) -> Result<()> {
+    assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
+    
     let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
 
@@ -101,6 +114,8 @@ pub fn _revoke_or_allow_currency(
 }
 
 pub fn _remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
+    assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
+
     let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
 
@@ -134,6 +149,8 @@ pub fn _open_position(
     gas: u64,
     currrencys: Vec<Currencys>,
 ) -> Result<()> {
+    assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
+
     let payments = &ctx.accounts.payments;
     let strategy_list = &ctx.accounts.strategy_list;
     let temp_fee_account = &mut ctx.accounts.temporary_fee_account;
@@ -189,17 +206,21 @@ pub fn _open_position(
     // Armazena a fee no PDA temporário
     temp_fee_account.fee = fee;
 
-    // 5. Emite eventos (Anchor Events ou logs)
-    emit!(OpenPositionEvent {
-        contract_address: ctx.accounts.bot.manager_address.key(),
-        user: ctx.accounts.user.key(),
-        id: account_id.clone(),
-        strategy_token,
+    let details = PositionDetails {
+        strategy: strategy_token,
         coin,
         old_balance,
         fee,
         gas,
         profit: amount,
+    };
+
+    // 5. Emite eventos (Anchor Events ou logs)
+    emit!(OpenPositionEvent {
+        contract_address: ctx.accounts.bot.manager_address.key(),
+        user: ctx.accounts.user.key(),
+        id: account_id.clone(),
+        details,
     });
 
     for pair in currrencys.iter() {

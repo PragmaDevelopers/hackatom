@@ -1,8 +1,8 @@
 use anchor_lang::prelude::*;
 
 pub mod state;
-
 pub mod processor;
+pub mod authority;
 
 pub mod error;
 

@@ -20,7 +20,7 @@ describe("webdex_manager", () => {
 
         // REGISTRANDO MANAGER
         await managerProgram.methods
-            .registerManager(sharedState.contractAddress)
+            .registerManager()
             .accounts({
                 signer: user.publicKey,
             })
@@ -35,7 +35,7 @@ describe("webdex_manager", () => {
 
         // REGISTRANDO USER
         const tx = await managerProgram.methods
-            .register(user.publicKey)
+            .register()
             .accounts({
                 signer: user.publicKey,
                 manager: managerPda,

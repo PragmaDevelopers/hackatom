@@ -728,6 +728,22 @@
             "type": "pubkey"
           },
           {
+            "name": "collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_4",
+            "type": "pubkey"
+          },
+          {
             "name": "manager_address",
             "type": "pubkey"
           },

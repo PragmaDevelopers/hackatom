@@ -1,13 +1,22 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
+use crate::authority::{_get_authorized_managers};
 use crate::error::ErrorCode;
-use anchor_lang::solana_program::{program::invoke, system_instruction};
-use anchor_lang::system_program::{self};
+use anchor_lang::solana_program::{
+    program::{invoke, invoke_signed},
+    system_instruction,
+};
 use anchor_spl::token::{MintTo, Burn, mint_to, burn, transfer, Transfer};
 use webdex_sub_accounts::{state::RemoveLiquidity, processor::_remove_liquidity};
-use crate::ID as PROGRAM_ID;
 
-pub fn _register_manager(ctx: Context<RegisterManager>, manager: Pubkey) -> Result<()> {
+pub fn _register_manager(ctx: Context<RegisterManager>) -> Result<()> {
+    let allowed_managers = _get_authorized_managers();
+    let manager = ctx.accounts.signer.key();
+    require!(
+        allowed_managers.contains(&manager),
+        ErrorCode::Unauthorized
+    );
+
     let user = &mut ctx.accounts.user;
 
     user.manager = manager;
@@ -23,7 +32,7 @@ pub fn _register_manager(ctx: Context<RegisterManager>, manager: Pubkey) -> Resu
     Ok(())
 }
 
-pub fn _register(ctx: Context<Register>, manager: Pubkey) -> Result<()> {
+pub fn _register(ctx: Context<Register>) -> Result<()> {
     let user = &mut ctx.accounts.user;
     let manager = &mut ctx.accounts.manager;
 
@@ -67,17 +76,22 @@ pub fn _add_gas(ctx: Context<AddGas>, amount: u64) -> Result<()> {
 
     let user = &mut ctx.accounts.user;
 
+    // Transfere SOL do signer para o vault
+    invoke(
+        &system_instruction::transfer(
+            &ctx.accounts.signer.key(),
+            &ctx.accounts.vault_sol_account.key(),
+            amount,
+        ),
+        &[
+            ctx.accounts.signer.to_account_info(),
+            ctx.accounts.vault_sol_account.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+        ],
+    )?;
+
     // Atualiza o saldo de gas na conta do usuário
     user.gas_balance = user.gas_balance.saturating_add(amount);
-
-    // 💸 Transfere o token do usuário para a vault (pode ser o próprio programa)
-    let cpi_accounts = Transfer {
-        from: ctx.accounts.user_pol_account.to_account_info(),
-        to: ctx.accounts.vault_pol_account.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
-    };
-    let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
-    transfer(cpi_ctx, amount)?;
 
     emit!(BalanceGasEvent {
         user: user.key(),
@@ -92,19 +106,27 @@ pub fn _add_gas(ctx: Context<AddGas>, amount: u64) -> Result<()> {
 
 pub fn _remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
     let user = &mut ctx.accounts.user;
+    let user_key = user.key();
 
     require!(user.gas_balance >= amount, ErrorCode::InsufficientGasBalance);
 
-    user.gas_balance -= amount;
+    user.gas_balance = user.gas_balance.saturating_sub(amount);
 
-    // 💸 Transfere os tokens para o usuário
-    let cpi_accounts = Transfer {
-        from: ctx.accounts.vault_pol_account.to_account_info(),
-        to: ctx.accounts.user_pol_account.to_account_info(),
-        authority: ctx.accounts.signer.to_account_info(),
-    };
-    let cpi_ctx = CpiContext::new(ctx.accounts.token_program.to_account_info(), cpi_accounts);
-    transfer(cpi_ctx, amount)?;
+    // Transfere SOL do vault para o signer (usuário)
+    let seeds = &[b"vault_sol_account", user_key.as_ref(), &[ctx.bumps.vault_sol_account]];
+    invoke_signed(
+        &system_instruction::transfer(
+            &ctx.accounts.vault_sol_account.key(),
+            &ctx.accounts.signer.key(),
+            amount,
+        ),
+        &[
+            ctx.accounts.vault_sol_account.to_account_info(),
+            ctx.accounts.signer.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+        ],
+        &[seeds],
+    )?;
 
     // Emite o evento
     emit!(BalanceGasEvent {
@@ -217,7 +239,7 @@ pub fn _liquidity_add(
     // 2. Mint LP token para o usuário
     let bump = ctx.bumps.lp_mint_authority;
 
-    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority", &[bump]]];
+    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority",strategy_token.as_ref(), &[bump]]];
 
     let cpi_mint_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
@@ -280,14 +302,14 @@ pub fn _liquidity_remove(
 
     // 2. Burn LP token
     let bump = ctx.bumps.lp_mint_authority;
-    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority", &[bump]]];
+    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority",strategy_token.as_ref(), &[bump]]];
 
     let cpi_burn_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
         Burn {
             mint: ctx.accounts.lp_token.to_account_info(),
             from: ctx.accounts.user_lp_token_account.to_account_info(),
-            authority: ctx.accounts.lp_mint_authority.to_account_info(),
+            authority: ctx.accounts.user_authority.to_account_info(),
         },
         signer_seeds,
     );
@@ -324,6 +346,7 @@ pub fn _rebalance_position(
     gas: u64,
 ) -> Result<()> {
     let user = &mut ctx.accounts.user;
+    let user_key = user.key();
     let signer = &mut ctx.accounts.signer;
     let temporary_fee_account = ctx.accounts.temporary_fee_account.fee;
 
@@ -344,9 +367,14 @@ pub fn _rebalance_position(
     user.pass_balance = user.pass_balance.saturating_sub(temporary_fee_account);
 
     let bump = ctx.bumps.lp_mint_authority;
-    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority", &[bump]]];
+    let signer_seeds: &[&[&[u8]]] = &[&[b"mint_authority",_strategy_token.as_ref(), &[bump]]];
 
     if amount > 0 {
+        // Cálculo da distribuição
+        let user_amount = amount * 80 / 100;
+        let owner_amount = amount * 15 / 100;
+        let collector_amount = amount * 125 / 10000;
+
         // Mint
         let cpi_mint_ctx = CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -358,6 +386,39 @@ pub fn _rebalance_position(
             signer_seeds,
         );
         mint_to(cpi_mint_ctx, amount)?;
+
+        // Mint para owner
+        let cpi_ctx_owner = CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            MintTo {
+                mint: ctx.accounts.lp_token.to_account_info(),
+                to: ctx.accounts.bot_owner_lp_account.to_account_info(),
+                authority: ctx.accounts.lp_mint_authority.to_account_info(),
+            },
+            signer_seeds,
+        );
+        mint_to(cpi_ctx_owner, owner_amount)?;
+
+        // Mint para collectors
+        let collector_accounts = [
+            &ctx.accounts.collector_1_lp_account,
+            &ctx.accounts.collector_2_lp_account,
+            &ctx.accounts.collector_3_lp_account,
+            &ctx.accounts.collector_4_lp_account,
+        ];
+
+        for collector_account in collector_accounts.iter() {
+            let cpi_ctx_collector = CpiContext::new_with_signer(
+                ctx.accounts.token_program.to_account_info(),
+                MintTo {
+                    mint: ctx.accounts.lp_token.to_account_info(),
+                    to: collector_account.to_account_info(),
+                    authority: ctx.accounts.lp_mint_authority.to_account_info(),
+                },
+                signer_seeds,
+            );
+            mint_to(cpi_ctx_collector, collector_amount)?;
+        }
     } else {
         // Burn
         let cpi_ctx = CpiContext::new_with_signer(
@@ -365,7 +426,7 @@ pub fn _rebalance_position(
             Burn {
                 mint: ctx.accounts.lp_token.to_account_info(),
                 from: ctx.accounts.user_lp_token_account.to_account_info(),
-                authority: ctx.accounts.lp_mint_authority.to_account_info(),
+                authority: ctx.accounts.user_authority.to_account_info(),
             },
             signer_seeds,
         );
@@ -376,16 +437,19 @@ pub fn _rebalance_position(
     let owner_clone = &ctx.accounts.bot.owner;
 
     // Transfera gas para o owner do bot
-    let transfer_instruction = system_instruction::transfer(signer_clone, owner_clone, gas);
-
-    // Invoke the transfer instruction
-    invoke(
-        &transfer_instruction,
+    let seeds = &[b"vault_sol_account", user_key.as_ref(), &[ctx.bumps.vault_sol_account]];
+    invoke_signed(
+        &system_instruction::transfer(
+            &ctx.accounts.vault_sol_account.key(),
+            owner_clone,
+            gas,
+        ),
         &[
-            ctx.accounts.signer.to_account_info(),
+            ctx.accounts.vault_sol_account.to_account_info(),
             ctx.accounts.bot_owner.clone(),
             ctx.accounts.system_program.to_account_info(),
         ],
+        &[seeds],
     )?;
 
     // Emite eventos (você pode adaptar para seus eventos atuais)

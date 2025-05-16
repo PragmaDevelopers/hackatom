@@ -1,6 +1,16 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
+use shared_factory::state::{Bot};
+use crate::authority::{_get_authorized_owner};
 use crate::error::ErrorCode;
+
+pub fn assert_only_owner(signer: &Pubkey, bot: &Account<Bot>) -> Result<()> {
+    require!(
+        *signer == bot.owner,
+        ErrorCode::Unauthorized
+    );
+    Ok(())
+}
 
 pub fn _add_bot(
     ctx: Context<AddBot>,
@@ -15,6 +25,11 @@ pub fn _add_bot(
     fee_withdraw_network: u64,
     fee_collector_network_address: Pubkey,
 ) -> Result<()> {
+    let allowed_owner = _get_authorized_owner();
+
+    // Restrição estilo onlyOwner
+    require_keys_eq!(ctx.accounts.signer.key(), allowed_owner, ErrorCode::Unauthorized);
+
     let bot = &mut ctx.accounts.bot;
 
     // ⚠️ Evita sobrescrever bot já existente
@@ -69,12 +84,9 @@ pub fn _update_bot(
     sub_account_address: Option<Pubkey>,
     payments_address: Option<Pubkey>,
 ) -> Result<()> {
-    let bot = &mut ctx.accounts.bot;
+    assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
 
-    // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.signer.key() {
-        return Err(ErrorCode::Unauthorized.into());
-    }
+    let bot = &mut ctx.accounts.bot;
     
     if let Some(addr) = strategy_address {
         bot.strategy_address = addr;
@@ -97,12 +109,10 @@ pub fn _update_bot(
 }
 
 pub fn _remove_bot(ctx: Context<RemoveBot>) -> Result<()> {
+    assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
+
     let bot_pubkey = ctx.accounts.bot.key();
     let bot = &mut ctx.accounts.bot;
-
-    if bot.owner != ctx.accounts.signer.key() {
-        return Err(ErrorCode::Unauthorized.into());
-    }
 
     if bot.manager_address == Pubkey::default() {
         return Err(ErrorCode::BotNotFound.into());
