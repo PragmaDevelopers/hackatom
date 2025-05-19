@@ -70,7 +70,7 @@ pub fn _revoke_or_allow_currency(
     let payments = &mut ctx.accounts.payments;
 
     // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.signer.key() && bot.manager_address != ctx.accounts.signer.key() {
+    if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
@@ -120,7 +120,7 @@ pub fn _remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
     let payments = &mut ctx.accounts.payments;
 
     // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.signer.key() && bot.manager_address != ctx.accounts.signer.key() {
+    if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 

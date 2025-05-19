@@ -10,21 +10,18 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     let sub_account = &mut ctx.accounts.sub_account;
     let signer = &ctx.accounts.signer;
     let user = &ctx.accounts.user;
+    let bot = &ctx.accounts.bot;
 
-    if ctx.accounts.bot.manager_address == Pubkey::default() {
+    if bot.manager_address == Pubkey::default() {
        return Err(ErrorCode::Unauthorized.into());
     }
 
     // ✅ Garante que o contrato da lista pertence ao mesmo bot
     if sub_account_list.contract_address == Pubkey::default() {
-        sub_account_list.contract_address = signer.key();
+        sub_account_list.contract_address = bot.manager_address;
     }
 
     let sub_account_count = sub_account_list.sub_accounts.len();
-
-    // ✅ Converte para u8 com verificação segura
-    let index_byte = u8::try_from(sub_account_count)
-        .map_err(|_| ErrorCode::MaxSubAccountsReached)?;
 
     // ✅ Gera o PDA de forma determinística
     let (sub_account_id, _bump) = Pubkey::find_program_address(
@@ -32,7 +29,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
             b"sub_account_id",
             user.key().as_ref(),
             name.as_bytes(),
-            &[index_byte],
+            bot.prefix.as_bytes(),
         ],
         ctx.program_id,
     );
@@ -358,7 +355,7 @@ pub fn _position_liquidity<'info>(
        return Err(ErrorCode::Unauthorized.into());
     }
 
-    if ctx.accounts.bot.payments_address != signer.key() {
+    if ctx.accounts.bot.owner != signer.key() {
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 

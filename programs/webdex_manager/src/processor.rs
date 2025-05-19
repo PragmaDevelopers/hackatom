@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
-use crate::authority::{_get_authorized_managers};
 use crate::error::ErrorCode;
 use anchor_lang::solana_program::{
     program::{invoke, invoke_signed},
@@ -9,51 +8,36 @@ use anchor_lang::solana_program::{
 use anchor_spl::token::{MintTo, Burn, mint_to, burn, transfer, Transfer};
 use webdex_sub_accounts::{state::RemoveLiquidity, processor::_remove_liquidity};
 
-pub fn _register_manager(ctx: Context<RegisterManager>) -> Result<()> {
-    let allowed_managers = _get_authorized_managers();
-    let manager = ctx.accounts.signer.key();
-    require!(
-        allowed_managers.contains(&manager),
-        ErrorCode::Unauthorized
-    );
-
-    let user = &mut ctx.accounts.user;
-
-    user.manager = manager;
-    user.gas_balance = 0;
-    user.pass_balance = 0;
-    user.status = true;
-
-    emit!(RegisterEvent {
-        user: user.key(),
-        manager,
-    });
-
-    Ok(())
-}
-
 pub fn _register(ctx: Context<Register>) -> Result<()> {
     let user = &mut ctx.accounts.user;
-    let manager = &mut ctx.accounts.manager;
 
-    if manager.key() != Pubkey::default() {
-        if !manager.status {
-            return Err(ErrorCode::UnregisteredManager.into());
+    // Aqui manager é opcional
+    if let Some(manager) = &ctx.accounts.manager {
+        // Se não for a conta default (zeroed Pubkey)
+        if manager.key() != Pubkey::default() {
+            if !manager.status {
+                return Err(ErrorCode::UnregisteredManager.into());
+            }
         }
+
+        // Setar o manager no usuário
+        user.manager = manager.key();
+    } else {
+        // Se manager for None, setar como default ou tratar como quiser
+        user.manager = Pubkey::default();
     }
 
     if user.status {
         return Err(ErrorCode::RegisteredUser.into());
     }
 
-    user.manager = manager.key();
     user.gas_balance = 0;
     user.pass_balance = 0;
     user.status = true;
 
     emit!(RegisterEvent {
         user: user.key(),
-        manager: manager.key(),
+        manager: user.manager,
     });
 
     Ok(())
@@ -350,7 +334,7 @@ pub fn _rebalance_position(
     let signer = &mut ctx.accounts.signer;
     let temporary_fee_account = ctx.accounts.temporary_fee_account.fee;
 
-    if ctx.accounts.bot.payments_address != signer.key() {
+    if ctx.accounts.bot.owner != signer.key() {
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 
@@ -385,7 +369,7 @@ pub fn _rebalance_position(
             },
             signer_seeds,
         );
-        mint_to(cpi_mint_ctx, amount)?;
+        mint_to(cpi_mint_ctx, user_amount)?;
 
         // Mint para owner
         let cpi_ctx_owner = CpiContext::new_with_signer(
@@ -401,10 +385,10 @@ pub fn _rebalance_position(
 
         // Mint para collectors
         let collector_accounts = [
-            &ctx.accounts.collector_1_lp_account,
-            &ctx.accounts.collector_2_lp_account,
-            &ctx.accounts.collector_3_lp_account,
-            &ctx.accounts.collector_4_lp_account,
+            &ctx.accounts.void_collector_1_lp_account,
+            &ctx.accounts.void_collector_2_lp_account,
+            &ctx.accounts.void_collector_3_lp_account,
+            &ctx.accounts.void_collector_4_lp_account,
         ];
 
         for collector_account in collector_accounts.iter() {

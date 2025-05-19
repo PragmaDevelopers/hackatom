@@ -29,34 +29,6 @@ pub struct UserDisplay {
     pub pass_balance: u64,
 }
 
-#[account]
-pub struct ManagerIndex {
-    pub manager: Pubkey,
-    pub users: Vec<Pubkey>, // endereços das contas dos usuários
-}
-
-impl ManagerIndex {
-    pub const MAX_USERS: usize = 50; // ou algum limite que faça sentido
-    pub const INIT_SPACE: usize = 8 + 32 + 4 + (32 * Self::MAX_USERS);
-}
-
-#[derive(Accounts)]
-pub struct RegisterManager<'info> {
-    #[account(
-        init_if_needed, 
-        payer = signer, 
-        space = User::SPACE, 
-        seeds = [b"manager", signer.key().as_ref()], 
-        bump
-    )]
-    pub user: Account<'info, User>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-}
-
 #[derive(Accounts)]
 pub struct Register<'info> {
     #[account(
@@ -68,7 +40,8 @@ pub struct Register<'info> {
     )]
     pub user: Account<'info, User>,
 
-    pub manager: Account<'info, User>,
+    #[account()]
+    pub manager: Option<Account<'info, User>>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -234,12 +207,12 @@ pub struct LiquidityAdd<'info> {
     pub sub_account: Account<'info, SubAccount>,
 
     /// CHECK: Apenas para seeds
-    pub usdt_mint: AccountInfo<'info>,
+    pub token_mint: AccountInfo<'info>,
 
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = usdt_mint,
+        associated_token::mint = token_mint,
         associated_token::authority = signer,
     )]
     pub user_usdt_account: Account<'info, TokenAccount>, // do SPL depositado
@@ -247,7 +220,7 @@ pub struct LiquidityAdd<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = usdt_mint,
+        associated_token::mint = token_mint,
         associated_token::authority = sub_account_authority,
     )]
     pub vault_usdt_account: Account<'info, TokenAccount>, // onde o token vai
@@ -262,7 +235,7 @@ pub struct LiquidityAdd<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),usdt_mint.key().as_ref()],
+        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),token_mint.key().as_ref()],
         bump,
         mint::decimals = decimals,
         mint::authority = lp_mint_authority,
@@ -312,18 +285,18 @@ pub struct LiquidityRemove<'info> {
     pub strategy_balance: Account<'info, StrategyBalanceList>,
 
     /// CHECK: Apenas para seeds
-    pub usdt_mint: AccountInfo<'info>,
+    pub token_mint: AccountInfo<'info>,
 
     #[account(
         mut,
-        associated_token::mint = usdt_mint,
+        associated_token::mint = token_mint,
         associated_token::authority = signer,
     )]
     pub user_usdt_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
         mut,
-        associated_token::mint = usdt_mint,
+        associated_token::mint = token_mint,
         associated_token::authority = sub_account_authority,
     )]
     pub vault_usdt_account: Account<'info, TokenAccount>, // onde o token vai
@@ -337,7 +310,7 @@ pub struct LiquidityRemove<'info> {
 
     #[account(
         mut,
-        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),usdt_mint.key().as_ref()],
+        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),token_mint.key().as_ref()],
         bump,
         mint::decimals = decimals,
         mint::authority = lp_mint_authority,
@@ -388,11 +361,11 @@ pub struct RebalancePosition<'info> {
     pub temporary_fee_account: Account<'info, FeeAccount>,
 
     /// CHECK: Apenas para seeds
-    pub usdt_mint: AccountInfo<'info>,
+    pub token_mint: AccountInfo<'info>,
 
     #[account(
         mut,
-        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),usdt_mint.key().as_ref()],
+        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),token_mint.key().as_ref()],
         bump,
         mint::decimals = decimals,
         mint::authority = lp_mint_authority,
@@ -422,45 +395,45 @@ pub struct RebalancePosition<'info> {
     pub bot_owner_lp_account: Box<Account<'info, TokenAccount>>,
 
     /// CHECK: Coletore
-    pub collector_1: AccountInfo<'info>,
+    pub void_collector_1: AccountInfo<'info>,
     /// CHECK: Coletore
-    pub collector_2: AccountInfo<'info>,
+    pub void_collector_2: AccountInfo<'info>,
     /// CHECK: Coletore
-    pub collector_3: AccountInfo<'info>,
+    pub void_collector_3: AccountInfo<'info>,
     /// CHECK: Coletore
-    pub collector_4: AccountInfo<'info>,
+    pub void_collector_4: AccountInfo<'info>,
 
     #[account(
         init_if_needed,
         payer = user,
         associated_token::mint = lp_token,
-        associated_token::authority = collector_1
+        associated_token::authority = void_collector_1
     )]
-    pub collector_1_lp_account: Box<Account<'info, TokenAccount>>,
+    pub void_collector_1_lp_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
         payer = user,
         associated_token::mint = lp_token,
-        associated_token::authority = collector_2
+        associated_token::authority = void_collector_2
     )]
-    pub collector_2_lp_account: Box<Account<'info, TokenAccount>>,
+    pub void_collector_2_lp_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
         payer = user,
         associated_token::mint = lp_token,
-        associated_token::authority = collector_3
+        associated_token::authority = void_collector_3
     )]
-    pub collector_3_lp_account: Box<Account<'info, TokenAccount>>,
+    pub void_collector_3_lp_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         init_if_needed,
         payer = user,
         associated_token::mint = lp_token,
-        associated_token::authority = collector_4
+        associated_token::authority = void_collector_4
     )]
-    pub collector_4_lp_account: Box<Account<'info, TokenAccount>>,
+    pub void_collector_4_lp_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         seeds = [b"mint_authority", strategy_token.key().as_ref()],

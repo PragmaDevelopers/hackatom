@@ -1,84 +1,164 @@
-**Documentação Técnica: Migração do Contrato WEbdEXNetworkV4 (EVM) para Anchor/Solana**
+# Documentação: Contrato WebdEX Network (Anchor Solana)
+
+Este módulo do protocolo WebdEX gerencia as taxas de rede pagas por subcontas a contratos e permite o saque de valores acumulados com dedução de taxa.
 
 ---
 
-## Objetivo
-Este documento descreve a migração do contrato inteligente `WEbdEXNetworkV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
+## ✨ Visão Geral
+
+O contrato é composto por:
+
+* Armazenamento do saldo de taxas pagas (`BalanceInfo`)
+* Função de pagamento de taxa para um contrato
+* Função de saque com taxa de retirada
+* Eventos emitidos para atualizações
 
 ---
 
-## Estrutura Original (EVM)
+## 🔢 Estruturas
 
-### Funções do Contrato:
-1. `payFee(...)`
-2. `withdrawal(address)`
-3. `getBalance(...)`
+### BalanceInfo
 
-### Armazenamento:
-- Mapeamento: `mapping(address => Bot) internal bots;`
-- Estrutura `Bot` com campos:
-  - `mapping(address => mapping(address => BalanceInfo)) balances;`
+Armazena o saldo de taxas pagas por um usuário para um contrato específico.
 
----
-
-## Adaptação Solana (Anchor Framework)
-
-### Módulos:
-- `state.rs`: define a estrutura `BalanceInfo`, conta principal e dados persistentes
-- `processor.rs`: implementação da lógica das instruções
-- `error.rs`: definição de erros personalizados com Anchor
-
-### Instruções Migradas:
-1. `pay_fee`  → Paga a taxa de network
-2. `withdrawal` → Subtrai o valor adquido das taxas de network 
-3. `get_balance` → Pega o valor da sua liquidez atual das taxas de network
-
-### Declaração do Programa:
 ```rust
-#[program]
-pub mod webdex_network {
-    // ...
+#[account]
+pub struct BalanceInfo {
+    pub balance: u64,                  // Saldo atual de taxas
+    pub token: Pubkey,                // Token SPL utilizado (ex: USDT)
+    pub user: Pubkey,                 // Usuário pagante
+    pub contract_address: Pubkey,     // Endereço do contrato alvo
 }
 ```
 
-### Mudanças de Paradigma:
-| Conceito EVM              | Equivalente Solana (Anchor)    |
-|---------------------------|--------------------------------|
-| `mapping`                 | `Account` com seeds/PDA        |
-| `msg.sender`              | `ctx.accounts.signer.key`      |
-| `require(...)`            | `require!(cond, ErrorCode::X)` |
-| `onlySubAccount` modifier | Não foi necessário             |
+### BalanceData (Retorno de consulta)
 
-### Exemplo de Contexto AddBot
 ```rust
-#[derive(Accounts)]
-pub struct PayFee<'info> {
-    #[account(mut)]
-    pub user: Account<'info, User>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = 8 + std::mem::size_of::<BalanceInfo>(),
-        seeds = [b"balance_info", contract_address.key().as_ref(), user.key().as_ref(), usdt_mint.key().as_ref()],
-        bump
-    )]
-    pub balance_info: Account<'info, BalanceInfo>,
-
-    /// CHECK: Apenas para seeds
-    pub usdt_mint: Account<'info, Mint>,
-
-    /// CHECK: Apenas para seeds
-    pub contract_address: AccountInfo<'info>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
+pub struct BalanceData {
+    pub balance: u64,
 }
 ```
 
 ---
 
-## Conclusão
-A adaptação do contrato `WEbdEXNetworkV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.
+## ⚖️ Instruções
+
+### 1. `_pay_fee`
+
+Registra o pagamento de uma taxa por um usuário para um contrato. Não transfere tokens; apenas atualiza o estado.
+
+**Parâmetros:**
+
+* `sub_account_name`: Nome da subconta (pode ser usado para rastreamento)
+* `contract_address`: Endereço do contrato a ser vinculado ao pagamento
+* `amount`: Quantidade de tokens pagos como taxa
+
+**Restrição:**
+
+* O `signer` deve ser o `owner` do `bot`
+
+**Evento Emitido:**
+
+* `BalanceNetworkAdd`
+
+### 2. `_withdrawal`
+
+Permite que o `fee_collector_network_address` saque o saldo, aplicando uma taxa de retirada definida no `bot`.
+
+**Parâmetros:**
+
+* `amount`: Valor total a ser sacado (100%)
+* Taxa aplicada: `bot.fee_withdraw_network` (%)
+* Destino: `signer` (usuário) recebe valor líquido, `fee_collector_network_account` recebe a taxa
+
+**Evento Emitido:**
+
+* `BalanceNetworkRemove`
+
+### 3. `_get_balance`
+
+Consulta o saldo registrado para um contrato, token e usuário.
+
+**Retorno:**
+
+* `BalanceData { balance }`
+
+---
+
+## 🎙️ Eventos
+
+### `BalanceNetworkAdd`
+
+Emitido ao pagar uma taxa:
+
+```rust
+pub struct BalanceNetworkAdd {
+    pub contract_address: Pubkey,
+    pub user: Pubkey,
+    pub token: Pubkey,
+    pub new_balance: u64,
+    pub amount: u64,
+}
+```
+
+### `BalanceNetworkRemove`
+
+Emitido ao sacar:
+
+```rust
+pub struct BalanceNetworkRemove {
+    pub contract_address: Pubkey,
+    pub user: Pubkey,
+    pub token: Pubkey,
+    pub new_balance: u64,
+    pub amount: u64,
+    pub fee: u64,
+}
+```
+
+---
+
+## 🧱 PDAs e Seeds
+
+| Conta                           | Seeds                                                  |
+| ------------------------------- | ------------------------------------------------------ |
+| `balance_info`                  | `[b"balance_info", contract_address, user, usdt_mint]` |
+| `user_network_account`          | Associated Token do usuário para o token               |
+| `vault_network_account`         | Associated Token da fee authority (vault)              |
+| `fee_collector_network_account` | Associated Token da fee authority                      |
+
+---
+
+## ⚡ Possíveis Melhoria
+
+* Validar que o `vault_network_account` é controlado por um PDA do programa
+* Criar instrução de "burn" ou limpeza de saldo se contrato for encerrado
+* Adicionar campo `last_updated` em `BalanceInfo` para rastrear atividade
+
+---
+
+## 📃 Exemplo de Uso (Frontend)
+
+1. Pagar taxa:
+
+```ts
+await program.methods.payFee("sub0", contract, amount)
+  .accounts({ user, bot, ... })
+```
+
+2. Sacar:
+
+```ts
+await program.methods.withdraw(amount)
+  .accounts({ user, feeCollector, ... })
+```
+
+3. Consultar saldo:
+
+```ts
+await program.account.balanceInfo.fetch(pda)
+```
+
+---
+
+> Documentação gerada para uso interno da equipe WebdEX. Contribuições são bem-vindas! 🚀

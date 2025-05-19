@@ -6,7 +6,8 @@ pub struct BotInfo {
     pub name: String,
     pub prefix: String,
     pub owner: Pubkey,
-    pub manager_address: Pubkey, // manager_address
+    pub manager_address: Pubkey,
+    pub collector: Vec<Pubkey>,
     pub strategy_address: Pubkey,
     pub sub_account_address: Pubkey,
     pub payments_address: Pubkey,

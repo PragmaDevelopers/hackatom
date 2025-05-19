@@ -1,136 +1,173 @@
-**Documentação Técnica: Migração do Contrato WEbdEXManagerV4 (EVM) para Anchor/Solana**
+# Documentação dos Contratos - Módulo `manager`
+
+Este módulo é responsável pela gestão dos usuários, saldos de gás e passe (token SPL), interações de liquidez com subcontas e operações de rebalanceamento de posição.
 
 ---
 
-## Objetivo
-Este documento descreve a migração do contrato inteligente `WEbdEXManagerV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
+## Estruturas de Conta
 
----
+### `User`
 
-## Estrutura Original (EVM)
+Armazena os dados de um usuário registrado.
 
-### Funções do Contrato:
-01. `register(...)`
-02. `createSubAccount(...)`
-03. `getInfoUser(...)`
-04. `liquidyAdd(...)`
-05. `liquidyRemove(...)`
-06. `togglePause(...)`
-07. `gasRemove(...)`
-09. `gasAdd(...)`
-10. `gasBalance(...)`
-11. `passAdd(...)`
-12. `passRemove(...)`
-13. `passBalance(...)`
-14. `rebalancePosition(...)`
-
-### Armazenamento:
-- Mapeamento: `mapping(address => User) internal users;`
-- Estrutura `User` com campos:
-  - `manager`, `gasBalance`, `passBalance`, `status`
-
----
-
-## Adaptação Solana (Anchor Framework)
-
-### Módulos:
-- `state.rs`: define a estrutura `User` dentre outros, conta principal e dados persistentes
-- `processor.rs`: implementação da lógica das instruções
-- `error.rs`: definição de erros personalizados com Anchor
-
-### Instruções Migradas:
-01. `register_manager`  → Cria uma conta para ser manager
-02. `register` → Cria a conta user com auxilio de manager
-03. `get_info_user` → Faz o get dos dados de `User`
-04. `add_gas` → Adiciona gas a conta `User`
-05. `remove_gas` → Subtrai gas da conta `User`
-06. `pass_add` → Adiciona pass a conta `User`
-07. `pass_remove` → Subtrai pass da conta `User`
-08. `liquidity_add` → Adiciona liquidez ao `User -> Vault` e mint os tokens
-09. `liquidity_remove` → Devolve liquidez ao `Vault -> User` e burn os tokens
-10. `rebalance_position` → Atualiza (gas e pass). Mint e burn dependendo do amout
-
-> Funções como `createSubAccount` e `liquidyAdd` foram movidas para contratos separados especializados, e podem ser acessadas via CPI (Cross-Program Invocation) quando necessário. Isso foi feito devido a dificuldade de se trabalhar com laços de repetição envolvendo funções externas aos contratos, o mesmo é válido quando se trata de funções responsáveis por inicializar uma conta.
-
-### Declaração do Programa:
 ```rust
-#[program]
-pub mod webdex_manager {
-    // ...
+#[account]
+pub struct User {
+    pub manager: Pubkey,
+    pub gas_balance: u64,
+    pub pass_balance: u64,
+    pub status: bool,
 }
 ```
 
-### Mudanças de Paradigma:
-| Conceito EVM            | Equivalente Solana (Anchor)     |
-|-------------------------|---------------------------------|
-| `mapping`               | `Account` com seeds/PDA         |
-| `msg.sender`            | `ctx.accounts.signer.key`       |
-| `require(...)`          | `require!(cond, ErrorCode::X)`  |
-| `onlyPayments` modifier | Verificação manual via `signer` |
+### `UserDisplay`
 
-### Exemplo de Contexto AddBot
+Retornado pela chamada de leitura `get_info_user`.
+
 ```rust
-#[derive(Accounts)]
-pub struct AddGas<'info> {
-    #[account(
-        mut,
-        seeds = [b"user", signer.key().as_ref()],
-        bump,
-        constraint = user.status @ ErrorCode::RegisteredUser
-    )]
-    pub user: Account<'info, User>,
-
-    /// CHECK: Apenas para seeds
-    pub pol_mint: AccountInfo<'info>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = pol_mint,
-        associated_token::authority = signer,
-    )]
-    pub user_pol_account: Account<'info, TokenAccount>, // do SPL depositado
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = pol_mint,
-        associated_token::authority = signer
-    )]
-    pub vault_pol_account: Account<'info, TokenAccount>, // onde o token vai
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
+pub struct UserDisplay {
+    pub manager: Pubkey,
+    pub gas_balance: u64,
+    pub pass_balance: u64,
 }
 ```
 
 ---
 
-## Considerações de Segurança
-- Uso de TokenAccount para armazenamento de tokens que não sejam SOL
-- Uso de ferramentas de validação automática como `constraint = user.status @ ErrorCode::UnregisteredUser`
+## Instruções
+
+### `register`
+
+Registra um novo usuário na plataforma, com um `manager` opcional.
+
+### `get_info_user`
+
+Retorna uma estrutura com os dados atuais do usuário (saldos e manager).
+
+### `add_gas`
+
+Adiciona SOL (gás) à conta do usuário e transfere para uma vault PDA.
+
+### `remove_gas`
+
+Remove SOL da vault PDA e envia de volta ao usuário. Atualiza o saldo de gás.
+
+### `pass_add`
+
+Permite o usuário depositar tokens SPL (ex: WEbdEX) para uso como "pass".
+
+### `pass_remove`
+
+Permite o saque dos tokens SPL da vault para o usuário, reduzindo o saldo de `pass_balance`.
+
+### `liquidity_add`
+
+Permite ao usuário adicionar liquidez em uma determinada estratégia.
+
+* Transfere o token base para a vault da subconta.
+* Mint LP tokens para o usuário.
+
+### `liquidity_remove`
+
+Remove liquidez:
+
+* Executa uma CPI com a subconta (`_remove_liquidity`).
+* Burn dos LP tokens.
+* Retorna token base ao usuário via transferência assinada.
+
+### `rebalance_position`
+
+Usado pelo contrato de pagamento para realizar operações de lucro ou prejuízo com LP tokens.
+
+* Verifica se `signer` é o `owner` do `bot`.
+* Queima ou gera LP tokens para:
+
+  * Usuário (80%)
+  * Owner do bot (15%)
+  * 4 coletadores (1.25% cada)
+* Deduz valores de `gas` e `pass` do usuário.
+* Transfere o SOL de gás para o owner do bot.
 
 ---
 
-## Integração entre Contratos via CPI
-As funcionalidades auxiliares removidas deste contrato podem ser acessadas por meio de chamadas CPI, mas usar laços de repetição para fazer muitas CPIs pode prejudicar o desempenho na Solana. Exemplo:
+## Eventos
+
+### `RegisterEvent`
+
+Emitido ao registrar um usuário:
+
 ```rust
-for item in items.iter() {
-    let cpi_ctx = ...;
-    external_program::cpi::some_instruction(cpi_ctx, item)?;
+pub struct RegisterEvent {
+    pub user: Pubkey,
+    pub manager: Pubkey,
+}
+```
+
+### `BalanceGasEvent`
+
+```rust
+pub struct BalanceGasEvent {
+    pub user: Pubkey,
+    pub balance: u64,
+    pub value: u64,
+    pub increase: bool,
+    pub is_operation: bool,
+}
+```
+
+### `BalancePassEvent`
+
+```rust
+pub struct BalancePassEvent {
+    pub user: Pubkey,
+    pub balance: u64,
+    pub value: u64,
+    pub increase: bool,
+    pub is_operation: bool,
 }
 ```
 
 ---
 
-## Pendências / Futuras Extensões
-- Definição formal das interfaces CPI para contratos externos
+## PDAs
+
+* `user`: `seeds = [b"user", signer.key().as_ref()]`
+* `vault_sol_account`: `seeds = [b"vault_sol_account", user.key().as_ref()]`
+* `lp_token`: `seeds = [b"lp_token", strategy_token, sub_account, token_mint]`
+* `lp_mint_authority`: `seeds = [b"mint_authority", strategy_token]`
+* `sub_account_authority`: `seeds = [b"sub_account", sub_account.key()]`
 
 ---
 
-## Conclusão
-A adaptação do contrato `WEbdEXManagerV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.
+## Distribuição de LP Tokens (`rebalance_position`)
+
+| Destinatário   | Percentual |
+| -------------- | ---------- |
+| Usuário        | 80%        |
+| Owner do bot   | 15%        |
+| Cada collector | 1.25%      |
+
+---
+
+## Requisitos e Validações
+
+* Todos os valores precisam ser `> 0`.
+* Valida saldo suficiente para `gas_balance` e `pass_balance`.
+* `manager` opcional ao registrar.
+* Somente o owner do bot pode chamar `rebalance_position`.
+
+---
+
+## Módulos Externos Utilizados
+
+* `anchor_lang`
+* `anchor_spl::token`
+* `webdex_sub_accounts::{state, processor}`
+
+---
+
+Para mais detalhes de integração, veja os contratos `payments`, `sub_account` e `strategy_list`.
+
+---
+
+Documentação gerada automaticamente para fins de manutenção e integração com o front-end Web3 (EVM/Solana).

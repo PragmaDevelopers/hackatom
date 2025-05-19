@@ -1,0 +1,548 @@
+{
+  "address": "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH",
+  "metadata": {
+    "name": "webdex_strategy",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "add_strategy",
+      "discriminator": [
+        64,
+        123,
+        127,
+        227,
+        192,
+        234,
+        198,
+        20
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "strategy_list",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_mint",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "token_address"
+        },
+        {
+          "name": "metadata_program"
+        },
+        {
+          "name": "metadata",
+          "writable": true
+        },
+        {
+          "name": "token_authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        },
+        {
+          "name": "symbol",
+          "type": "string"
+        },
+        {
+          "name": "uri",
+          "type": "string"
+        },
+        {
+          "name": "contract_address",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "delete_strategy",
+      "discriminator": [
+        170,
+        252,
+        31,
+        143,
+        231,
+        7,
+        212,
+        159
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "strategy_list",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "contract_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "token_address",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "find_strategy",
+      "discriminator": [
+        36,
+        220,
+        180,
+        220,
+        15,
+        202,
+        88,
+        185
+      ],
+      "accounts": [
+        {
+          "name": "strategy_list"
+        }
+      ],
+      "args": [
+        {
+          "name": "contract_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "token_address",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "Strategy"
+        }
+      }
+    },
+    {
+      "name": "get_strategies",
+      "discriminator": [
+        138,
+        127,
+        147,
+        212,
+        159,
+        189,
+        52,
+        250
+      ],
+      "accounts": [
+        {
+          "name": "strategy_list"
+        }
+      ],
+      "args": [
+        {
+          "name": "contract_address",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "Strategy"
+          }
+        }
+      }
+    },
+    {
+      "name": "update_strategy_status",
+      "discriminator": [
+        75,
+        150,
+        40,
+        235,
+        0,
+        137,
+        169,
+        59
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "strategy_list",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "contract_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "token_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "is_active",
+          "type": "bool"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Bot",
+      "discriminator": [
+        122,
+        136,
+        3,
+        241,
+        243,
+        138,
+        195,
+        52
+      ]
+    },
+    {
+      "name": "StrategyList",
+      "discriminator": [
+        128,
+        85,
+        53,
+        230,
+        250,
+        80,
+        204,
+        252
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "StrategyAddedEvent",
+      "discriminator": [
+        80,
+        39,
+        53,
+        74,
+        111,
+        1,
+        201,
+        250
+      ]
+    },
+    {
+      "name": "StrategyStatusUpdatedEvent",
+      "discriminator": [
+        34,
+        208,
+        66,
+        66,
+        64,
+        129,
+        46,
+        7
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidContractAddress",
+      "msg": "O endereço do contrato fornecido é inválido."
+    },
+    {
+      "code": 6001,
+      "name": "BotNotFound",
+      "msg": "Bot not found"
+    },
+    {
+      "code": 6002,
+      "name": "BotAlreadyRegistered",
+      "msg": "Bot already registered"
+    },
+    {
+      "code": 6003,
+      "name": "CoinNotFound",
+      "msg": "A moeda especificada não foi encontrada."
+    },
+    {
+      "code": 6004,
+      "name": "StrategyNotFound",
+      "msg": "Strategy not found"
+    },
+    {
+      "code": 6005,
+      "name": "CoinAlreadyExists",
+      "msg": "Coin already exists"
+    },
+    {
+      "code": 6006,
+      "name": "MaxStrategiesReached",
+      "msg": "Max strategies reached"
+    },
+    {
+      "code": 6007,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6008,
+      "name": "UnauthorizedSubAccount",
+      "msg": "Você não tem permissão para acessar esta subconta."
+    },
+    {
+      "code": 6009,
+      "name": "SubAccountNotFound",
+      "msg": "SubAccount not found"
+    },
+    {
+      "code": 6010,
+      "name": "AccountNotLinkedToCurrency",
+      "msg": "Account not linked to currency"
+    },
+    {
+      "code": 6011,
+      "name": "MaxSubAccountsReached",
+      "msg": "Max Sub Accounts Reached"
+    },
+    {
+      "code": 6012,
+      "name": "InvalidSubAccountId",
+      "msg": "Invalid Sub Account Id"
+    },
+    {
+      "code": 6013,
+      "name": "StrategyNotLinked",
+      "msg": "Strategy Not Linked"
+    },
+    {
+      "code": 6014,
+      "name": "StrategyBalanceNotFound",
+      "msg": "Strategy Balance Not Found"
+    },
+    {
+      "code": 6015,
+      "name": "CoinNotLinked",
+      "msg": "Coin Not Linked"
+    }
+  ],
+  "types": [
+    {
+      "name": "Bot",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "prefix",
+            "type": "string"
+          },
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_4",
+            "type": "pubkey"
+          },
+          {
+            "name": "manager_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "strategy_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "sub_account_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "payments_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_pass_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_network",
+            "type": "u64"
+          },
+          {
+            "name": "fee_collector_network_address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Strategy",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "token_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StrategyAddedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contract_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "uri",
+            "type": "string"
+          },
+          {
+            "name": "token_address",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StrategyList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contract_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "strategies",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Strategy"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "StrategyStatusUpdatedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contract_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
+          }
+        ]
+      }
+    }
+  ]
+}

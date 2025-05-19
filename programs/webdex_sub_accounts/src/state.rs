@@ -99,6 +99,10 @@ pub struct ChangePausedEvent {
 #[derive(Accounts)]
 #[instruction(name: String)]
 pub struct CreateSubAccount<'info> {
+    #[account(
+        seeds = [b"bot", signer.key().as_ref(),name.as_bytes()],
+        bump
+    )]
     pub bot: Account<'info, Bot>,
 
     pub user: Account<'info, User>,
@@ -107,7 +111,7 @@ pub struct CreateSubAccount<'info> {
         init_if_needed,
         payer = signer,
         space = SubAccountList::SPACE,
-        seeds = [b"sub_account_list", user.key().as_ref()],
+        seeds = [b"sub_account_list", bot.key().as_ref()],
         bump
     )]
     pub sub_account_list: Account<'info, SubAccountList>,

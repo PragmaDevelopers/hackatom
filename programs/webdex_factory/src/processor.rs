@@ -17,6 +17,10 @@ pub fn _add_bot(
     name: String,
     prefix: String,
     owner: Pubkey,
+    void_collector_1: Pubkey,
+    void_collector_2: Pubkey,
+    void_collector_3: Pubkey,
+    void_collector_4: Pubkey,
     contract_address: Pubkey,
     strategy_address: Pubkey,
     sub_account_address: Pubkey,
@@ -40,6 +44,10 @@ pub fn _add_bot(
     bot.name = name;
     bot.prefix = prefix;
     bot.owner = owner;
+    bot.void_collector_1 = void_collector_1;
+    bot.void_collector_2 = void_collector_2;
+    bot.void_collector_3 = void_collector_3;
+    bot.void_collector_4 = void_collector_4;
     bot.manager_address = contract_address;
     bot.strategy_address = strategy_address;
     bot.sub_account_address = sub_account_address;

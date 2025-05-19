@@ -21,6 +21,10 @@ pub mod webdex_factory {
         name: String,
         prefix: String,
         owner: Pubkey,
+        void_collector_1: Pubkey,
+        void_collector_2: Pubkey,
+        void_collector_3: Pubkey,
+        void_collector_4: Pubkey,
         contract_address: Pubkey,
         strategy_address: Pubkey,
         sub_account_address: Pubkey,
@@ -29,7 +33,7 @@ pub mod webdex_factory {
         fee_withdraw_network: u64,
         fee_collector_network_address: Pubkey,
     ) -> Result<()> {
-        _add_bot(ctx,name,prefix,owner,contract_address,strategy_address,sub_account_address,payments_address,token_pass_address,fee_withdraw_network,fee_collector_network_address)
+        _add_bot(ctx,name,prefix,owner,void_collector_1,void_collector_2,void_collector_3,void_collector_4,contract_address,strategy_address,sub_account_address,payments_address,token_pass_address,fee_withdraw_network,fee_collector_network_address)
     }
 
     pub fn get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Result<BotInfo> {

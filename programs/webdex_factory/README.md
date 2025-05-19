@@ -1,112 +1,158 @@
-**Documentação Técnica: Migração do Contrato WEbdEXFactoryV4 (EVM) para Anchor/Solana**
+
+# 📘 Documentação do Contrato Solana: Gerenciamento de Bots
+
+Este contrato Anchor Solana permite o gerenciamento de bots que representam instâncias de estratégias automatizadas. Ele provê instruções para registro, consulta, atualização e remoção.
 
 ---
 
-## Objetivo
-Este documento descreve a migração do contrato inteligente `WEbdEXFactoryV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
+## 📌 Eventos
+
+### `BotCreated`
+Emitido quando um bot é registrado.
+
+```ts
+Fields:
+- contract_address: Pubkey
+- bot: Pubkey
+- owner: Pubkey
+```
 
 ---
 
-## Estrutura Original (EVM)
+### `BotUpdated`
+Emitido quando dados de um bot são modificados.
 
-### Funções do Contrato:
-1. `addBot(...)`
-2. `getBotInfo(...)`
-3. `updateBot(...)`
-4. `removeBot(...)`
-5. `currencyAllow(...)`
-6. `currencyRevoke(...)`
-7. `addStrategy(...)`
-8. `updateStrategyStatus(...)`
-
-### Armazenamento:
-- Mapeamento: `mapping(address => IFactory.Bot) bots;`
-- Estrutura `Bot` com campos:
-  - `prefix`, `name`, `owner`, `contractAddress`, `strategyAddress`, `subAccountAddress`, `paymentsAddress`, `tokenPassAddress`
+```ts
+Fields:
+- bot: Pubkey
+- strategy_address: Pubkey
+- sub_account_address: Pubkey
+- payments_address: Pubkey
+```
 
 ---
 
-## Adaptação Solana (Anchor Framework)
+### `BotRemoved`
+Emitido ao remover um bot.
 
-### Módulos:
-- `state.rs`: define a estrutura `Bot`, conta principal e dados persistentes
-- `processor.rs`: implementação da lógica das instruções
-- `error.rs`: definição de erros personalizados com Anchor
+```ts
+Fields:
+- bot: Pubkey
+- owner: Pubkey
+```
 
-### Instruções Migradas:
-1. `add_bot`  → Cria uma conta de bot e popula os dados
-2. `get_bot_info` → Retorna estrutura `BotInfo` de leitura
-3. `update_bot` → Atualiza ponteiros de `strategy`, `sub_account`, `payments`
-4. `remove_bot` → Apaga a conta do bot
+---
 
-> Funções como `currencyAllow`, `currencyRevoke`, `addStrategy` e `updateStrategyStatus` foram movidas para contratos separados especializados, e podem ser acessadas via CPI (Cross-Program Invocation) quando necessário.
+## 🔧 Instruções
 
-### Declaração do Programa:
+### `add_bot`
+Registra um novo bot.
+
 ```rust
-#[program]
-pub mod webdex_factory {
-    // ...
+pub fn _add_bot(ctx: Context<AddBot>, ...) -> Result<()>
+```
+
+**Permissão:** Apenas o owner autorizado.
+
+**Checks:**
+- `signer` deve ser igual ao `_get_authorized_owner()`
+- Não pode sobrescrever bot existente
+
+**Resultado:** Criação e persistência da conta PDA `bot`
+
+---
+
+### `get_bot_info`
+Consulta dados de um bot.
+
+```rust
+pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Result<BotInfo>
+```
+
+**Valida:** `bot.manager_address == contract_address`
+
+**Retorna:** Struct `BotInfo`
+
+---
+
+### `update_bot`
+Atualiza campos de um bot.
+
+```rust
+pub fn _update_bot(ctx: Context<UpdateBot>, ...) -> Result<()>
+```
+
+**Permissão:** Somente `bot.owner`
+
+**Campos Atualizáveis:**
+- `strategy_address`
+- `sub_account_address`
+- `payments_address`
+
+---
+
+### `remove_bot`
+Remove logicamente um bot e fecha sua conta.
+
+```rust
+pub fn _remove_bot(ctx: Context<RemoveBot>) -> Result<()>
+```
+
+**Permissão:** Somente `bot.owner`
+
+**Valida:** Bot já registrado
+
+**Efeito:** Fecha a conta e emite `BotRemoved`
+
+---
+
+## 📦 Structs
+
+### `Bot`
+
+```rust
+pub struct Bot {
+    pub name: String,
+    pub prefix: String,
+    pub owner: Pubkey,
+    pub void_collector_1: Pubkey,
+    pub void_collector_2: Pubkey,
+    pub void_collector_3: Pubkey,
+    pub void_collector_4: Pubkey,
+    pub manager_address: Pubkey,
+    pub strategy_address: Pubkey,
+    pub sub_account_address: Pubkey,
+    pub payments_address: Pubkey,
+    pub token_pass_address: Pubkey,
+    pub fee_withdraw_network: u64,
+    pub fee_collector_network_address: Pubkey,
 }
 ```
 
-### Mudanças de Paradigma:
-| Conceito EVM         | Equivalente Solana (Anchor)     |
-|----------------------|---------------------------------|
-| `mapping`            | `Account` com seeds/PDA         |
-| `msg.sender`         | `ctx.accounts.signer.key`       |
-| `require(...)`       | `require!(cond, ErrorCode::X)`  |
-| `onlyOwner` modifier | Verificação manual via `signer` |
+---
 
-### Exemplo de Contexto AddBot
-```rust
-#[derive(Accounts)]
-pub struct AddBot<'info> {
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = Bot::INIT_SPACE,
-        seeds = [b"bot", manager_address.key().as_ref()],
-        bump
-    )]
-    pub bot: Account<'info, Bot>,
+## ⚙️ Contextos de Conta (Anchor)
 
-    /// CHECK
-    pub manager_address: AccountInfo<'info>,
+### `AddBot`
+- Cria ou reutiliza PDA do bot via `seeds = [b"bot", manager_address]`
+- `signer` é o pagador
 
-    #[account(mut)]
-    pub signer: Signer<'info>,
+### `GetBotInfo`
+- Apenas leitura da conta `bot`
 
-    pub system_program: Program<'info, System>,
-}
-```
+### `UpdateBot`
+- Requer `mut` e assinatura do `owner`
+
+### `RemoveBot`
+- Fecha a conta `bot` e transfere lamports para o `signer`
 
 ---
 
-## Considerações de Segurança
-- Armazenamento de bots em PDAs com seed determinístico
-- Funções auxiliares foram desacopladas em contratos dedicados, fortalecendo a separação de responsabilidades
+## 🛡 Funções Auxiliares
+
+### `assert_only_owner()`
+Valida se `signer == bot.owner`. Retorna erro `Unauthorized` se não.
 
 ---
 
-## Integração entre Contratos via CPI
-As funcionalidades auxiliares removidas deste contrato podem ser acessadas por meio de chamadas CPI quando não envolvem inicialização de contas. Exemplo:
-```rust
-let cpi_ctx = CpiContext::new(
-    ctx.accounts.payments_program.to_account_info(),
-    RevokeOrAllowCurrency {
-        payments: ctx.accounts.payments.to_account_info(),
-        // ... outros campos
-    }
-);
-revoke_or_allow_currency(cpi_ctx, true)?;
-```
-
----
-
-## Pendências / Futuras Extensões
-- Definição formal das interfaces CPI para contratos externos
-
----
-
-## Conclusão
-A adaptação do contrato `WEbdEXFactoryV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.
+> Criado para integração com sistemas de arbitragem e gestão estratégica via Web3 na Solana.

@@ -39,6 +39,8 @@ pub struct BalanceNetworkRemove {
 
 #[derive(Accounts)]
 pub struct PayFee<'info> {
+    pub bot: Account<'info, Bot>,
+    
     pub user: Account<'info, User>,
 
     pub sub_account: Account<'info, SubAccount>,

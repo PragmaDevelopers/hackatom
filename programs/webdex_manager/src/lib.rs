@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 
 pub mod processor;
 pub mod state;
-pub mod authority;
 
 pub mod error;
 
@@ -15,10 +14,6 @@ declare_id!("CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH");
 pub mod webdex_manager {
 
     use super::*;
-
-    pub fn register_manager(ctx: Context<RegisterManager>) -> Result<()> {
-        _register_manager(ctx)
-    }
 
     pub fn register(ctx: Context<Register>) -> Result<()> {
         _register(ctx)

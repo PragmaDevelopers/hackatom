@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
 use anchor_spl::token::{transfer, Transfer};
-use webdex_sub_accounts::ID as SUB_ACCOUNT_ID;
 
 pub fn _pay_fee(
     ctx: Context<PayFee>,
@@ -10,12 +9,11 @@ pub fn _pay_fee(
     contract_address: Pubkey,
     amount: u64,
 ) -> Result<()> {
-    let (expected_pda, _) = Pubkey::find_program_address(
-        &[b"sub_account", ctx.accounts.user.key().as_ref(), sub_account_name.as_bytes()],
-        &SUB_ACCOUNT_ID,
-    );
-    
-    require!(ctx.accounts.sub_account.key() == expected_pda, ErrorCode::Unauthorized);
+    let signer = &mut ctx.accounts.signer;
+
+    if ctx.accounts.bot.owner != signer.key() {
+        return Err(ErrorCode::Unauthorized.into());
+    }
 
     let balance_info = &mut ctx.accounts.balance_info;
 
