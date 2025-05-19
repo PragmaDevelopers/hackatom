@@ -1,18 +1,41 @@
-# Ignorar tudo dentro de target/
-target/**
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# Mas liberar (não ignorar) apenas a pasta target/idl e seus arquivos
-!target/idl/
-!target/idl/**
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
 
-# Mas liberar (não ignorar) apenas a pasta target/idl e seus arquivos
-!target/types/
-!target/types/**
+# testing
+/coverage
 
-# Ignorar outros padrões normais
-.anchor
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
 .DS_Store
-**/*.rs.bk
-node_modules
-test-ledger
-.yarn
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
