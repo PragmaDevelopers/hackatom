@@ -2,55 +2,82 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/webdex_factory.json`.
+ * IDL can be found at `target/idl/webdex_strategy.json`.
  */
-export type WebdexFactory = {
-  "address": "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i",
+export type WebdexStrategy = {
+  "address": "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH",
   "metadata": {
-    "name": "webdexFactory",
+    "name": "webdexStrategy",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "addBot",
+      "name": "addStrategy",
       "discriminator": [
-        33,
-        251,
-        240,
-        162,
-        159,
-        44,
-        51,
-        74
+        64,
+        123,
+        127,
+        227,
+        192,
+        234,
+        198,
+        20
       ],
       "accounts": [
         {
-          "name": "bot",
+          "name": "bot"
+        },
+        {
+          "name": "strategyList",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
-                  98,
-                  111,
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  108,
+                  105,
+                  115,
                   116
                 ]
               },
               {
                 "kind": "account",
-                "path": "managerAddress"
+                "path": "bot"
               }
             ]
           }
         },
         {
-          "name": "managerAddress",
-          "docs": [
-            "CHECK"
-          ]
+          "name": "tokenMint",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "tokenAddress"
+        },
+        {
+          "name": "metadataProgram"
+        },
+        {
+          "name": "metadata",
+          "writable": true
+        },
+        {
+          "name": "tokenAuthority",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "signer",
@@ -60,6 +87,14 @@ export type WebdexFactory = {
         {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "name": "tokenProgram",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         }
       ],
       "args": [
@@ -68,74 +103,103 @@ export type WebdexFactory = {
           "type": "string"
         },
         {
-          "name": "prefix",
+          "name": "symbol",
           "type": "string"
         },
         {
-          "name": "owner",
-          "type": "pubkey"
-        },
-        {
-          "name": "voidCollector1",
-          "type": "pubkey"
-        },
-        {
-          "name": "voidCollector2",
-          "type": "pubkey"
-        },
-        {
-          "name": "voidCollector3",
-          "type": "pubkey"
-        },
-        {
-          "name": "voidCollector4",
-          "type": "pubkey"
+          "name": "uri",
+          "type": "string"
         },
         {
           "name": "contractAddress",
-          "type": "pubkey"
-        },
-        {
-          "name": "strategyAddress",
-          "type": "pubkey"
-        },
-        {
-          "name": "subAccountAddress",
-          "type": "pubkey"
-        },
-        {
-          "name": "paymentsAddress",
-          "type": "pubkey"
-        },
-        {
-          "name": "tokenPassAddress",
-          "type": "pubkey"
-        },
-        {
-          "name": "feeWithdrawNetwork",
-          "type": "u64"
-        },
-        {
-          "name": "feeCollectorNetworkAddress",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "getBotInfo",
+      "name": "deleteStrategy",
       "discriminator": [
-        217,
-        201,
-        199,
-        39,
-        89,
-        250,
-        26,
-        106
+        170,
+        252,
+        31,
+        143,
+        231,
+        7,
+        212,
+        159
       ],
       "accounts": [
         {
           "name": "bot"
+        },
+        {
+          "name": "strategyList",
+          "writable": true
+        },
+        {
+          "name": "signer",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "contractAddress",
+          "type": "pubkey"
+        },
+        {
+          "name": "tokenAddress",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "findStrategy",
+      "discriminator": [
+        36,
+        220,
+        180,
+        220,
+        15,
+        202,
+        88,
+        185
+      ],
+      "accounts": [
+        {
+          "name": "strategyList"
+        }
+      ],
+      "args": [
+        {
+          "name": "contractAddress",
+          "type": "pubkey"
+        },
+        {
+          "name": "tokenAddress",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "defined": {
+          "name": "strategy"
+        }
+      }
+    },
+    {
+      "name": "getStrategies",
+      "discriminator": [
+        138,
+        127,
+        147,
+        212,
+        159,
+        189,
+        52,
+        250
+      ],
+      "accounts": [
+        {
+          "name": "strategyList"
         }
       ],
       "args": [
@@ -145,50 +209,31 @@ export type WebdexFactory = {
         }
       ],
       "returns": {
-        "defined": {
-          "name": "botInfo"
+        "vec": {
+          "defined": {
+            "name": "strategy"
+          }
         }
       }
     },
     {
-      "name": "removeBot",
+      "name": "updateStrategyStatus",
       "discriminator": [
-        49,
-        239,
-        98,
-        212,
-        120,
-        98,
-        225,
-        252
+        75,
+        150,
+        40,
+        235,
+        0,
+        137,
+        169,
+        59
       ],
       "accounts": [
         {
-          "name": "bot",
-          "writable": true
+          "name": "bot"
         },
         {
-          "name": "signer",
-          "signer": true
-        }
-      ],
-      "args": []
-    },
-    {
-      "name": "updateBot",
-      "discriminator": [
-        72,
-        160,
-        124,
-        173,
-        234,
-        179,
-        108,
-        203
-      ],
-      "accounts": [
-        {
-          "name": "bot",
+          "name": "strategyList",
           "writable": true
         },
         {
@@ -198,22 +243,16 @@ export type WebdexFactory = {
       ],
       "args": [
         {
-          "name": "strategyAddress",
-          "type": {
-            "option": "pubkey"
-          }
+          "name": "contractAddress",
+          "type": "pubkey"
         },
         {
-          "name": "subAccountAddress",
-          "type": {
-            "option": "pubkey"
-          }
+          "name": "tokenAddress",
+          "type": "pubkey"
         },
         {
-          "name": "paymentsAddress",
-          "type": {
-            "option": "pubkey"
-          }
+          "name": "isActive",
+          "type": "bool"
         }
       ]
     }
@@ -231,46 +270,46 @@ export type WebdexFactory = {
         195,
         52
       ]
+    },
+    {
+      "name": "strategyList",
+      "discriminator": [
+        128,
+        85,
+        53,
+        230,
+        250,
+        80,
+        204,
+        252
+      ]
     }
   ],
   "events": [
     {
-      "name": "botCreated",
+      "name": "strategyAddedEvent",
       "discriminator": [
-        172,
-        143,
-        0,
-        188,
-        140,
-        195,
-        196,
-        202
+        80,
+        39,
+        53,
+        74,
+        111,
+        1,
+        201,
+        250
       ]
     },
     {
-      "name": "botRemoved",
+      "name": "strategyStatusUpdatedEvent",
       "discriminator": [
-        200,
-        194,
-        224,
-        187,
-        67,
-        115,
-        183,
-        25
-      ]
-    },
-    {
-      "name": "botUpdated",
-      "discriminator": [
-        125,
-        156,
-        171,
-        248,
-        124,
-        139,
-        132,
-        193
+        34,
+        208,
+        66,
+        66,
+        64,
+        129,
+        46,
+        7
       ]
     }
   ],
@@ -322,33 +361,38 @@ export type WebdexFactory = {
     },
     {
       "code": 6009,
+      "name": "subAccountNotFound",
+      "msg": "SubAccount not found"
+    },
+    {
+      "code": 6010,
       "name": "accountNotLinkedToCurrency",
       "msg": "Account not linked to currency"
     },
     {
-      "code": 6010,
+      "code": 6011,
+      "name": "maxSubAccountsReached",
+      "msg": "Max Sub Accounts Reached"
+    },
+    {
+      "code": 6012,
       "name": "invalidSubAccountId",
       "msg": "Invalid Sub Account Id"
     },
     {
-      "code": 6011,
+      "code": 6013,
       "name": "strategyNotLinked",
       "msg": "Strategy Not Linked"
     },
     {
-      "code": 6012,
+      "code": 6014,
       "name": "strategyBalanceNotFound",
       "msg": "Strategy Balance Not Found"
     },
     {
-      "code": 6013,
+      "code": 6015,
       "name": "coinNotLinked",
       "msg": "Coin Not Linked"
-    },
-    {
-      "code": 6014,
-      "name": "accountNotFound",
-      "msg": "Account not found"
     }
   ],
   "types": [
@@ -370,19 +414,19 @@ export type WebdexFactory = {
             "type": "pubkey"
           },
           {
-            "name": "voidCollector1",
+            "name": "collector1",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector2",
+            "name": "collector2",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector3",
+            "name": "collector3",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector4",
+            "name": "collector4",
             "type": "pubkey"
           },
           {
@@ -417,27 +461,7 @@ export type WebdexFactory = {
       }
     },
     {
-      "name": "botCreated",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "contractAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "bot",
-            "type": "pubkey"
-          },
-          {
-            "name": "owner",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "botInfo",
+      "name": "strategy",
       "type": {
         "kind": "struct",
         "fields": [
@@ -446,96 +470,82 @@ export type WebdexFactory = {
             "type": "string"
           },
           {
-            "name": "prefix",
+            "name": "tokenAddress",
+            "type": "pubkey"
+          },
+          {
+            "name": "isActive",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "strategyAddedEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contractAddress",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
             "type": "string"
           },
           {
-            "name": "owner",
-            "type": "pubkey"
+            "name": "symbol",
+            "type": "string"
           },
           {
-            "name": "voidCollector1",
-            "type": "pubkey"
+            "name": "uri",
+            "type": "string"
           },
           {
-            "name": "voidCollector2",
-            "type": "pubkey"
-          },
-          {
-            "name": "voidCollector3",
-            "type": "pubkey"
-          },
-          {
-            "name": "voidCollector4",
-            "type": "pubkey"
-          },
-          {
-            "name": "managerAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "strategyAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "subAccountAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "paymentsAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "tokenPassAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "feeWithdrawNetwork",
-            "type": "u64"
-          },
-          {
-            "name": "feeCollectorNetworkAddress",
+            "name": "tokenAddress",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "botRemoved",
+      "name": "strategyList",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "bot",
+            "name": "contractAddress",
             "type": "pubkey"
           },
           {
-            "name": "owner",
-            "type": "pubkey"
+            "name": "strategies",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "strategy"
+                }
+              }
+            }
           }
         ]
       }
     },
     {
-      "name": "botUpdated",
+      "name": "strategyStatusUpdatedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "bot",
+            "name": "contractAddress",
             "type": "pubkey"
           },
           {
-            "name": "strategyAddress",
+            "name": "tokenAddress",
             "type": "pubkey"
           },
           {
-            "name": "subAccountAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "paymentsAddress",
-            "type": "pubkey"
+            "name": "isActive",
+            "type": "bool"
           }
         ]
       }

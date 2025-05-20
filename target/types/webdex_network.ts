@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_network.json`.
  */
 export type WebdexNetwork = {
-  "address": "EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE",
+  "address": "66E8D8LRoAwze5aAURujjiKgMMFDejZADFzoX8sRSBwp",
   "metadata": {
     "name": "webdexNetwork",
     "version": "0.1.0",
@@ -670,19 +670,19 @@ export type WebdexNetwork = {
             "type": "pubkey"
           },
           {
-            "name": "collector1",
+            "name": "voidCollector1",
             "type": "pubkey"
           },
           {
-            "name": "collector2",
+            "name": "voidCollector2",
             "type": "pubkey"
           },
           {
-            "name": "collector3",
+            "name": "voidCollector3",
             "type": "pubkey"
           },
           {
-            "name": "collector4",
+            "name": "voidCollector4",
             "type": "pubkey"
           },
           {

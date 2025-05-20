@@ -1,5 +1,5 @@
 {
-  "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje",
+  "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6",
   "metadata": {
     "name": "webdex_sub_accounts",
     "version": "0.1.0",
@@ -728,19 +728,19 @@
             "type": "pubkey"
           },
           {
-            "name": "collector_1",
+            "name": "void_collector_1",
             "type": "pubkey"
           },
           {
-            "name": "collector_2",
+            "name": "void_collector_2",
             "type": "pubkey"
           },
           {
-            "name": "collector_3",
+            "name": "void_collector_3",
             "type": "pubkey"
           },
           {
-            "name": "collector_4",
+            "name": "void_collector_4",
             "type": "pubkey"
           },
           {
@@ -835,6 +835,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "user_address",
+            "type": "pubkey"
+          },
           {
             "name": "sub_account_address",
             "type": "pubkey"

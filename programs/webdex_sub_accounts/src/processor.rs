@@ -42,6 +42,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
 
     // ✅ Atualiza a lista de subcontas
     sub_account_list.sub_accounts.push(SimpleSubAccount {
+        user_address: user.key(),
         sub_account_address: sub_account.key(),
         id: sub_account_id.to_string(),
         name: name.clone(),
@@ -60,20 +61,17 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
 
 pub fn _get_sub_accounts(
     ctx: Context<GetSubAccounts>,
-    contract_address: Pubkey,
+    user: Pubkey,
 ) -> Result<Vec<SimpleSubAccount>> {
     let list = &ctx.accounts.sub_account_list;
 
-    // ✅ Validação de segurança
-    if list.contract_address != contract_address {
-        return Err(ErrorCode::InvalidContractAddress.into());
-    }
-
-    // ✅ Converte de SubAccountEntry para SimpleSubAccount (mais leve)
-    let sub_accounts = list
+    // Filtra sub_accounts que pertencem ao usuário informado
+    let sub_accounts: Vec<SimpleSubAccount> = list
         .sub_accounts
         .iter()
+        .filter(|entry| entry.user_address == user)  // <-- filtro pelo user
         .map(|entry| SimpleSubAccount {
+            user_address: entry.user_address,
             sub_account_address: entry.sub_account_address.clone(),
             id: entry.id.clone(),
             name: entry.name.clone(),

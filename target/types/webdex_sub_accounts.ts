@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_sub_accounts.json`.
  */
 export type WebdexSubAccounts = {
-  "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje",
+  "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6",
   "metadata": {
     "name": "webdexSubAccounts",
     "version": "0.1.0",
@@ -734,19 +734,19 @@ export type WebdexSubAccounts = {
             "type": "pubkey"
           },
           {
-            "name": "collector1",
+            "name": "voidCollector1",
             "type": "pubkey"
           },
           {
-            "name": "collector2",
+            "name": "voidCollector2",
             "type": "pubkey"
           },
           {
-            "name": "collector3",
+            "name": "voidCollector3",
             "type": "pubkey"
           },
           {
-            "name": "collector4",
+            "name": "voidCollector4",
             "type": "pubkey"
           },
           {
@@ -841,6 +841,10 @@ export type WebdexSubAccounts = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "userAddress",
+            "type": "pubkey"
+          },
           {
             "name": "subAccountAddress",
             "type": "pubkey"

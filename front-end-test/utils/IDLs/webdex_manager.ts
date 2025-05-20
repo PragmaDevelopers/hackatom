@@ -1,14 +1,20 @@
-{
-  "address": "2ybNsGNJiEmDT3gkX3Tbm4ewdrfxRZS7gvd9Ff3gZFj6",
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/webdex_manager.json`.
+ */
+export type WebdexManager = {
+  "address": "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH",
   "metadata": {
-    "name": "webdex_manager",
+    "name": "webdexManager",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "add_gas",
+      "name": "addGas",
       "discriminator": [
         102,
         60,
@@ -42,7 +48,7 @@
           }
         },
         {
-          "name": "vault_sol_account",
+          "name": "vaultSolAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -81,7 +87,7 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -93,7 +99,7 @@
       ]
     },
     {
-      "name": "get_info_user",
+      "name": "getInfoUser",
       "discriminator": [
         127,
         182,
@@ -112,12 +118,12 @@
       "args": [],
       "returns": {
         "defined": {
-          "name": "UserDisplay"
+          "name": "userDisplay"
         }
       }
     },
     {
-      "name": "liquidity_add",
+      "name": "liquidityAdd",
       "discriminator": [
         157,
         5,
@@ -136,16 +142,16 @@
           "name": "user"
         },
         {
-          "name": "strategy_list"
+          "name": "strategyList"
         },
         {
-          "name": "sub_account"
+          "name": "subAccount"
         },
         {
-          "name": "token_mint"
+          "name": "usdtMint"
         },
         {
-          "name": "user_usdt_account",
+          "name": "userUsdtAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -192,7 +198,7 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "usdtMint"
               }
             ],
             "program": {
@@ -235,13 +241,13 @@
           }
         },
         {
-          "name": "vault_usdt_account",
+          "name": "vaultUsdtAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "sub_account_authority"
+                "path": "subAccountAuthority"
               },
               {
                 "kind": "const",
@@ -282,7 +288,7 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "usdtMint"
               }
             ],
             "program": {
@@ -325,7 +331,7 @@
           }
         },
         {
-          "name": "sub_account_authority",
+          "name": "subAccountAuthority",
           "pda": {
             "seeds": [
               {
@@ -346,13 +352,13 @@
               },
               {
                 "kind": "account",
-                "path": "sub_account"
+                "path": "subAccount"
               }
             ]
           }
         },
         {
-          "name": "lp_token",
+          "name": "lpToken",
           "writable": true,
           "pda": {
             "seeds": [
@@ -371,30 +377,30 @@
               },
               {
                 "kind": "arg",
-                "path": "strategy_token"
+                "path": "strategyToken"
               },
               {
                 "kind": "account",
-                "path": "sub_account"
+                "path": "subAccount"
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "usdtMint"
               }
             ]
           }
         },
         {
-          "name": "user_authority"
+          "name": "userAuthority"
         },
         {
-          "name": "user_lp_token_account",
+          "name": "userLpTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user_authority"
+                "path": "userAuthority"
               },
               {
                 "kind": "const",
@@ -435,7 +441,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -478,7 +484,7 @@
           }
         },
         {
-          "name": "lp_mint_authority",
+          "name": "lpMintAuthority",
           "pda": {
             "seeds": [
               {
@@ -502,7 +508,7 @@
               },
               {
                 "kind": "arg",
-                "path": "strategy_token"
+                "path": "strategyToken"
               }
             ]
           }
@@ -513,25 +519,25 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associated_token_program",
+          "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
         {
-          "name": "strategy_token",
+          "name": "strategyToken",
           "type": "pubkey"
         },
         {
-          "name": "_decimals",
+          "name": "decimals",
           "type": "u8"
         },
         {
@@ -541,7 +547,7 @@
       ]
     },
     {
-      "name": "liquidity_remove",
+      "name": "liquidityRemove",
       "discriminator": [
         208,
         28,
@@ -560,21 +566,21 @@
           "name": "bot"
         },
         {
-          "name": "sub_account",
+          "name": "subAccount",
           "writable": true
         },
         {
-          "name": "strategy_list"
+          "name": "strategyList"
         },
         {
-          "name": "strategy_balance",
+          "name": "strategyBalance",
           "writable": true
         },
         {
-          "name": "token_mint"
+          "name": "usdtMint"
         },
         {
-          "name": "user_usdt_account",
+          "name": "userUsdtAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -621,7 +627,7 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "usdtMint"
               }
             ],
             "program": {
@@ -664,13 +670,13 @@
           }
         },
         {
-          "name": "vault_usdt_account",
+          "name": "vaultUsdtAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "sub_account_authority"
+                "path": "subAccountAuthority"
               },
               {
                 "kind": "const",
@@ -711,7 +717,7 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "usdtMint"
               }
             ],
             "program": {
@@ -754,7 +760,7 @@
           }
         },
         {
-          "name": "sub_account_authority",
+          "name": "subAccountAuthority",
           "pda": {
             "seeds": [
               {
@@ -775,13 +781,13 @@
               },
               {
                 "kind": "account",
-                "path": "sub_account"
+                "path": "subAccount"
               }
             ]
           }
         },
         {
-          "name": "lp_token",
+          "name": "lpToken",
           "writable": true,
           "pda": {
             "seeds": [
@@ -800,30 +806,30 @@
               },
               {
                 "kind": "arg",
-                "path": "strategy_token"
+                "path": "strategyToken"
               },
               {
                 "kind": "account",
-                "path": "sub_account"
+                "path": "subAccount"
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "usdtMint"
               }
             ]
           }
         },
         {
-          "name": "user_authority"
+          "name": "userAuthority"
         },
         {
-          "name": "user_lp_token_account",
+          "name": "userLpTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user_authority"
+                "path": "userAuthority"
               },
               {
                 "kind": "const",
@@ -864,7 +870,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -907,7 +913,7 @@
           }
         },
         {
-          "name": "lp_mint_authority",
+          "name": "lpMintAuthority",
           "pda": {
             "seeds": [
               {
@@ -931,7 +937,7 @@
               },
               {
                 "kind": "arg",
-                "path": "strategy_token"
+                "path": "strategyToken"
               }
             ]
           }
@@ -942,28 +948,28 @@
           "signer": true
         },
         {
-          "name": "sub_account_program"
+          "name": "subAccountProgram"
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associated_token_program",
+          "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
         {
-          "name": "strategy_token",
+          "name": "strategyToken",
           "type": "pubkey"
         },
         {
-          "name": "_decimals",
+          "name": "decimals",
           "type": "u8"
         },
         {
-          "name": "account_id",
+          "name": "accountId",
           "type": "string"
         },
         {
@@ -977,7 +983,7 @@
       ]
     },
     {
-      "name": "pass_add",
+      "name": "passAdd",
       "discriminator": [
         0,
         62,
@@ -1011,10 +1017,10 @@
           }
         },
         {
-          "name": "webdex_mint"
+          "name": "webdexMint"
         },
         {
-          "name": "user_webdex_account",
+          "name": "userWebdexAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1061,7 +1067,7 @@
               },
               {
                 "kind": "account",
-                "path": "webdex_mint"
+                "path": "webdexMint"
               }
             ],
             "program": {
@@ -1104,7 +1110,7 @@
           }
         },
         {
-          "name": "vault_webdex_account",
+          "name": "vaultWebdexAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1151,7 +1157,7 @@
               },
               {
                 "kind": "account",
-                "path": "webdex_mint"
+                "path": "webdexMint"
               }
             ],
             "program": {
@@ -1199,15 +1205,15 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associated_token_program",
+          "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
@@ -1219,7 +1225,7 @@
       ]
     },
     {
-      "name": "pass_remove",
+      "name": "passRemove",
       "discriminator": [
         228,
         188,
@@ -1253,10 +1259,10 @@
           }
         },
         {
-          "name": "webdex_mint"
+          "name": "webdexMint"
         },
         {
-          "name": "user_webdex_account",
+          "name": "userWebdexAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1303,7 +1309,7 @@
               },
               {
                 "kind": "account",
-                "path": "webdex_mint"
+                "path": "webdexMint"
               }
             ],
             "program": {
@@ -1346,7 +1352,7 @@
           }
         },
         {
-          "name": "vault_webdex_account",
+          "name": "vaultWebdexAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1393,7 +1399,7 @@
               },
               {
                 "kind": "account",
-                "path": "webdex_mint"
+                "path": "webdexMint"
               }
             ],
             "program": {
@@ -1441,11 +1447,11 @@
           "signer": true
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associated_token_program",
+          "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
@@ -1457,7 +1463,7 @@
       ]
     },
     {
-      "name": "rebalance_position",
+      "name": "rebalancePosition",
       "discriminator": [
         219,
         41,
@@ -1478,18 +1484,18 @@
           "writable": true
         },
         {
-          "name": "sub_account",
+          "name": "subAccount",
           "writable": true
         },
         {
-          "name": "temporary_fee_account",
+          "name": "temporaryFeeAccount",
           "writable": true
         },
         {
-          "name": "token_mint"
+          "name": "usdtMint"
         },
         {
-          "name": "lp_token",
+          "name": "lpToken",
           "writable": true,
           "pda": {
             "seeds": [
@@ -1508,30 +1514,30 @@
               },
               {
                 "kind": "arg",
-                "path": "strategy_token"
+                "path": "strategyToken"
               },
               {
                 "kind": "account",
-                "path": "sub_account"
+                "path": "subAccount"
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "usdtMint"
               }
             ]
           }
         },
         {
-          "name": "user_authority"
+          "name": "userAuthority"
         },
         {
-          "name": "user_lp_token_account",
+          "name": "userLpTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user_authority"
+                "path": "userAuthority"
               },
               {
                 "kind": "const",
@@ -1572,7 +1578,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -1615,16 +1621,16 @@
           }
         },
         {
-          "name": "bot_owner"
+          "name": "botOwner"
         },
         {
-          "name": "bot_owner_lp_account",
+          "name": "botOwnerLpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "bot_owner"
+                "path": "botOwner"
               },
               {
                 "kind": "const",
@@ -1665,7 +1671,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -1708,25 +1714,25 @@
           }
         },
         {
-          "name": "void_collector_1"
+          "name": "collector1"
         },
         {
-          "name": "void_collector_2"
+          "name": "collector2"
         },
         {
-          "name": "void_collector_3"
+          "name": "collector3"
         },
         {
-          "name": "void_collector_4"
+          "name": "collector4"
         },
         {
-          "name": "void_collector_1_lp_account",
+          "name": "collector1LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "void_collector_1"
+                "path": "collector1"
               },
               {
                 "kind": "const",
@@ -1767,7 +1773,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -1810,13 +1816,13 @@
           }
         },
         {
-          "name": "void_collector_2_lp_account",
+          "name": "collector2LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "void_collector_2"
+                "path": "collector2"
               },
               {
                 "kind": "const",
@@ -1857,7 +1863,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -1900,13 +1906,13 @@
           }
         },
         {
-          "name": "void_collector_3_lp_account",
+          "name": "collector3LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "void_collector_3"
+                "path": "collector3"
               },
               {
                 "kind": "const",
@@ -1947,7 +1953,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -1990,13 +1996,13 @@
           }
         },
         {
-          "name": "void_collector_4_lp_account",
+          "name": "collector4LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "void_collector_4"
+                "path": "collector4"
               },
               {
                 "kind": "const",
@@ -2037,7 +2043,7 @@
               },
               {
                 "kind": "account",
-                "path": "lp_token"
+                "path": "lpToken"
               }
             ],
             "program": {
@@ -2080,7 +2086,7 @@
           }
         },
         {
-          "name": "lp_mint_authority",
+          "name": "lpMintAuthority",
           "pda": {
             "seeds": [
               {
@@ -2104,13 +2110,13 @@
               },
               {
                 "kind": "arg",
-                "path": "strategy_token"
+                "path": "strategyToken"
               }
             ]
           }
         },
         {
-          "name": "vault_sol_account",
+          "name": "vaultSolAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2149,25 +2155,25 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associated_token_program",
+          "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
         {
-          "name": "_strategy_token",
+          "name": "strategyToken",
           "type": "pubkey"
         },
         {
-          "name": "_decimals",
+          "name": "decimals",
           "type": "u8"
         },
         {
@@ -2224,14 +2230,14 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": []
     },
     {
-      "name": "remove_gas",
+      "name": "removeGas",
       "discriminator": [
         88,
         224,
@@ -2265,7 +2271,7 @@
           }
         },
         {
-          "name": "vault_sol_account",
+          "name": "vaultSolAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2304,7 +2310,7 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -2318,7 +2324,7 @@
   ],
   "accounts": [
     {
-      "name": "Bot",
+      "name": "bot",
       "discriminator": [
         122,
         136,
@@ -2331,7 +2337,7 @@
       ]
     },
     {
-      "name": "FeeAccount",
+      "name": "feeAccount",
       "discriminator": [
         137,
         191,
@@ -2344,7 +2350,7 @@
       ]
     },
     {
-      "name": "StrategyBalanceList",
+      "name": "strategyBalanceList",
       "discriminator": [
         101,
         190,
@@ -2357,7 +2363,7 @@
       ]
     },
     {
-      "name": "StrategyList",
+      "name": "strategyList",
       "discriminator": [
         128,
         85,
@@ -2370,7 +2376,7 @@
       ]
     },
     {
-      "name": "SubAccount",
+      "name": "subAccount",
       "discriminator": [
         227,
         47,
@@ -2383,7 +2389,7 @@
       ]
     },
     {
-      "name": "User",
+      "name": "user",
       "discriminator": [
         159,
         117,
@@ -2398,7 +2404,7 @@
   ],
   "events": [
     {
-      "name": "BalanceGasEvent",
+      "name": "balanceGasEvent",
       "discriminator": [
         188,
         143,
@@ -2411,7 +2417,7 @@
       ]
     },
     {
-      "name": "BalancePassEvent",
+      "name": "balancePassEvent",
       "discriminator": [
         102,
         121,
@@ -2424,7 +2430,7 @@
       ]
     },
     {
-      "name": "RegisterEvent",
+      "name": "registerEvent",
       "discriminator": [
         11,
         129,
@@ -2440,123 +2446,123 @@
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidContractAddress",
+      "name": "invalidContractAddress",
       "msg": "O endereço do contrato fornecido é inválido."
     },
     {
       "code": 6001,
-      "name": "BotNotFound",
+      "name": "botNotFound",
       "msg": "Bot not found"
     },
     {
       "code": 6002,
-      "name": "Unauthorized",
-      "msg": "Unauthorized"
+      "name": "unauthorized",
+      "msg": "unauthorized"
     },
     {
       "code": 6003,
-      "name": "UnauthorizedSubAccount",
+      "name": "unauthorizedSubAccount",
       "msg": "Você não tem permissão para acessar esta subconta."
     },
     {
       "code": 6004,
-      "name": "AccountNotLinkedToCurrency",
+      "name": "accountNotLinkedToCurrency",
       "msg": "Account not linked to currency"
     },
     {
       "code": 6005,
-      "name": "MaxSubAccountsReached",
+      "name": "maxSubAccountsReached",
       "msg": "Max Sub Accounts Reached"
     },
     {
       "code": 6006,
-      "name": "InvalidSubAccountId",
+      "name": "invalidSubAccountId",
       "msg": "Invalid Sub Account Id"
     },
     {
       "code": 6007,
-      "name": "StrategyNotLinked",
+      "name": "strategyNotLinked",
       "msg": "Strategy Not Linked"
     },
     {
       "code": 6008,
-      "name": "StrategyBalanceNotFound",
+      "name": "strategyBalanceNotFound",
       "msg": "Strategy Balance Not Found"
     },
     {
       "code": 6009,
-      "name": "CoinNotLinked",
+      "name": "coinNotLinked",
       "msg": "Coin Not Linked"
     },
     {
       "code": 6010,
-      "name": "MustPauseBeforeWithdraw",
+      "name": "mustPauseBeforeWithdraw",
       "msg": "Liquidity must be paused before removal"
     },
     {
       "code": 6011,
-      "name": "CoinNotLinkedToStrategy",
+      "name": "coinNotLinkedToStrategy",
       "msg": "Coin not linked to strategy"
     },
     {
       "code": 6012,
-      "name": "PauseStateUnchanged",
+      "name": "pauseStateUnchanged",
       "msg": "The paused state must be different"
     },
     {
       "code": 6013,
-      "name": "UnauthorizedPaymentsCaller",
+      "name": "unauthorizedPaymentsCaller",
       "msg": "Only the registered Payments program can call this"
     },
     {
       "code": 6014,
-      "name": "InsufficientFunds",
+      "name": "insufficientFunds",
       "msg": "Insufficient funds to subtract"
     },
     {
       "code": 6015,
-      "name": "UnregisteredManager",
+      "name": "unregisteredManager",
       "msg": "Unregistered Manager"
     },
     {
       "code": 6016,
-      "name": "RegisteredUser",
+      "name": "registeredUser",
       "msg": "User already registered"
     },
     {
       "code": 6017,
-      "name": "InsufficientGasBalance",
+      "name": "insufficientGasBalance",
       "msg": "Insufficient Gas Balance"
     },
     {
       "code": 6018,
-      "name": "InvalidAmount",
+      "name": "invalidAmount",
       "msg": "Invalid Amount"
     },
     {
       "code": 6019,
-      "name": "InsufficientPassBalance",
+      "name": "insufficientPassBalance",
       "msg": "Insufficient Pass Balance"
     },
     {
       "code": 6020,
-      "name": "YouMustTheWebDexPayments",
+      "name": "youMustTheWebDexPayments",
       "msg": "You must the WebDexPayments"
     },
     {
       "code": 6021,
-      "name": "StrategyNotFound",
+      "name": "strategyNotFound",
       "msg": "Strategy Not Found"
     },
     {
       "code": 6022,
-      "name": "InvalidAuthority",
+      "name": "invalidAuthority",
       "msg": "Invalid Authority"
     }
   ],
   "types": [
     {
-      "name": "BalanceGasEvent",
+      "name": "balanceGasEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2577,14 +2583,14 @@
             "type": "bool"
           },
           {
-            "name": "is_operation",
+            "name": "isOperation",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "BalancePassEvent",
+      "name": "balancePassEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2605,14 +2611,14 @@
             "type": "bool"
           },
           {
-            "name": "is_operation",
+            "name": "isOperation",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "BalanceStrategy",
+      "name": "balanceStrategy",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2648,7 +2654,7 @@
       }
     },
     {
-      "name": "Bot",
+      "name": "bot",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2665,54 +2671,54 @@
             "type": "pubkey"
           },
           {
-            "name": "void_collector_1",
+            "name": "collector1",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_2",
+            "name": "collector2",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_3",
+            "name": "collector3",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_4",
+            "name": "collector4",
             "type": "pubkey"
           },
           {
-            "name": "manager_address",
+            "name": "managerAddress",
             "type": "pubkey"
           },
           {
-            "name": "strategy_address",
+            "name": "strategyAddress",
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
+            "name": "subAccountAddress",
             "type": "pubkey"
           },
           {
-            "name": "payments_address",
+            "name": "paymentsAddress",
             "type": "pubkey"
           },
           {
-            "name": "token_pass_address",
+            "name": "tokenPassAddress",
             "type": "pubkey"
           },
           {
-            "name": "fee_withdraw_network",
+            "name": "feeWithdrawNetwork",
             "type": "u64"
           },
           {
-            "name": "fee_collector_network_address",
+            "name": "feeCollectorNetworkAddress",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "FeeAccount",
+      "name": "feeAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2724,7 +2730,7 @@
       }
     },
     {
-      "name": "RegisterEvent",
+      "name": "registerEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2740,7 +2746,7 @@
       }
     },
     {
-      "name": "Strategy",
+      "name": "strategy",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2749,23 +2755,23 @@
             "type": "string"
           },
           {
-            "name": "token_address",
+            "name": "tokenAddress",
             "type": "pubkey"
           },
           {
-            "name": "is_active",
+            "name": "isActive",
             "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "StrategyBalanceList",
+      "name": "strategyBalanceList",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "strategy_token",
+            "name": "strategyToken",
             "type": "pubkey"
           },
           {
@@ -2773,7 +2779,7 @@
             "type": "bool"
           },
           {
-            "name": "list_coins",
+            "name": "listCoins",
             "type": {
               "vec": "pubkey"
             }
@@ -2783,7 +2789,7 @@
             "type": {
               "vec": {
                 "defined": {
-                  "name": "BalanceStrategy"
+                  "name": "balanceStrategy"
                 }
               }
             }
@@ -2792,12 +2798,12 @@
       }
     },
     {
-      "name": "StrategyList",
+      "name": "strategyList",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "contractAddress",
             "type": "pubkey"
           },
           {
@@ -2805,7 +2811,7 @@
             "type": {
               "vec": {
                 "defined": {
-                  "name": "Strategy"
+                  "name": "strategy"
                 }
               }
             }
@@ -2814,7 +2820,7 @@
       }
     },
     {
-      "name": "SubAccount",
+      "name": "subAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2827,7 +2833,7 @@
             "type": "string"
           },
           {
-            "name": "list_strategies",
+            "name": "listStrategies",
             "type": {
               "vec": "pubkey"
             }
@@ -2842,7 +2848,7 @@
       }
     },
     {
-      "name": "User",
+      "name": "user",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2851,11 +2857,11 @@
             "type": "pubkey"
           },
           {
-            "name": "gas_balance",
+            "name": "gasBalance",
             "type": "u64"
           },
           {
-            "name": "pass_balance",
+            "name": "passBalance",
             "type": "u64"
           },
           {
@@ -2866,7 +2872,7 @@
       }
     },
     {
-      "name": "UserDisplay",
+      "name": "userDisplay",
       "type": {
         "kind": "struct",
         "fields": [
@@ -2875,15 +2881,15 @@
             "type": "pubkey"
           },
           {
-            "name": "gas_balance",
+            "name": "gasBalance",
             "type": "u64"
           },
           {
-            "name": "pass_balance",
+            "name": "passBalance",
             "type": "u64"
           }
         ]
       }
     }
   ]
-}
+};

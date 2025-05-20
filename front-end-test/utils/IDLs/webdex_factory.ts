@@ -1,14 +1,20 @@
-{
-  "address": "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i",
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/webdex_factory.json`.
+ */
+export type WebdexFactory = {
+  "address": "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc",
   "metadata": {
-    "name": "webdex_factory",
+    "name": "webdexFactory",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "add_bot",
+      "name": "addBot",
       "discriminator": [
         33,
         251,
@@ -35,13 +41,13 @@
               },
               {
                 "kind": "account",
-                "path": "manager_address"
+                "path": "managerAddress"
               }
             ]
           }
         },
         {
-          "name": "manager_address",
+          "name": "managerAddress",
           "docs": [
             "CHECK"
           ]
@@ -52,7 +58,7 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -70,53 +76,53 @@
           "type": "pubkey"
         },
         {
-          "name": "void_collector_1",
+          "name": "voidCollector1",
           "type": "pubkey"
         },
         {
-          "name": "void_collector_2",
+          "name": "voidCollector2",
           "type": "pubkey"
         },
         {
-          "name": "void_collector_3",
+          "name": "voidCollector3",
           "type": "pubkey"
         },
         {
-          "name": "void_collector_4",
+          "name": "voidCollector4",
           "type": "pubkey"
         },
         {
-          "name": "contract_address",
+          "name": "contractAddress",
           "type": "pubkey"
         },
         {
-          "name": "strategy_address",
+          "name": "strategyAddress",
           "type": "pubkey"
         },
         {
-          "name": "sub_account_address",
+          "name": "subAccountAddress",
           "type": "pubkey"
         },
         {
-          "name": "payments_address",
+          "name": "paymentsAddress",
           "type": "pubkey"
         },
         {
-          "name": "token_pass_address",
+          "name": "tokenPassAddress",
           "type": "pubkey"
         },
         {
-          "name": "fee_withdraw_network",
+          "name": "feeWithdrawNetwork",
           "type": "u64"
         },
         {
-          "name": "fee_collector_network_address",
+          "name": "feeCollectorNetworkAddress",
           "type": "pubkey"
         }
       ]
     },
     {
-      "name": "get_bot_info",
+      "name": "getBotInfo",
       "discriminator": [
         217,
         201,
@@ -134,18 +140,18 @@
       ],
       "args": [
         {
-          "name": "contract_address",
+          "name": "contractAddress",
           "type": "pubkey"
         }
       ],
       "returns": {
         "defined": {
-          "name": "BotInfo"
+          "name": "botInfo"
         }
       }
     },
     {
-      "name": "remove_bot",
+      "name": "removeBot",
       "discriminator": [
         49,
         239,
@@ -169,7 +175,7 @@
       "args": []
     },
     {
-      "name": "update_bot",
+      "name": "updateBot",
       "discriminator": [
         72,
         160,
@@ -192,19 +198,19 @@
       ],
       "args": [
         {
-          "name": "strategy_address",
+          "name": "strategyAddress",
           "type": {
             "option": "pubkey"
           }
         },
         {
-          "name": "sub_account_address",
+          "name": "subAccountAddress",
           "type": {
             "option": "pubkey"
           }
         },
         {
-          "name": "payments_address",
+          "name": "paymentsAddress",
           "type": {
             "option": "pubkey"
           }
@@ -214,7 +220,7 @@
   ],
   "accounts": [
     {
-      "name": "Bot",
+      "name": "bot",
       "discriminator": [
         122,
         136,
@@ -229,7 +235,7 @@
   ],
   "events": [
     {
-      "name": "BotCreated",
+      "name": "botCreated",
       "discriminator": [
         172,
         143,
@@ -242,7 +248,7 @@
       ]
     },
     {
-      "name": "BotRemoved",
+      "name": "botRemoved",
       "discriminator": [
         200,
         194,
@@ -255,7 +261,7 @@
       ]
     },
     {
-      "name": "BotUpdated",
+      "name": "botUpdated",
       "discriminator": [
         125,
         156,
@@ -271,83 +277,83 @@
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidContractAddress",
+      "name": "invalidContractAddress",
       "msg": "O endereço do contrato fornecido é inválido."
     },
     {
       "code": 6001,
-      "name": "BotNotFound",
+      "name": "botNotFound",
       "msg": "Bot not found"
     },
     {
       "code": 6002,
-      "name": "BotAlreadyRegistered",
+      "name": "botAlreadyRegistered",
       "msg": "Bot already registered"
     },
     {
       "code": 6003,
-      "name": "CoinNotFound",
+      "name": "coinNotFound",
       "msg": "A moeda especificada não foi encontrada."
     },
     {
       "code": 6004,
-      "name": "StrategyNotFound",
+      "name": "strategyNotFound",
       "msg": "Strategy not found"
     },
     {
       "code": 6005,
-      "name": "CoinAlreadyExists",
+      "name": "coinAlreadyExists",
       "msg": "Coin already exists"
     },
     {
       "code": 6006,
-      "name": "MaxStrategiesReached",
+      "name": "maxStrategiesReached",
       "msg": "Max strategies reached"
     },
     {
       "code": 6007,
-      "name": "Unauthorized",
-      "msg": "Unauthorized"
+      "name": "unauthorized",
+      "msg": "unauthorized"
     },
     {
       "code": 6008,
-      "name": "UnauthorizedSubAccount",
+      "name": "unauthorizedSubAccount",
       "msg": "Você não tem permissão para acessar esta subconta."
     },
     {
       "code": 6009,
-      "name": "AccountNotLinkedToCurrency",
+      "name": "accountNotLinkedToCurrency",
       "msg": "Account not linked to currency"
     },
     {
       "code": 6010,
-      "name": "InvalidSubAccountId",
+      "name": "invalidSubAccountId",
       "msg": "Invalid Sub Account Id"
     },
     {
       "code": 6011,
-      "name": "StrategyNotLinked",
+      "name": "strategyNotLinked",
       "msg": "Strategy Not Linked"
     },
     {
       "code": 6012,
-      "name": "StrategyBalanceNotFound",
+      "name": "strategyBalanceNotFound",
       "msg": "Strategy Balance Not Found"
     },
     {
       "code": 6013,
-      "name": "CoinNotLinked",
+      "name": "coinNotLinked",
       "msg": "Coin Not Linked"
     },
     {
       "code": 6014,
-      "name": "AccountNotFound",
+      "name": "accountNotFound",
       "msg": "Account not found"
     }
   ],
   "types": [
     {
-      "name": "Bot",
+      "name": "bot",
       "type": {
         "kind": "struct",
         "fields": [
@@ -364,59 +370,59 @@
             "type": "pubkey"
           },
           {
-            "name": "void_collector_1",
+            "name": "voidCollector1",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_2",
+            "name": "voidCollector2",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_3",
+            "name": "voidCollector3",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_4",
+            "name": "voidCollector4",
             "type": "pubkey"
           },
           {
-            "name": "manager_address",
+            "name": "managerAddress",
             "type": "pubkey"
           },
           {
-            "name": "strategy_address",
+            "name": "strategyAddress",
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
+            "name": "subAccountAddress",
             "type": "pubkey"
           },
           {
-            "name": "payments_address",
+            "name": "paymentsAddress",
             "type": "pubkey"
           },
           {
-            "name": "token_pass_address",
+            "name": "tokenPassAddress",
             "type": "pubkey"
           },
           {
-            "name": "fee_withdraw_network",
+            "name": "feeWithdrawNetwork",
             "type": "u64"
           },
           {
-            "name": "fee_collector_network_address",
+            "name": "feeCollectorNetworkAddress",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "BotCreated",
+      "name": "botCreated",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "contractAddress",
             "type": "pubkey"
           },
           {
@@ -431,7 +437,7 @@
       }
     },
     {
-      "name": "BotInfo",
+      "name": "botInfo",
       "type": {
         "kind": "struct",
         "fields": [
@@ -448,54 +454,54 @@
             "type": "pubkey"
           },
           {
-            "name": "void_collector_1",
+            "name": "voidCollector1",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_2",
+            "name": "voidCollector2",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_3",
+            "name": "voidCollector3",
             "type": "pubkey"
           },
           {
-            "name": "void_collector_4",
+            "name": "voidCollector4",
             "type": "pubkey"
           },
           {
-            "name": "manager_address",
+            "name": "managerAddress",
             "type": "pubkey"
           },
           {
-            "name": "strategy_address",
+            "name": "strategyAddress",
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
+            "name": "subAccountAddress",
             "type": "pubkey"
           },
           {
-            "name": "payments_address",
+            "name": "paymentsAddress",
             "type": "pubkey"
           },
           {
-            "name": "token_pass_address",
+            "name": "tokenPassAddress",
             "type": "pubkey"
           },
           {
-            "name": "fee_withdraw_network",
+            "name": "feeWithdrawNetwork",
             "type": "u64"
           },
           {
-            "name": "fee_collector_network_address",
+            "name": "feeCollectorNetworkAddress",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "BotRemoved",
+      "name": "botRemoved",
       "type": {
         "kind": "struct",
         "fields": [
@@ -511,7 +517,7 @@
       }
     },
     {
-      "name": "BotUpdated",
+      "name": "botUpdated",
       "type": {
         "kind": "struct",
         "fields": [
@@ -520,19 +526,19 @@
             "type": "pubkey"
           },
           {
-            "name": "strategy_address",
+            "name": "strategyAddress",
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
+            "name": "subAccountAddress",
             "type": "pubkey"
           },
           {
-            "name": "payments_address",
+            "name": "paymentsAddress",
             "type": "pubkey"
           }
         ]
       }
     }
   ]
-}
+};

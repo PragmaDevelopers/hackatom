@@ -1,5 +1,5 @@
 {
-  "address": "AZpLbd9HonogrHXnLqy4YSkc2Zf6BvTv1Qpn4jZrpXfM",
+  "address": "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc",
   "metadata": {
     "name": "webdex_factory",
     "version": "0.1.0",
@@ -67,6 +67,22 @@
         },
         {
           "name": "owner",
+          "type": "pubkey"
+        },
+        {
+          "name": "void_collector_1",
+          "type": "pubkey"
+        },
+        {
+          "name": "void_collector_2",
+          "type": "pubkey"
+        },
+        {
+          "name": "void_collector_3",
+          "type": "pubkey"
+        },
+        {
+          "name": "void_collector_4",
           "type": "pubkey"
         },
         {
@@ -348,6 +364,22 @@
             "type": "pubkey"
           },
           {
+            "name": "void_collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "void_collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "void_collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "void_collector_4",
+            "type": "pubkey"
+          },
+          {
             "name": "manager_address",
             "type": "pubkey"
           },
@@ -413,6 +445,22 @@
           },
           {
             "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "void_collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "void_collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "void_collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "void_collector_4",
             "type": "pubkey"
           },
           {

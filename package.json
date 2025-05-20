@@ -4,7 +4,14 @@
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
     "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
     "add:bot:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/add/bot.ts",
+    "add:coins:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/add/coins.ts",
+    "add:user:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/add/user.ts",
+    "add:sub_account:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/add/sub_account.ts",
     "get:bots:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/get/bots.ts",
+    "get:coins:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/get/coins.ts",
+    "get:user:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/get/user.ts",
+    "get:sub_account:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/get/sub_account.ts",
+    "remove:bots:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/remove/bots.ts",
     "parse:keypair:base58_to_64bytes": "ts-mocha -p ./tsconfig.json -t 1000000 tests/parse/keypair.ts"
   },
   "devDependencies": {

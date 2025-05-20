@@ -42,6 +42,7 @@ impl SubAccount {
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct SimpleSubAccount {
+    pub user_address: Pubkey,
     pub sub_account_address: Pubkey,
     pub id: String,
     pub name: String,
@@ -99,10 +100,6 @@ pub struct ChangePausedEvent {
 #[derive(Accounts)]
 #[instruction(name: String)]
 pub struct CreateSubAccount<'info> {
-    #[account(
-        seeds = [b"bot", signer.key().as_ref(),name.as_bytes()],
-        bump
-    )]
     pub bot: Account<'info, Bot>,
 
     pub user: Account<'info, User>,

@@ -2,247 +2,35 @@
  * Program IDL in camelCase format in order to be used in JS/TS.
  *
  * Note that this is only a type helper and is not the actual IDL. The original
- * IDL can be found at `target/idl/webdex_payments.json`.
+ * IDL can be found at `target/idl/webdex_sub_accounts.json`.
  */
-export type WebdexPayments = {
-  "address": "24xr25kWdRkLFZTfsxjrpyQWfezn3Eof65VaM9D7FXiy",
+export type WebdexSubAccounts = {
+  "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje",
   "metadata": {
-    "name": "webdexPayments",
+    "name": "webdexSubAccounts",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "addFeeTiers",
+      "name": "addLiquidity",
       "discriminator": [
-        44,
-        61,
-        29,
-        131,
-        243,
-        123,
-        223,
-        236
+        181,
+        157,
+        89,
+        67,
+        143,
+        182,
+        52,
+        72
       ],
       "accounts": [
         {
           "name": "bot"
         },
         {
-          "name": "payments",
-          "writable": true
-        },
-        {
-          "name": "signer",
-          "signer": true
-        }
-      ],
-      "args": [
-        {
-          "name": "contractAddress",
-          "type": "pubkey"
-        },
-        {
-          "name": "newFeeTiers",
-          "type": {
-            "vec": {
-              "defined": {
-                "name": "feeTier"
-              }
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "currencyAllow",
-      "discriminator": [
-        179,
-        10,
-        139,
-        180,
-        236,
-        201,
-        238,
-        71
-      ],
-      "accounts": [
-        {
-          "name": "bot"
-        },
-        {
-          "name": "payments",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  97,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116,
-                  115
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "coinPubkey",
-          "type": "pubkey"
-        },
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "name": "decimals",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "currencyRevoke",
-      "discriminator": [
-        84,
-        136,
-        1,
-        71,
-        226,
-        160,
-        156,
-        83
-      ],
-      "accounts": [
-        {
-          "name": "bot"
-        },
-        {
-          "name": "payments",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  97,
-                  121,
-                  109,
-                  101,
-                  110,
-                  116,
-                  115
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
-              }
-            ]
-          }
-        },
-        {
-          "name": "signer",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "coinPubkey",
-          "type": "pubkey"
-        },
-        {
-          "name": "name",
-          "type": "string"
-        },
-        {
-          "name": "symbol",
-          "type": "string"
-        },
-        {
-          "name": "decimals",
-          "type": "u8"
-        }
-      ]
-    },
-    {
-      "name": "getFeeTiers",
-      "discriminator": [
-        201,
-        117,
-        217,
-        106,
-        185,
-        132,
-        20,
-        175
-      ],
-      "accounts": [
-        {
-          "name": "payments"
-        }
-      ],
-      "args": [],
-      "returns": {
-        "vec": {
-          "defined": {
-            "name": "feeTier"
-          }
-        }
-      }
-    },
-    {
-      "name": "openPosition",
-      "discriminator": [
-        135,
-        128,
-        47,
-        77,
-        15,
-        152,
-        240,
-        49
-      ],
-      "accounts": [
-        {
-          "name": "bot",
-          "writable": true
-        },
-        {
-          "name": "payments"
-        },
-        {
-          "name": "strategyList"
+          "name": "user"
         },
         {
           "name": "subAccount",
@@ -250,38 +38,29 @@ export type WebdexPayments = {
         },
         {
           "name": "strategyBalance",
-          "writable": true
-        },
-        {
-          "name": "user",
-          "writable": true
-        },
-        {
-          "name": "temporaryFeeAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
+                  115,
                   116,
-                  101,
-                  109,
-                  112,
-                  111,
                   114,
                   97,
-                  114,
+                  116,
+                  101,
+                  103,
                   121,
                   95,
-                  102,
-                  101,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
                   101
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
               },
               {
                 "kind": "account",
@@ -292,12 +71,8 @@ export type WebdexPayments = {
                 "path": "subAccount"
               },
               {
-                "kind": "account",
-                "path": "strategyBalance"
-              },
-              {
-                "kind": "account",
-                "path": "payments"
+                "kind": "arg",
+                "path": "strategyToken"
               }
             ]
           }
@@ -310,25 +85,186 @@ export type WebdexPayments = {
         {
           "name": "systemProgram",
           "address": "11111111111111111111111111111111"
-        },
-        {
-          "name": "tokenProgram",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "associatedTokenProgram",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
-          "name": "subAccountProgram",
-          "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6"
         }
       ],
       "args": [
         {
-          "name": "decimals",
-          "type": "u8"
+          "name": "strategyToken",
+          "type": "pubkey"
         },
+        {
+          "name": "accountId",
+          "type": "string"
+        },
+        {
+          "name": "coin",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "coinName",
+          "type": "string"
+        },
+        {
+          "name": "coinIco",
+          "type": "string"
+        },
+        {
+          "name": "coinDecimals",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "createSubAccount",
+      "discriminator": [
+        230,
+        148,
+        237,
+        115,
+        126,
+        55,
+        226,
+        172
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "subAccountList",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  95,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
+        },
+        {
+          "name": "subAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "name",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "findSubAccountIndexById",
+      "discriminator": [
+        148,
+        160,
+        82,
+        235,
+        60,
+        6,
+        225,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "subAccountList"
+        }
+      ],
+      "args": [
+        {
+          "name": "accountId",
+          "type": "string"
+        }
+      ],
+      "returns": "i64"
+    },
+    {
+      "name": "getBalance",
+      "discriminator": [
+        5,
+        173,
+        180,
+        151,
+        243,
+        81,
+        233,
+        55
+      ],
+      "accounts": [
+        {
+          "name": "subAccount"
+        },
+        {
+          "name": "strategyBalance"
+        }
+      ],
+      "args": [
         {
           "name": "accountId",
           "type": "string"
@@ -338,58 +274,160 @@ export type WebdexPayments = {
           "type": "pubkey"
         },
         {
-          "name": "amount",
-          "type": "u64"
-        },
-        {
           "name": "coin",
           "type": "pubkey"
-        },
-        {
-          "name": "gas",
-          "type": "u64"
-        },
-        {
-          "name": "currrencys",
-          "type": {
-            "vec": {
-              "defined": {
-                "name": "currencys"
-              }
-            }
-          }
         }
-      ]
+      ],
+      "returns": {
+        "defined": {
+          "name": "balanceStrategy"
+        }
+      }
     },
     {
-      "name": "removeCoin",
+      "name": "getBalances",
       "discriminator": [
+        7,
+        176,
+        166,
+        37,
+        177,
+        24,
+        146,
+        160
+      ],
+      "accounts": [
+        {
+          "name": "subAccount"
+        },
+        {
+          "name": "strategyBalance"
+        }
+      ],
+      "args": [
+        {
+          "name": "accountId",
+          "type": "string"
+        },
+        {
+          "name": "strategyToken",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "balanceStrategy"
+          }
+        }
+      }
+    },
+    {
+      "name": "getSubAccountStrategies",
+      "discriminator": [
+        206,
+        224,
+        140,
+        8,
+        122,
+        76,
+        250,
+        125
+      ],
+      "accounts": [
+        {
+          "name": "subAccount"
+        }
+      ],
+      "args": [
+        {
+          "name": "accountId",
+          "type": "string"
+        }
+      ],
+      "returns": {
+        "vec": "pubkey"
+      }
+    },
+    {
+      "name": "getSubAccounts",
+      "discriminator": [
+        28,
+        197,
+        164,
         187,
+        19,
         229,
-        187,
-        174,
-        213,
-        190,
-        162,
-        142
+        3,
+        247
+      ],
+      "accounts": [
+        {
+          "name": "subAccountList"
+        }
+      ],
+      "args": [
+        {
+          "name": "contractAddress",
+          "type": "pubkey"
+        }
+      ],
+      "returns": {
+        "vec": {
+          "defined": {
+            "name": "simpleSubAccount"
+          }
+        }
+      }
+    },
+    {
+      "name": "togglePause",
+      "discriminator": [
+        238,
+        237,
+        206,
+        27,
+        255,
+        95,
+        123,
+        229
       ],
       "accounts": [
         {
           "name": "bot"
         },
         {
-          "name": "payments",
+          "name": "user"
+        },
+        {
+          "name": "subAccount"
+        },
+        {
+          "name": "strategyBalance",
           "writable": true
         },
         {
           "name": "signer",
+          "writable": true,
           "signer": true
         }
       ],
       "args": [
         {
+          "name": "accountId",
+          "type": "string"
+        },
+        {
+          "name": "strategyToken",
+          "type": "pubkey"
+        },
+        {
           "name": "coin",
           "type": "pubkey"
+        },
+        {
+          "name": "paused",
+          "type": "bool"
         }
       ]
     }
@@ -409,32 +447,6 @@ export type WebdexPayments = {
       ]
     },
     {
-      "name": "feeAccount",
-      "discriminator": [
-        137,
-        191,
-        201,
-        34,
-        168,
-        222,
-        43,
-        138
-      ]
-    },
-    {
-      "name": "payments",
-      "discriminator": [
-        172,
-        186,
-        73,
-        99,
-        243,
-        28,
-        103,
-        34
-      ]
-    },
-    {
       "name": "strategyBalanceList",
       "discriminator": [
         101,
@@ -448,19 +460,6 @@ export type WebdexPayments = {
       ]
     },
     {
-      "name": "strategyList",
-      "discriminator": [
-        128,
-        85,
-        53,
-        230,
-        250,
-        80,
-        204,
-        252
-      ]
-    },
-    {
       "name": "subAccount",
       "discriminator": [
         227,
@@ -471,6 +470,19 @@ export type WebdexPayments = {
         171,
         32,
         114
+      ]
+    },
+    {
+      "name": "subAccountList",
+      "discriminator": [
+        38,
+        246,
+        153,
+        110,
+        100,
+        224,
+        230,
+        98
       ]
     },
     {
@@ -489,29 +501,42 @@ export type WebdexPayments = {
   ],
   "events": [
     {
-      "name": "openPositionEvent",
+      "name": "balanceLiquidityEvent",
       "discriminator": [
-        83,
-        43,
-        164,
-        147,
-        169,
-        87,
-        81,
-        172
+        110,
+        172,
+        183,
+        118,
+        187,
+        90,
+        2,
+        139
       ]
     },
     {
-      "name": "traderEvent",
+      "name": "changePausedEvent",
       "discriminator": [
-        54,
-        131,
-        40,
-        86,
-        169,
-        250,
-        106,
-        144
+        97,
+        143,
+        220,
+        187,
+        52,
+        2,
+        123,
+        241
+      ]
+    },
+    {
+      "name": "createSubAccountEvent",
+      "discriminator": [
+        50,
+        188,
+        230,
+        37,
+        53,
+        212,
+        46,
+        2
       ]
     }
   ],
@@ -533,81 +558,128 @@ export type WebdexPayments = {
     },
     {
       "code": 6003,
-      "name": "coinNotFound",
-      "msg": "Coin not found"
-    },
-    {
-      "code": 6004,
       "name": "strategyNotFound",
       "msg": "Strategy not found"
     },
     {
-      "code": 6005,
-      "name": "coinAlreadyExists",
-      "msg": "Coin already exists"
+      "code": 6004,
+      "name": "youMustTheWebDexPayments",
+      "msg": "You must the WebDexPayments"
     },
     {
-      "code": 6006,
+      "code": 6005,
       "name": "maxStrategiesReached",
       "msg": "Max strategies reached"
     },
     {
-      "code": 6007,
+      "code": 6006,
       "name": "unauthorized",
       "msg": "unauthorized"
     },
     {
-      "code": 6008,
+      "code": 6007,
       "name": "unauthorizedSubAccount",
       "msg": "Você não tem permissão para acessar esta subconta."
     },
     {
-      "code": 6009,
+      "code": 6008,
       "name": "subAccountNotFound",
       "msg": "SubAccount not found"
     },
     {
-      "code": 6010,
+      "code": 6009,
       "name": "accountNotLinkedToCurrency",
       "msg": "Account not linked to currency"
     },
     {
+      "code": 6010,
+      "name": "maxSubAccountsReached",
+      "msg": "Max Sub Accounts Reached"
+    },
+    {
       "code": 6011,
+      "name": "invalidSubAccountId",
+      "msg": "Invalid Sub Account Id"
+    },
+    {
+      "code": 6012,
       "name": "strategyNotLinked",
       "msg": "Strategy Not Linked"
     },
     {
-      "code": 6012,
+      "code": 6013,
       "name": "strategyBalanceNotFound",
       "msg": "Strategy Balance Not Found"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "coinNotLinked",
       "msg": "Coin Not Linked"
     },
     {
-      "code": 6014,
-      "name": "statusMustBeDifferent",
-      "msg": "Status Must Be Different"
-    },
-    {
       "code": 6015,
-      "name": "coinNotRegistered",
-      "msg": "Coin Not Registered"
+      "name": "mustPauseBeforeWithdraw",
+      "msg": "Liquidity must be paused before removal"
     },
     {
       "code": 6016,
-      "name": "invalidCoin",
-      "msg": "Invalid Coin"
+      "name": "coinNotFound",
+      "msg": "Coin not found"
     },
     {
       "code": 6017,
-      "name": "invalidAuthority",
-      "msg": "Invalid Coin"
+      "name": "coinNotLinkedToStrategy",
+      "msg": "Coin not linked to strategy"
+    },
+    {
+      "code": 6018,
+      "name": "pauseStateUnchanged",
+      "msg": "The paused state must be different"
+    },
+    {
+      "code": 6019,
+      "name": "unauthorizedPaymentsCaller",
+      "msg": "Only the registered Payments program can call this"
+    },
+    {
+      "code": 6020,
+      "name": "insufficientFunds",
+      "msg": "Insufficient funds to subtract"
     }
   ],
   "types": [
+    {
+      "name": "balanceLiquidityEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "strategyToken",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "increase",
+            "type": "bool"
+          },
+          {
+            "name": "isOperation",
+            "type": "bool"
+          }
+        ]
+      }
+    },
     {
       "name": "balanceStrategy",
       "type": {
@@ -662,19 +734,19 @@ export type WebdexPayments = {
             "type": "pubkey"
           },
           {
-            "name": "voidCollector1",
+            "name": "collector1",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector2",
+            "name": "collector2",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector3",
+            "name": "collector3",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector4",
+            "name": "collector4",
             "type": "pubkey"
           },
           {
@@ -709,100 +781,12 @@ export type WebdexPayments = {
       }
     },
     {
-      "name": "coinData",
+      "name": "changePausedEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "pubkey",
-            "type": "pubkey"
-          },
-          {
-            "name": "coin",
-            "type": {
-              "defined": {
-                "name": "coins"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "coins",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "symbol",
-            "type": "string"
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
-          },
-          {
-            "name": "status",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "currencys",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "from",
-            "type": "pubkey"
-          },
-          {
-            "name": "to",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "feeAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "fee",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "feeTier",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "limit",
-            "type": "u64"
-          },
-          {
-            "name": "fee",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "openPositionEvent",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "contractAddress",
+            "name": "signer",
             "type": "pubkey"
           },
           {
@@ -814,55 +798,7 @@ export type WebdexPayments = {
             "type": "string"
           },
           {
-            "name": "details",
-            "type": {
-              "defined": {
-                "name": "positionDetails"
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "payments",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "contractAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "feeTiers",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "feeTier"
-                }
-              }
-            }
-          },
-          {
-            "name": "coins",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "coinData"
-                }
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
-      "name": "positionDetails",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "strategy",
+            "name": "strategyToken",
             "type": "pubkey"
           },
           {
@@ -870,40 +806,52 @@ export type WebdexPayments = {
             "type": "pubkey"
           },
           {
-            "name": "oldBalance",
-            "type": "u64"
-          },
-          {
-            "name": "fee",
-            "type": "u64"
-          },
-          {
-            "name": "gas",
-            "type": "u64"
-          },
-          {
-            "name": "profit",
-            "type": "u64"
+            "name": "paused",
+            "type": "bool"
           }
         ]
       }
     },
     {
-      "name": "strategy",
+      "name": "createSubAccountEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "tokenAddress",
+            "name": "signer",
             "type": "pubkey"
           },
           {
-            "name": "isActive",
-            "type": "bool"
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "simpleSubAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "subAccountAddress",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
           }
         ]
       }
@@ -941,28 +889,6 @@ export type WebdexPayments = {
       }
     },
     {
-      "name": "strategyList",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "contractAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "strategies",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "strategy"
-                }
-              }
-            }
-          }
-        ]
-      }
-    },
-    {
       "name": "subAccount",
       "type": {
         "kind": "struct",
@@ -991,7 +917,7 @@ export type WebdexPayments = {
       }
     },
     {
-      "name": "traderEvent",
+      "name": "subAccountList",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1000,12 +926,14 @@ export type WebdexPayments = {
             "type": "pubkey"
           },
           {
-            "name": "from",
-            "type": "pubkey"
-          },
-          {
-            "name": "to",
-            "type": "pubkey"
+            "name": "subAccounts",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "simpleSubAccount"
+                }
+              }
+            }
           }
         ]
       }

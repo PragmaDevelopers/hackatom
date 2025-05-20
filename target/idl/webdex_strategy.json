@@ -1,5 +1,5 @@
 {
-  "address": "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH",
+  "address": "FiogR2EQUviZr5zNZPjCkid27HshpEdRZyfjuGKH1Q8a",
   "metadata": {
     "name": "webdex_strategy",
     "version": "0.1.0",
@@ -408,19 +408,19 @@
             "type": "pubkey"
           },
           {
-            "name": "collector_1",
+            "name": "void_collector_1",
             "type": "pubkey"
           },
           {
-            "name": "collector_2",
+            "name": "void_collector_2",
             "type": "pubkey"
           },
           {
-            "name": "collector_3",
+            "name": "void_collector_3",
             "type": "pubkey"
           },
           {
-            "name": "collector_4",
+            "name": "void_collector_4",
             "type": "pubkey"
           },
           {

@@ -11,24 +11,22 @@ use webdex_sub_accounts::{state::RemoveLiquidity, processor::_remove_liquidity};
 pub fn _register(ctx: Context<Register>) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
-    // Aqui manager é opcional
-    if let Some(manager) = &ctx.accounts.manager {
-        // Se não for a conta default (zeroed Pubkey)
-        if manager.key() != Pubkey::default() {
+    // Proteção: evitar sobrescrever dados se o user já estiver registrado
+    if user.status {
+        return Err(ErrorCode::RegisteredUser.into());
+    }
+
+    // Lógica de manager opcional
+    match &ctx.accounts.manager {
+        Some(manager) => {
             if !manager.status {
                 return Err(ErrorCode::UnregisteredManager.into());
             }
+            user.manager = manager.key();
         }
-
-        // Setar o manager no usuário
-        user.manager = manager.key();
-    } else {
-        // Se manager for None, setar como default ou tratar como quiser
-        user.manager = Pubkey::default();
-    }
-
-    if user.status {
-        return Err(ErrorCode::RegisteredUser.into());
+        None => {
+            user.manager = Pubkey::default();
+        }
     }
 
     user.gas_balance = 0;

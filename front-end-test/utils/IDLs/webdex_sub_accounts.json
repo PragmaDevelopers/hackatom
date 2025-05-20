@@ -1,5 +1,5 @@
 {
-  "address": "9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL",
+  "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje",
   "metadata": {
     "name": "webdex_sub_accounts",
     "version": "0.1.0",
@@ -159,7 +159,7 @@
               },
               {
                 "kind": "account",
-                "path": "user"
+                "path": "bot"
               }
             ]
           }
@@ -725,6 +725,22 @@
           },
           {
             "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_4",
             "type": "pubkey"
           },
           {

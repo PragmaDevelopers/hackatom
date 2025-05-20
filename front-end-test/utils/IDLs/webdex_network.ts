@@ -1,14 +1,20 @@
-{
+/**
+ * Program IDL in camelCase format in order to be used in JS/TS.
+ *
+ * Note that this is only a type helper and is not the actual IDL. The original
+ * IDL can be found at `target/idl/webdex_network.json`.
+ */
+export type WebdexNetwork = {
   "address": "EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE",
   "metadata": {
-    "name": "webdex_network",
+    "name": "webdexNetwork",
     "version": "0.1.0",
     "spec": "0.1.0",
     "description": "Created with Anchor"
   },
   "instructions": [
     {
-      "name": "get_balance",
+      "name": "getBalance",
       "discriminator": [
         5,
         173,
@@ -21,18 +27,18 @@
       ],
       "accounts": [
         {
-          "name": "balance_info"
+          "name": "balanceInfo"
         }
       ],
       "args": [],
       "returns": {
         "defined": {
-          "name": "BalanceData"
+          "name": "balanceData"
         }
       }
     },
     {
-      "name": "pay_fee",
+      "name": "payFee",
       "discriminator": [
         98,
         25,
@@ -51,10 +57,10 @@
           "name": "user"
         },
         {
-          "name": "sub_account"
+          "name": "subAccount"
         },
         {
-          "name": "balance_info",
+          "name": "balanceInfo",
           "writable": true,
           "pda": {
             "seeds": [
@@ -77,7 +83,7 @@
               },
               {
                 "kind": "account",
-                "path": "contract_address"
+                "path": "contractAddress"
               },
               {
                 "kind": "account",
@@ -85,16 +91,16 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "usdtMint"
               }
             ]
           }
         },
         {
-          "name": "usdt_mint"
+          "name": "usdtMint"
         },
         {
-          "name": "contract_address"
+          "name": "contractAddress"
         },
         {
           "name": "signer",
@@ -102,17 +108,17 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "sub_account_name",
+          "name": "subAccountName",
           "type": "string"
         },
         {
-          "name": "contract_address",
+          "name": "contractAddress",
           "type": "pubkey"
         },
         {
@@ -143,11 +149,11 @@
           "writable": true
         },
         {
-          "name": "balance_info",
+          "name": "balanceInfo",
           "writable": true
         },
         {
-          "name": "user_network_account",
+          "name": "userNetworkAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -194,7 +200,7 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "usdtMint"
               }
             ],
             "program": {
@@ -237,13 +243,13 @@
           }
         },
         {
-          "name": "vault_network_account",
+          "name": "vaultNetworkAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "fee_collector_network_address"
+                "path": "feeCollectorNetworkAddress"
               },
               {
                 "kind": "const",
@@ -284,7 +290,7 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "usdtMint"
               }
             ],
             "program": {
@@ -327,13 +333,13 @@
           }
         },
         {
-          "name": "fee_collector_network_account",
+          "name": "feeCollectorNetworkAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "fee_collector_network_address"
+                "path": "feeCollectorNetworkAddress"
               },
               {
                 "kind": "const",
@@ -374,7 +380,7 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "usdtMint"
               }
             ],
             "program": {
@@ -417,12 +423,12 @@
           }
         },
         {
-          "name": "fee_collector_network_address",
+          "name": "feeCollectorNetworkAddress",
           "writable": true,
           "signer": true
         },
         {
-          "name": "usdt_mint"
+          "name": "usdtMint"
         },
         {
           "name": "signer",
@@ -430,15 +436,15 @@
           "signer": true
         },
         {
-          "name": "system_program",
+          "name": "systemProgram",
           "address": "11111111111111111111111111111111"
         },
         {
-          "name": "token_program",
+          "name": "tokenProgram",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
         {
-          "name": "associated_token_program",
+          "name": "associatedTokenProgram",
           "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
@@ -452,7 +458,7 @@
   ],
   "accounts": [
     {
-      "name": "BalanceInfo",
+      "name": "balanceInfo",
       "discriminator": [
         151,
         39,
@@ -465,7 +471,7 @@
       ]
     },
     {
-      "name": "Bot",
+      "name": "bot",
       "discriminator": [
         122,
         136,
@@ -478,7 +484,7 @@
       ]
     },
     {
-      "name": "SubAccount",
+      "name": "subAccount",
       "discriminator": [
         227,
         47,
@@ -491,7 +497,7 @@
       ]
     },
     {
-      "name": "User",
+      "name": "user",
       "discriminator": [
         159,
         117,
@@ -506,7 +512,7 @@
   ],
   "events": [
     {
-      "name": "BalanceNetworkAdd",
+      "name": "balanceNetworkAdd",
       "discriminator": [
         177,
         253,
@@ -519,7 +525,7 @@
       ]
     },
     {
-      "name": "BalanceNetworkRemove",
+      "name": "balanceNetworkRemove",
       "discriminator": [
         136,
         183,
@@ -535,23 +541,23 @@
   "errors": [
     {
       "code": 6000,
-      "name": "Unauthorized",
-      "msg": "Unauthorized"
+      "name": "unauthorized",
+      "msg": "unauthorized"
     },
     {
       "code": 6001,
-      "name": "InsufficientBalance",
+      "name": "insufficientBalance",
       "msg": "Insufficient Balance"
     },
     {
       "code": 6002,
-      "name": "Overflow",
-      "msg": "Overflow"
+      "name": "overflow",
+      "msg": "overflow"
     }
   ],
   "types": [
     {
-      "name": "BalanceData",
+      "name": "balanceData",
       "type": {
         "kind": "struct",
         "fields": [
@@ -563,7 +569,7 @@
       }
     },
     {
-      "name": "BalanceInfo",
+      "name": "balanceInfo",
       "type": {
         "kind": "struct",
         "fields": [
@@ -580,19 +586,19 @@
             "type": "pubkey"
           },
           {
-            "name": "contract_address",
+            "name": "contractAddress",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "BalanceNetworkAdd",
+      "name": "balanceNetworkAdd",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "contractAddress",
             "type": "pubkey"
           },
           {
@@ -604,7 +610,7 @@
             "type": "pubkey"
           },
           {
-            "name": "new_balance",
+            "name": "newBalance",
             "type": "u64"
           },
           {
@@ -615,12 +621,12 @@
       }
     },
     {
-      "name": "BalanceNetworkRemove",
+      "name": "balanceNetworkRemove",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "contractAddress",
             "type": "pubkey"
           },
           {
@@ -632,7 +638,7 @@
             "type": "pubkey"
           },
           {
-            "name": "new_balance",
+            "name": "newBalance",
             "type": "u64"
           },
           {
@@ -647,7 +653,7 @@
       }
     },
     {
-      "name": "Bot",
+      "name": "bot",
       "type": {
         "kind": "struct",
         "fields": [
@@ -664,54 +670,54 @@
             "type": "pubkey"
           },
           {
-            "name": "collector_1",
+            "name": "collector1",
             "type": "pubkey"
           },
           {
-            "name": "collector_2",
+            "name": "collector2",
             "type": "pubkey"
           },
           {
-            "name": "collector_3",
+            "name": "collector3",
             "type": "pubkey"
           },
           {
-            "name": "collector_4",
+            "name": "collector4",
             "type": "pubkey"
           },
           {
-            "name": "manager_address",
+            "name": "managerAddress",
             "type": "pubkey"
           },
           {
-            "name": "strategy_address",
+            "name": "strategyAddress",
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
+            "name": "subAccountAddress",
             "type": "pubkey"
           },
           {
-            "name": "payments_address",
+            "name": "paymentsAddress",
             "type": "pubkey"
           },
           {
-            "name": "token_pass_address",
+            "name": "tokenPassAddress",
             "type": "pubkey"
           },
           {
-            "name": "fee_withdraw_network",
+            "name": "feeWithdrawNetwork",
             "type": "u64"
           },
           {
-            "name": "fee_collector_network_address",
+            "name": "feeCollectorNetworkAddress",
             "type": "pubkey"
           }
         ]
       }
     },
     {
-      "name": "SubAccount",
+      "name": "subAccount",
       "type": {
         "kind": "struct",
         "fields": [
@@ -724,7 +730,7 @@
             "type": "string"
           },
           {
-            "name": "list_strategies",
+            "name": "listStrategies",
             "type": {
               "vec": "pubkey"
             }
@@ -739,7 +745,7 @@
       }
     },
     {
-      "name": "User",
+      "name": "user",
       "type": {
         "kind": "struct",
         "fields": [
@@ -748,11 +754,11 @@
             "type": "pubkey"
           },
           {
-            "name": "gas_balance",
+            "name": "gasBalance",
             "type": "u64"
           },
           {
-            "name": "pass_balance",
+            "name": "passBalance",
             "type": "u64"
           },
           {
@@ -763,4 +769,4 @@
       }
     }
   ]
-}
+};

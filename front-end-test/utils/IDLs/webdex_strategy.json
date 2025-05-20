@@ -1,5 +1,5 @@
 {
-  "address": "BW8NiUW7jpcKmwFtBLVdgBwxNA4QR5CydPbKWb5oSkna",
+  "address": "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH",
   "metadata": {
     "name": "webdex_strategy",
     "version": "0.1.0",
@@ -54,6 +54,11 @@
           }
         },
         {
+          "name": "token_mint",
+          "writable": true,
+          "signer": true
+        },
+        {
           "name": "token_address"
         },
         {
@@ -62,6 +67,11 @@
         {
           "name": "metadata",
           "writable": true
+        },
+        {
+          "name": "token_authority",
+          "writable": true,
+          "signer": true
         },
         {
           "name": "signer",
@@ -395,6 +405,22 @@
           },
           {
             "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_4",
             "type": "pubkey"
           },
           {

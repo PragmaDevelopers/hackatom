@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_payments.json`.
  */
 export type WebdexPayments = {
-  "address": "24xr25kWdRkLFZTfsxjrpyQWfezn3Eof65VaM9D7FXiy",
+  "address": "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5",
   "metadata": {
     "name": "webdexPayments",
     "version": "0.1.0",
@@ -321,7 +321,7 @@ export type WebdexPayments = {
         },
         {
           "name": "subAccountProgram",
-          "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6"
+          "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
         }
       ],
       "args": [
@@ -662,19 +662,19 @@ export type WebdexPayments = {
             "type": "pubkey"
           },
           {
-            "name": "voidCollector1",
+            "name": "collector1",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector2",
+            "name": "collector2",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector3",
+            "name": "collector3",
             "type": "pubkey"
           },
           {
-            "name": "voidCollector4",
+            "name": "collector4",
             "type": "pubkey"
           },
           {

@@ -6,20 +6,20 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-webdex_factory = "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc"
-webdex_manager = "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH"
-webdex_network = "EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE"
-webdex_payments = "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5"
-webdex_strategy = "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH"
-webdex_sub_accounts = "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
+webdex_factory = "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i"
+webdex_manager = "2ybNsGNJiEmDT3gkX3Tbm4ewdrfxRZS7gvd9Ff3gZFj6"
+webdex_network = "66E8D8LRoAwze5aAURujjiKgMMFDejZADFzoX8sRSBwp"
+webdex_payments = "24xr25kWdRkLFZTfsxjrpyQWfezn3Eof65VaM9D7FXiy"
+webdex_strategy = "FiogR2EQUviZr5zNZPjCkid27HshpEdRZyfjuGKH1Q8a"
+webdex_sub_accounts = "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6"
 
 [programs.devnet]
-webdex_factory = "CVo61LAJcaB6BZ5oScydhG6nAnL7RPrU27EJ39uzUYuc"
-webdex_manager = "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH"
-webdex_network = "EXRdumfXfTUH5NrzhLfJCAcGtNp9UtgjtvBwfh4WpXtE"
-webdex_payments = "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5"
-webdex_strategy = "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH"
-webdex_sub_accounts = "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
+webdex_factory = "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i"
+webdex_manager = "2ybNsGNJiEmDT3gkX3Tbm4ewdrfxRZS7gvd9Ff3gZFj6"
+webdex_network = "66E8D8LRoAwze5aAURujjiKgMMFDejZADFzoX8sRSBwp"
+webdex_payments = "24xr25kWdRkLFZTfsxjrpyQWfezn3Eof65VaM9D7FXiy"
+webdex_strategy = "FiogR2EQUviZr5zNZPjCkid27HshpEdRZyfjuGKH1Q8a"
+webdex_sub_accounts = "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6"
 
 [registry]
 url = "https://api.apr.dev"

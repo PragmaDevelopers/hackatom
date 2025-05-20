@@ -8,7 +8,7 @@ pub mod error;
 use crate::processor::*;
 use crate::state::*;
 
-declare_id!("CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH");
+declare_id!("2ybNsGNJiEmDT3gkX3Tbm4ewdrfxRZS7gvd9Ff3gZFj6");
 
 #[program]
 pub mod webdex_manager {

@@ -1,5 +1,5 @@
 {
-  "address": "AVHdHmVQS5r9s4rq8D5XdkVmD97hXkvGzpeau2idxkL1",
+  "address": "6zbeWoZkQ6mnrzm878ii246BHPyiqVxmaMekRdWNL2h5",
   "metadata": {
     "name": "webdex_payments",
     "version": "0.1.0",
@@ -20,6 +20,9 @@
         236
       ],
       "accounts": [
+        {
+          "name": "bot"
+        },
         {
           "name": "payments",
           "writable": true
@@ -312,7 +315,7 @@
         },
         {
           "name": "sub_account_program",
-          "address": "9tgvAbnsLUZ78v5C8HzaYVZhTuPk5JqX9G2tSVjdVMYL"
+          "address": "D4KYax2aKb7a3zexPXvkuvn5SWij2SLyftdFgF9N8Eje"
         }
       ],
       "args": [
@@ -653,6 +656,22 @@
             "type": "pubkey"
           },
           {
+            "name": "collector_1",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_2",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_3",
+            "type": "pubkey"
+          },
+          {
+            "name": "collector_4",
+            "type": "pubkey"
+          },
+          {
             "name": "manager_address",
             "type": "pubkey"
           },
@@ -789,28 +808,12 @@
             "type": "string"
           },
           {
-            "name": "strategy_token",
-            "type": "pubkey"
-          },
-          {
-            "name": "coin",
-            "type": "pubkey"
-          },
-          {
-            "name": "old_balance",
-            "type": "u64"
-          },
-          {
-            "name": "fee",
-            "type": "u64"
-          },
-          {
-            "name": "gas",
-            "type": "u64"
-          },
-          {
-            "name": "profit",
-            "type": "u64"
+            "name": "details",
+            "type": {
+              "defined": {
+                "name": "PositionDetails"
+              }
+            }
           }
         ]
       }
@@ -843,6 +846,38 @@
                 }
               }
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PositionDetails",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strategy",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_balance",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "gas",
+            "type": "u64"
+          },
+          {
+            "name": "profit",
+            "type": "u64"
           }
         ]
       }

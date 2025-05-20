@@ -2,7 +2,6 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexFactory } from "../../target/types/webdex_factory";
 import { PublicKey } from "@solana/web3.js";
-import { sharedState } from "../setup";
 import { BN } from "bn.js";
 
 describe("webdex_factoty", () => {
@@ -24,23 +23,25 @@ describe("webdex_factoty", () => {
         const fee_withdraw_network = new BN(0.06);
 
         const fee_collector_network_address = user.publicKey;
-        sharedState.feeCollectorNetworkAddress = fee_collector_network_address;
 
         // 🔀 contractAddress aleatório
         contractAddress = anchor.web3.Keypair.generate().publicKey;
-        sharedState.contractAddress = contractAddress;
 
         [botPda] = PublicKey.findProgramAddressSync(
             [Buffer.from("bot"), contractAddress.toBuffer()],
             factoryProgram.programId
         );
-        sharedState.botPda = botPda;
+
 
         const tx = await factoryProgram.methods
             .addBot(
-                "Bot 1", // name
-                "ONE",         // prefix
+                "Bot 2", // name
+                "TWO",         // prefix
                 user.publicKey, // owner é quem paga
+                user.publicKey, // 
+                user.publicKey, // 
+                user.publicKey, // 
+                user.publicKey, // 
                 contractAddress,
                 strategyAddress,
                 subAccountAddress,

@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_strategy.json`.
  */
 export type WebdexStrategy = {
-  "address": "418sMdM3mq48AdsMgNpt6gNp6q3vNNcyUB3THzqQmSgH",
+  "address": "FiogR2EQUviZr5zNZPjCkid27HshpEdRZyfjuGKH1Q8a",
   "metadata": {
     "name": "webdexStrategy",
     "version": "0.1.0",
@@ -414,19 +414,19 @@ export type WebdexStrategy = {
             "type": "pubkey"
           },
           {
-            "name": "collector1",
+            "name": "voidCollector1",
             "type": "pubkey"
           },
           {
-            "name": "collector2",
+            "name": "voidCollector2",
             "type": "pubkey"
           },
           {
-            "name": "collector3",
+            "name": "voidCollector3",
             "type": "pubkey"
           },
           {
-            "name": "collector4",
+            "name": "voidCollector4",
             "type": "pubkey"
           },
           {

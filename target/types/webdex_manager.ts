@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_manager.json`.
  */
 export type WebdexManager = {
-  "address": "CnMdKapFgFEuxcKoy8WRNmp6QfENE2hHtZXyBwnf7yLH",
+  "address": "2ybNsGNJiEmDT3gkX3Tbm4ewdrfxRZS7gvd9Ff3gZFj6",
   "metadata": {
     "name": "webdexManager",
     "version": "0.1.0",
@@ -148,7 +148,7 @@ export type WebdexManager = {
           "name": "subAccount"
         },
         {
-          "name": "usdtMint"
+          "name": "tokenMint"
         },
         {
           "name": "userUsdtAccount",
@@ -198,7 +198,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -288,7 +288,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -385,7 +385,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ]
           }
@@ -577,7 +577,7 @@ export type WebdexManager = {
           "writable": true
         },
         {
-          "name": "usdtMint"
+          "name": "tokenMint"
         },
         {
           "name": "userUsdtAccount",
@@ -627,7 +627,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -717,7 +717,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -814,7 +814,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ]
           }
@@ -1492,7 +1492,7 @@ export type WebdexManager = {
           "writable": true
         },
         {
-          "name": "usdtMint"
+          "name": "tokenMint"
         },
         {
           "name": "lpToken",
@@ -1522,7 +1522,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ]
           }
@@ -1714,25 +1714,25 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "collector1"
+          "name": "voidCollector1"
         },
         {
-          "name": "collector2"
+          "name": "voidCollector2"
         },
         {
-          "name": "collector3"
+          "name": "voidCollector3"
         },
         {
-          "name": "collector4"
+          "name": "voidCollector4"
         },
         {
-          "name": "collector1LpAccount",
+          "name": "voidCollector1LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "collector1"
+                "path": "voidCollector1"
               },
               {
                 "kind": "const",
@@ -1816,13 +1816,13 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "collector2LpAccount",
+          "name": "voidCollector2LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "collector2"
+                "path": "voidCollector2"
               },
               {
                 "kind": "const",
@@ -1906,13 +1906,13 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "collector3LpAccount",
+          "name": "voidCollector3LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "collector3"
+                "path": "voidCollector3"
               },
               {
                 "kind": "const",
@@ -1996,13 +1996,13 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "collector4LpAccount",
+          "name": "voidCollector4LpAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "collector4"
+                "path": "voidCollector4"
               },
               {
                 "kind": "const",
@@ -2671,19 +2671,19 @@ export type WebdexManager = {
             "type": "pubkey"
           },
           {
-            "name": "collector1",
+            "name": "voidCollector1",
             "type": "pubkey"
           },
           {
-            "name": "collector2",
+            "name": "voidCollector2",
             "type": "pubkey"
           },
           {
-            "name": "collector3",
+            "name": "voidCollector3",
             "type": "pubkey"
           },
           {
-            "name": "collector4",
+            "name": "voidCollector4",
             "type": "pubkey"
           },
           {
