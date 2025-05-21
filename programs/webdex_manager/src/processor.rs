@@ -234,6 +234,8 @@ pub fn _liquidity_add(
     );
     mint_to(cpi_mint_ctx, amount)?;
 
+    // CHAMAR A FUNÇÂO ADD LIQUIDY DO CONTRATO SUB ACCOUNTS LOGO DEPOIS PARA ATUALIZAR OS VALORES DA SUB CONTA
+
     Ok(())
 }
 

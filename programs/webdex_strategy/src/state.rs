@@ -54,20 +54,14 @@ pub struct AddStrategy<'info> {
     )]
     pub strategy_list: Account<'info, StrategyList>,
 
-    #[account(init_if_needed, payer = signer, mint::decimals = 0, mint::authority = token_authority)]
+    #[account(init, payer = signer, mint::decimals = 0, mint::authority = signer.key())]
     pub token_mint: Account<'info, Mint>,
-
-    /// CHECK: Esta conta é verificada pelo programa Metaplex
-    pub token_address: AccountInfo<'info>,
 
     /// CHECK: Esta conta é verificada pelo programa Metaplex
     pub metadata_program: AccountInfo<'info>,
     /// CHECK: Esta conta é verificada pelo programa Metaplex
     #[account(mut)]
     pub metadata: UncheckedAccount<'info>,
-
-    #[account(mut)]
-    pub token_authority: Signer<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,

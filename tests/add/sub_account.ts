@@ -18,7 +18,6 @@ describe("webdex_sub_accounts", () => {
 
     // 👉 Variáveis compartilhadas entre os testes
     let subAccountListPda: PublicKey;
-    let subAccountPda: PublicKey;
 
     it("Create SubAccount", async () => {
         const name = "Main Account";

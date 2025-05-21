@@ -639,6 +639,11 @@
       "code": 6020,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds to subtract"
+    },
+    {
+      "code": 6021,
+      "name": "DuplicateSubAccountName",
+      "msg": "Insufficient funds to subtract"
     }
   ],
   "types": [

@@ -44,4 +44,6 @@ pub enum ErrorCode {
     UnauthorizedPaymentsCaller,
     #[msg("Insufficient funds to subtract")]
     InsufficientFunds,
+    #[msg("Insufficient funds to subtract")]
+    DuplicateSubAccountName
 }

@@ -1,113 +1,215 @@
-**Documentação Técnica: Migração do Contrato WEbdEXStrategiesV4 (EVM) para Anchor/Solana**
+# 📘 Contrato de Estratégias WebDex
+
+Este contrato gerencia a criação, atualização, listagem e exclusão de estratégias de trading no ecossistema WebDex, garantindo controle de acesso e integridade dos dados.
 
 ---
 
-## Objetivo
-Este documento descreve a migração do contrato inteligente `WEbdEXStrategiesV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
+## 🔧 Funcionalidades
+
+- **Criação de Estratégias**: Gera um novo token com metadados via Metaplex e registra a estratégia.
+- **Atualização de Status**: Ativa ou desativa estratégias existentes.
+- **Listagem de Estratégias**: Retorna todas as estratégias registradas.
+- **Busca de Estratégia**: Recupera uma estratégia específica pelo endereço do token.
+- **Exclusão de Estratégia**: Remove uma estratégia da lista.
 
 ---
 
-## Estrutura Original (EVM)
+## 🧱 Estrutura de Dados
 
-### Funções do Contrato:
-1. `addStrategy(...)`
-2. `updateStrategyStatus(...)`
-3. `getStrategies(...)`
-4. `findStrategy(...)`
+### `Strategy`
 
-### Armazenamento:
-- Mapeamento: `mapping(address => Bot) internal bots;`
-- Estrutura `Bot` com campos:
-  - `contractAddress`, `strategies`
-
----
-
-## Adaptação Solana (Anchor Framework)
-
-### Módulos:
-- `state.rs`: define a estrutura `Strategy`, conta principal e dados persistentes
-- `processor.rs`: implementação da lógica das instruções
-- `error.rs`: definição de erros personalizados com Anchor
-
-### Instruções Migradas:
-1. `add_strategy`  → Cria uma estrategia vinculada a um bot, cria metadados NFT usando a metaplex 
-2. `update_strategy_status` → Atualiza o status da estrategia
-3. `get_strategies` → Faz o get de `StrategyList`
-4. `find_strategy` → Faz o get de um `Strategy` em especifico
-5. `delete_strategy` → Deleta uma `Strategy` em especifico
-
-### Declaração do Programa:
 ```rust
-#[program]
-pub mod webdex_strategy {
-    // ...
+pub struct Strategy {
+    pub name: String,
+    pub token_address: Pubkey,
+    pub is_active: bool,
 }
 ```
 
-### Mudanças de Paradigma:
-| Conceito EVM         | Equivalente Solana (Anchor)     |
-|----------------------|---------------------------------|
-| `mapping`            | `Account` com seeds/PDA         |
-| `msg.sender`         | `ctx.accounts.signer.key`       |
-| `require(...)`       | `require!(cond, ErrorCode::X)`  |
-| `onlyOwner` modifier | Verificação manual via `signer` |
+### `StrategyList`
 
-### Exemplo de Contexto AddBot
 ```rust
-#[derive(Accounts)]
-pub struct AddStrategy<'info> {
-    pub bot: Account<'info, Bot>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = StrategyList::INIT_SPACE,
-        seeds = [b"strategy_list", bot.key().as_ref()],
-        bump
-    )]
-    pub strategy_list: Account<'info, StrategyList>,
-
-    #[account(init, payer = signer, mint::decimals = 0, mint::authority = token_authority)]
-    pub token_mint: Account<'info, Mint>,
-
-    /// CHECK: Esta conta é verificada pelo programa Metaplex
-    pub token_address: AccountInfo<'info>,
-
-    /// CHECK: Esta conta é verificada pelo programa Metaplex
-    pub metadata_program: AccountInfo<'info>,
-    /// CHECK: Esta conta é verificada pelo programa Metaplex
-    #[account(mut)]
-    pub metadata: UncheckedAccount<'info>,
-
-    #[account(mut)]
-    pub token_authority: Signer<'info>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-    pub rent: Sysvar<'info, Rent>,
-    pub token_program: Program<'info, Token>,
+#[account]
+pub struct StrategyList {
+    pub contract_address: Pubkey,
+    pub strategies: Vec<Strategy>,
 }
 ```
 
 ---
 
-## Integração com Metadata (opcional)
-A criação de metadados NFT no Anchor utiliza:
-- `anchor_spl::metadata`
-- `create_metadata_accounts_v3`
+## 📥 Instruções
 
-A chamada está preparada mas comentada para personalização futura.
+### 1. `_add_strategy`
+
+**Descrição**: Cria uma nova estratégia com um token associado e metadados.
+
+**Parâmetros**:
+
+- `name`: Nome da estratégia.
+- `symbol`: Símbolo do token.
+- `uri`: URI dos metadados.
+- `contract_address`: Endereço do contrato gerenciador.
+
+**Requisitos**:
+
+- Somente o proprietário do bot pode chamar.
+- O bot deve estar registrado com o contrato.
+- Limite de estratégias não excedido.
+
+**Efeitos**:
+
+- Cria metadados via Metaplex.
+- Adiciona a estratégia à lista.
+- Emite evento `StrategyAddedEvent`.
+
+### 2. `_update_strategy_status`
+
+**Descrição**: Ativa ou desativa uma estratégia existente.
+
+**Parâmetros**:
+
+- `contract_address`: Endereço do contrato gerenciador.
+- `token_address`: Endereço do token da estratégia.
+- `is_active`: Novo status da estratégia.
+
+**Requisitos**:
+
+- Somente o proprietário do bot pode chamar.
+- O bot deve estar registrado com o contrato.
+
+**Efeitos**:
+
+- Atualiza o status da estratégia.
+- Emite evento `StrategyStatusUpdatedEvent`.
+
+### 3. `_get_strategies`
+
+**Descrição**: Retorna todas as estratégias registradas.
+
+**Parâmetros**:
+
+- `contract_address`: Endereço do contrato gerenciador.
+
+**Requisitos**:
+
+- O endereço do contrato deve corresponder ao registrado.
+
+**Retorno**:
+
+- `Vec<Strategy>`: Lista de estratégias.
+
+### 4. `_find_strategy`
+
+**Descrição**: Busca uma estratégia específica pelo endereço do token.
+
+**Parâmetros**:
+
+- `contract_address`: Endereço do contrato gerenciador.
+- `token_address`: Endereço do token da estratégia.
+
+**Requisitos**:
+
+- O endereço do contrato deve corresponder ao registrado.
+
+**Retorno**:
+
+- `Strategy`: Estratégia encontrada.
+
+### 5. `_delete_strategy`
+
+**Descrição**: Remove uma estratégia da lista.
+
+**Parâmetros**:
+
+- `contract_address`: Endereço do contrato gerenciador.
+- `token_address`: Endereço do token da estratégia.
+
+**Requisitos**:
+
+- Somente o proprietário do bot pode chamar.
+- O bot deve estar registrado com o contrato.
+
+**Efeitos**:
+
+- Remove a estratégia da lista.
+- Emite evento `StrategyStatusUpdatedEvent` com `is_active: false`.
 
 ---
 
-## Comunicação entre Contratos
-Em ambientes multi-programa:
-- **Solidity** usa chamadas diretas ao contrato `Factory` para validações.
-- **Solana** pode utilizar **CPI (Cross-Program Invocation)**, onde, por exemplo, o programa de estratégia pode chamar `get_bot_info` no programa `Factory` para validar bots (não implementado neste módulo, mas possível).
+## 📢 Eventos
+
+### `StrategyAddedEvent`
+
+```rust
+pub struct StrategyAddedEvent {
+    pub contract_address: Pubkey,
+    pub name: String,
+    pub symbol: String,
+    pub uri: String,
+    pub token_address: Pubkey,
+}
+```
+
+### `StrategyStatusUpdatedEvent`
+
+```rust
+pub struct StrategyStatusUpdatedEvent {
+    pub contract_address: Pubkey,
+    pub token_address: Pubkey,
+    pub is_active: bool,
+}
+```
 
 ---
 
-## Conclusão
-A adaptação do contrato `WEbdEXStrategiesV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.
+## 🔐 Segurança
+
+- Todas as operações críticas exigem autorização do proprietário do bot.
+- Verificação do endereço do contrato para evitar uso indevido.
+- Limite máximo de estratégias para evitar sobrecarga.
+
+---
+
+## 🧪 Exemplo de Uso
+
+### Criar Estratégia
+
+```rust
+_add_strategy(
+    ctx,
+    "Minha Estratégia".to_string(),
+    "MST".to_string(),
+    "https://meusite.com/metadata.json".to_string(),
+    contract_address,
+)?;
+```
+
+### Atualizar Status
+
+```rust
+_update_strategy_status(
+    ctx,
+    contract_address,
+    token_address,
+    false,
+)?;
+```
+
+### Listar Estratégias
+
+```rust
+let estrategias = _get_strategies(ctx, contract_address)?;
+```
+
+### Buscar Estratégia
+
+```rust
+let estrategia = _find_strategy(ctx, contract_address, token_address)?;
+```
+
+### Excluir Estratégia
+
+```rust
+_delete_strategy(ctx, contract_address, token_address)?;
+```

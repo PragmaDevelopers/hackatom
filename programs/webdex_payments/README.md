@@ -1,94 +1,224 @@
-**Documentação Técnica: Migração do Contrato WEbdEXPaymentsV4 (EVM) para Anchor/Solana**
+# Contrato de Pagamentos WebDex
 
----
+O contrato de **Pagamentos** é um componente central do ecossistema **WebDex**, responsável pela gestão de taxas, controle de moedas e abertura de posições com cálculo automatizado de taxas.
 
-## Objetivo
-Este documento descreve a migração do contrato inteligente `WEbdEXPaymentsV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
+## ✨ Funcionalidades
 
----
+- **Gestão de Faixas de Taxas**: Configure múltiplas faixas de taxas baseadas no valor da transação.  
+- **Gestão de Moedas**: Habilite ou desabilite moedas para negociação.  
+- **Abertura de Posições**: Gerencie a criação de posições com cálculo automático de taxas.  
+- **Armazenamento Temporário de Taxas**: Armazena taxas calculadas em PDAs para processamento posterior.
 
-## Estrutura Original (EVM)
+## 📦 Estrutura do Contrato
 
-### Funções do Contrato:
-1. `revokeOrAllowCurrency(...)`
-2. `addFeeTiers(...)`
-3. `calculateFee(...)`
-4. `openPosition(...)`
+### 🧾 Contas Principais
 
-### Armazenamento:
-- Mapeamento: `mapping(address => IPayments.Bot) internal bots;`
-- Estrutura `Bot` com campos:
-  - `contractAddress`, `feeTiers`, `coins`
-
----
-
-## Adaptação Solana (Anchor Framework)
-
-### Módulos:
-- `state.rs`: define a estrutura `Coins`, conta principal e dados persistentes
-- `processor.rs`: implementação da lógica das instruções
-- `error.rs`: definição de erros personalizados com Anchor
-
-### Instruções Migradas:
-1. `add_fee_tiers`  → Adiciona `FeeTier` de um bot
-2. `get_fee_tiers` → Faz o get dos `FeeTier` de um bot
-3. `currency_allow` → Cria/Permite uma `Coins`
-4. `currency_revoke` → Cria/Revoga uma `Coins`
-5. `remove_coin` → Deleta uma `Coins`
-6. `open_position` → Atualiza o saldo de uma `SubAccount`
-
-### Declaração do Programa:
+#### `Payments`
 ```rust
-#[program]
-pub mod webdex_payments {
-    // ...
+pub struct Payments {
+    pub contract_address: Pubkey,     // Endereço do contrato gerenciador
+    pub fee_tiers: Vec<FeeTier>,      // Faixas de taxa configuradas
+    pub coins: Vec<CoinData>,         // Moedas suportadas
 }
 ```
 
-### Mudanças de Paradigma:
-| Conceito EVM         | Equivalente Solana (Anchor)     |
-|----------------------|---------------------------------|
-| `mapping`            | `Account` com seeds/PDA         |
-| `msg.sender`         | `ctx.accounts.signer.key`       |
-| `require(...)`       | `require!(cond, ErrorCode::X)`  |
-| `onlyOwner` modifier | Verificação manual via `signer` |
-
-### Exemplo de Contexto AddBot
+#### `FeeAccount` (Armazenamento Temporário)
 ```rust
-#[derive(Accounts)]
-pub struct RevokeOrAllowCurrency<'info> {
-    pub bot: Account<'info, Bot>,
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = Payments::INIT_SPACE, // ou calcule o espaço necessário
-        seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
-        bump
-    )]
-    pub payments: Account<'info, Payments>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
+pub struct FeeAccount {
+    pub fee: u64, // Valor da taxa calculada
 }
 ```
 
----
+### 🏗️ Estruturas de Dados
 
-## Integração entre Contratos via CPI
-Por questão de incompatibilidade na estrutura entre os contratos, chamar a função `rebalancePosition` em `openPosition` não foi possivel. O uso de uma `mint::authority` que é PDA impossibilitou a chamada, agora feita separadamente pelo front-end:
+#### `FeeTier`
 ```rust
-manager(contractAddress).rebalancePosition(
-    user,
-    amount,
-    gas,
-    coin,
-    fee
-);
+pub struct FeeTier {
+    pub limit: u64, // Limite superior da faixa
+    pub fee: u64,   // Valor da taxa (absoluto)
+}
 ```
 
----
+#### `CoinData`
+```rust
+pub struct CoinData {
+    pub pubkey: Pubkey, // Endereço da mint da moeda
+    pub coin: Coins,    // Metadados da moeda
+}
+```
 
-## Conclusão
-A adaptação do contrato `WEbdEXPaymentsV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.
+#### `Coins`
+```rust
+pub struct Coins {
+    pub name: String,   // Nome da moeda
+    pub symbol: String, // Símbolo da moeda
+    pub decimals: u8,   // Casas decimais da moeda
+    pub status: bool,   // Se a moeda está habilitada
+}
+```
+
+## 📥 Instruções
+
+### 1. Adicionar/Atualizar Faixas de Taxas  
+**Instrução:** `_add_fee_tiers`
+
+**Descrição:** Adiciona ou substitui todas as faixas de taxas do contrato.
+
+**Parâmetros:**
+- `contract_address`: Endereço do contrato gerenciador
+- `new_fee_tiers`: Vetor com novas faixas de taxas
+
+**Requisitos:**
+- Somente o dono do bot pode chamar
+- Bot deve estar registrado
+
+### 2. Obter Faixas de Taxas  
+**Instrução:** `_get_fee_tiers`
+
+**Descrição:** Retorna todas as faixas de taxas configuradas.
+
+**Parâmetros:** Nenhum
+
+### 3. Gerenciar Moedas  
+**Instrução:** `_revoke_or_allow_currency`
+
+**Descrição:** Habilita/desabilita uma moeda ou adiciona uma nova.
+
+**Parâmetros:**
+- `coin_pubkey`: Endereço da mint da moeda
+- `status`: `true` para habilitar, `false` para desabilitar
+- `name`: Nome da moeda (para novas moedas)
+- `symbol`: Símbolo da moeda (para novas moedas)
+- `decimals`: Casas decimais da moeda (para novas moedas)
+
+**Requisitos:**
+- Somente o dono do bot pode chamar
+- O status deve ser diferente do atual
+
+### 4. Remover Moeda  
+**Instrução:** `_remove_coin`
+
+**Descrição:** Remove completamente uma moeda da lista.
+
+**Parâmetros:**
+- `coin`: Endereço da mint da moeda a ser removida
+
+**Requisitos:**
+- Somente o dono do bot pode chamar
+- A moeda deve existir
+
+### 5. Abrir Posição  
+**Instrução:** `_open_position`
+
+**Descrição:** Abre uma nova posição de negociação com cálculo de taxa.
+
+**Parâmetros:**
+- `account_id`: Identificador da subconta
+- `strategy_token`: Endereço do token da estratégia
+- `amount`: Valor da posição
+- `coin`: Moeda base
+- `gas`: Custo estimado de gás
+- `currrencys`: Pares de moedas envolvidos
+
+**Requisitos:**
+- Somente o dono do bot pode chamar
+- Estratégia válida
+- Todas as moedas devem estar habilitadas
+- Saldo suficiente
+
+**Efeitos:**
+- Cria conta temporária de taxa
+- Emite eventos de posição
+- Calcula e armazena taxa
+
+## 💰 Cálculo de Taxas
+
+Lógica:
+
+1. Para um determinado valor da transação, percorre as faixas de taxas na ordem.
+2. Usa a primeira faixa onde `valor <= limite`.
+3. Se nenhuma faixa corresponder, usa a taxa da última faixa.
+4. Se não houver faixas, a taxa é 0.
+
+## 📡 Eventos
+
+### `OpenPositionEvent`
+Emitido quando uma nova posição é aberta:
+```rust
+pub struct OpenPositionEvent {
+    pub contract_address: Pubkey,
+    pub user: Pubkey,
+    pub id: String,
+    pub details: PositionDetails,
+}
+```
+
+### `TraderEvent`
+Emitido para cada par de moedas na negociação:
+```rust
+pub struct TraderEvent {
+    pub contract_address: Pubkey,
+    pub from: Pubkey,
+    pub to: Pubkey,
+}
+```
+
+## ⚠️ Códigos de Erro
+
+| Código                   | Descrição                                 |
+|--------------------------|-------------------------------------------|
+| `Unauthorized`           | Assinante não é o dono do bot             |
+| `BotNotFound`            | Bot não registrado com o contrato         |
+| `InvalidContractAddress` | Endereço do contrato inválido             |
+| `StatusMustBeDifferent`  | Status da moeda não mudou                 |
+| `StrategyNotFound`       | Estratégia inválida ou inativa            |
+| `InvalidCoin`            | Moeda desabilitada ou não suportada       |
+| `CoinNotFound`           | Moeda não encontrada na lista             |
+
+## 🧪 Exemplos de Uso
+
+### Inicializar Conta de Pagamentos
+```rust
+let ctx = Context<RevokeOrAllowCurrency>;
+_revoke_or_allow_currency(
+    ctx,
+    coin_pubkey,
+    true,
+    "Solana".to_string(),
+    "SOL".to_string(),
+    9
+)?;
+```
+
+### Definir Faixas de Taxas
+```rust
+let tiers = vec![
+    FeeTier { limit: 1000, fee: 10 },
+    FeeTier { limit: 10000, fee: 50 },
+];
+_add_fee_tiers(ctx, contract_address, tiers)?;
+```
+
+### Abrir Posição
+```rust
+let currencies = vec![
+    Currencys { from: usdc_mint, to: sol_mint }
+];
+_open_position(
+    ctx,
+    9,
+    "account-123".to_string(),
+    strategy_token,
+    500,
+    usdc_mint,
+    0.001,
+    currencies
+)?;
+```
+
+## 🔒 Segurança
+
+- Todas as operações críticas exigem autorização do dono do bot.  
+- Verificação do endereço do contrato evita uso indevido.  
+- Contas temporárias de taxa são baseadas em PDA e únicas por posição.  
+- Verificação do status das moedas impede negociações não autorizadas.

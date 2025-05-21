@@ -24,27 +24,29 @@ impl StrategyBalanceList {
 
 #[account]
 pub struct SubAccount {
-    pub id: String,
+    pub id: Pubkey,
     pub name: String,
     pub list_strategies: Vec<Pubkey>,
     pub strategies: Vec<Pubkey>, // StrategyBalanceList
 }
 
 impl SubAccount {
-    pub const MAX_ID_LEN: usize = 64; // Defina o comprimento máximo esperado para 'id'
+    pub const MAX_ID_LEN: usize = 32; // Defina o comprimento máximo esperado para 'id'
     pub const MAX_STRATEGIES: usize = 10; // Número máximo de estratégias
 
-    pub const SPACE: usize = 8 // discriminador
-        + 4 + Self::MAX_ID_LEN // id
-        + 4 + Self::MAX_ID_LEN // name
-        + 4 + (Self::MAX_STRATEGIES * 32); // strategy_refs
+    pub const SPACE: usize =
+        8 + // discriminator
+        4 + Self::MAX_ID_LEN + 
+        4 + 64 + // name
+        4 + (32 * Self::MAX_STRATEGIES) + // list_strategies
+        4 + (32 * Self::MAX_STRATEGIES); // strategies
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
 pub struct SimpleSubAccount {
     pub user_address: Pubkey,
     pub sub_account_address: Pubkey,
-    pub id: String,
+    pub id: Pubkey,
     pub name: String,
 }
 
@@ -64,7 +66,7 @@ impl SubAccountList {
         + 4 // len of vec
         + Self::MAX_SUBACCOUNTS * (
             32 // key
-            + 4 + Self::MAX_ID_LEN // id (String)
+            + 4 + Self::MAX_ID_LEN // id (Pubkey)
             + 4 + Self::MAX_NAME_LEN // name (String)
         );
 }
@@ -73,13 +75,13 @@ impl SubAccountList {
 pub struct CreateSubAccountEvent {
     pub signer: Pubkey,
     pub user: Pubkey,
-    pub id: String,
+    pub id: Pubkey,
     pub name: String,
 }
 
 #[event]
 pub struct BalanceLiquidityEvent {
-    pub id: String,
+    pub id: Pubkey,
     pub strategy_token: Pubkey,
     pub coin: Pubkey,
     pub amount: u64,
@@ -91,7 +93,7 @@ pub struct BalanceLiquidityEvent {
 pub struct ChangePausedEvent {
     pub signer: Pubkey,
     pub user: Pubkey,
-    pub id: String,
+    pub id: Pubkey,
     pub strategy_token: Pubkey,
     pub coin: Pubkey,
     pub paused: bool,

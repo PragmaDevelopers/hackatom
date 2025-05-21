@@ -215,6 +215,8 @@ pub fn _open_position(
         profit: amount,
     };
 
+    // CHAMAR A FUNÇÂO REBALANCE POSITION DO CONTRATO MANAGER LOGO DEPOIS PARA FAZER USO DO "temp_fee_account"
+
     // 5. Emite eventos (Anchor Events ou logs)
     emit!(OpenPositionEvent {
         contract_address: ctx.accounts.bot.manager_address.key(),

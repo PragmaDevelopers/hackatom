@@ -65,19 +65,11 @@ export type WebdexStrategy = {
           "signer": true
         },
         {
-          "name": "tokenAddress"
-        },
-        {
           "name": "metadataProgram"
         },
         {
           "name": "metadata",
           "writable": true
-        },
-        {
-          "name": "tokenAuthority",
-          "writable": true,
-          "signer": true
         },
         {
           "name": "signer",

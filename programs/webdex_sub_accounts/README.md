@@ -1,102 +1,166 @@
-**Documentação Técnica: Migração do Contrato WEbdEXSubAccountsV4 (EVM) para Anchor/Solana**
+# 📦 Contrato de SubAccounts WebDex
+
+Este programa Solana (usando Anchor) permite a criação e gerenciamento de subcontas vinculadas a estratégias de liquidez, permitindo operações como adição, retirada, pausa e consulta de saldo de tokens em estratégias descentralizadas (como DEXes ou vaults de investimento).
 
 ---
 
-## Objetivo
-Este documento descreve a migração do contrato inteligente `WEbdEXSubAccountsV4` desenvolvido para a EVM (Ethereum Virtual Machine) para a blockchain Solana utilizando o framework Anchor. A adaptação visa manter a funcionalidade equivalente dentro do ecossistema Solana com as devidas mudanças de paradigma.
+## 🧠 Visão Geral
+
+O contrato gerencia:
+- Subcontas personalizadas por usuário.
+- Estratégias com múltiplos tokens por subconta.
+- Saldos de liquidez por token.
+- Operações de pausa e movimentação de liquidez.
+- Controle por conta gerenciadora (`bot`).
 
 ---
 
-## Estrutura Original (EVM)
+## 🧩 Estrutura de Contas
 
-### Funções do Contrato:
-1. `create(...)`
-2. `getBalance(...)`
-3. `getBalances(...)`
-4. `getStrategies(...)`
-5. `getSubAccounts(...)`
-6. `addLiquidy(...)`
-7. `position(...)`
-8. `findSubAccountIndexById(...)`
+### 🔸 `SubAccount`
 
-### Armazenamento:
-- Mapeamento: `mapping(address => Bot) internal bots;`
-- Estrutura `Bot` com campos:
-  - `contractAddress`, `subAccounts`
-- Mapeamento: `mapping(string => bool) private usedCodes;`
+Conta que representa uma subconta individual associada a um usuário.
+
+| Campo            | Tipo        | Descrição                                     |
+|------------------|-------------|-----------------------------------------------|
+| `id`             | `String`    | Identificador único (PDA).                    |
+| `name`           | `String`    | Nome definido pelo usuário.                  |
+| `list_strategies`| `Vec<Pubkey>`| Lista de estratégias vinculadas.             |
+| `strategies`     | `Vec<Pubkey>`| Contas `StrategyBalanceList` associadas.     |
 
 ---
 
-## Adaptação Solana (Anchor Framework)
+### 🔸 `StrategyBalanceList`
 
-### Módulos:
-- `state.rs`: define a estrutura `SubAccount`, conta principal e dados persistentes
-- `processor.rs`: implementação da lógica das instruções
-- `error.rs`: definição de erros personalizados com Anchor
+Armazena os saldos por estratégia.
 
-### Instruções Migradas:
-1. `create_sub_account`  → Cria uma `SubAccount`
-2. `get_sub_accounts` → Get de todas as `SubAccount` do `User`
-3. `find_sub_account_index_by_id` → Retorna o indice/index da `SubAccount`
-4. `add_liquidity` → Adiciona os valores de liquidez a `SubAccount`
-5. `get_balance` → Retorna o saldo da `SubAccount` com a `Strategy` e `Coins` especifica
-6. `get_balances` → Retorna os saldos da `SubAccount` com a `Strategy`
-7. `get_sub_account_strategies` → Retorna as `Strategy` de uma `SubAccount`
-8. `_remove_liquidity` → Subtrai os valores de liquidez a `SubAccount`. Chamada em `webdex_manager/liquidity_remove()` via CPI
-9. `_position_liquidity` → Atualiza o saldo da `Strategy` e rertorna o antigo. Chamada em `webdex_payments/open_position()` via CPI
-
-### Declaração do Programa:
-```rust
-#[program]
-pub mod webdex_sub_accounts {
-    // ...
-}
-```
-
-### Mudanças de Paradigma:
-| Conceito EVM            | Equivalente Solana (Anchor)     |
-|-------------------------|---------------------------------|
-| `mapping`               | `Account` com seeds/PDA         |
-| `msg.sender`            | `ctx.accounts.signer.key`       |
-| `require(...)`          | `require!(cond, ErrorCode::X)`  |
-| `onlyPayments` modifier | Verificação manual via `signer` |
-| `onlyManager` modifier  | Verificação manual via `signer` |
-
-### Exemplo de Contexto AddBot
-```rust
-#[derive(Accounts)]
-#[instruction(name: String)]
-pub struct CreateSubAccount<'info> {
-    pub bot: Account<'info, Bot>,
-
-    pub user: Account<'info, User>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = SubAccountList::SPACE,
-        seeds = [b"sub_account_list", user.key().as_ref()],
-        bump
-    )]
-    pub sub_account_list: Account<'info, SubAccountList>,
-
-    #[account(
-        init,
-        payer = signer,
-        space = SubAccount::SPACE,
-        seeds = [b"sub_account", user.key().as_ref(), name.as_bytes()],
-        bump
-    )]
-    pub sub_account: Account<'info, SubAccount>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-}
-```
+| Campo         | Tipo         | Descrição                            |
+|---------------|--------------|----------------------------------------|
+| `strategy_token` | `Pubkey`   | Token identificador da estratégia.    |
+| `status`      | `bool`       | Ativo/inativo.                        |
+| `list_coins`  | `Vec<Pubkey>`| Tokens gerenciados.                   |
+| `balance`     | `Vec<BalanceStrategy>` | Saldos por token.           |
 
 ---
 
-## Conclusão
-A adaptação do contrato `WEbdEXSubAccountsV4` para Solana com Anchor foi estruturada mantendo as funcionalidades centrais do sistema. Funções auxiliares foram migradas para contratos dedicados e podem ser acessadas via CPI, promovendo um design modular, seguro e alinhado às boas práticas de desenvolvimento na Solana.
+### 🔸 `BalanceStrategy` (importado de `shared_sub_accounts`)
+
+Representa um token gerenciado em uma estratégia.
+
+| Campo     | Tipo     | Descrição                      |
+|-----------|----------|--------------------------------|
+| `token`   | `Pubkey` | Token SPL                      |
+| `amount`  | `u64`    | Saldo atual                    |
+| `name`    | `String` | Nome do token (ex: USDT)       |
+| `ico`     | `String` | URL do ícone                   |
+| `decimals`| `u8`     | Decimais do token              |
+| `status`  | `bool`   | Ativo/inativo                  |
+| `paused`  | `bool`   | Pausado para retirada?         |
+
+---
+
+## ⚙️ Instruções
+
+### ✅ `create_sub_account(name)`
+Cria uma nova subconta para o usuário.
+
+- Valida se o nome é único por usuário.
+- Gera um `id` determinístico via PDA.
+
+---
+
+### 📥 `add_liquidity(...)`
+Adiciona liquidez a uma subconta e estratégia:
+
+Parâmetros:
+- `strategy_token`, `account_id`, `coin`, `amount`, `name`, `ico`, `decimals`
+
+---
+
+### 📤 `remove_liquidity(...)`
+Remove liquidez de um token pausado.
+
+Regras:
+- Token deve estar pausado.
+- Deve haver saldo suficiente.
+
+---
+
+### 🔄 `position_liquidity(...)`
+Opera diretamente no saldo da estratégia (positivo ou negativo).
+
+⚠️ Somente contratos internos com permissão (como WebDex).
+
+---
+
+### 💤 `toggle_pause(...)`
+Alterna o estado `paused` de um token de estratégia.
+
+---
+
+### 🔍 `get_sub_accounts(user)`
+Lista todas as subcontas do usuário.
+
+---
+
+### 🔍 `find_sub_account_index_by_id(account_id)`
+Retorna o índice da subconta no array.
+
+---
+
+### 🔍 `get_balance(...)`
+Retorna o saldo de um token em uma estratégia de subconta.
+
+---
+
+### 🔍 `get_balances(...)`
+Retorna todos os tokens e saldos de uma estratégia.
+
+---
+
+### 🔍 `get_sub_account_strategies(account_id)`
+Retorna as estratégias associadas a uma subconta.
+
+---
+
+## 🚧 Erros Comuns
+
+| Código                        | Descrição                                       |
+|------------------------------|-------------------------------------------------|
+| `Unauthorized`               | Gerente não autorizado.                         |
+| `DuplicateSubAccountName`   | Nome da subconta já existe para o usuário.      |
+| `InvalidSubAccountId`       | Subconta não encontrada.                        |
+| `StrategyNotLinked`         | Estratégia não está vinculada.                  |
+| `CoinNotLinked`             | Token não adicionado anteriormente.             |
+| `CoinNotFound`              | Token não encontrado.                           |
+| `CoinNotLinkedToStrategy`   | Token desativado.                               |
+| `PauseStateUnchanged`       | Já está no estado solicitado.                   |
+| `MustPauseBeforeWithdraw`   | É necessário pausar antes de remover liquidez.  |
+| `InsufficientFunds`         | Saldo insuficiente.                             |
+| `YouMustTheWebDexPayments`  | Apenas o contrato de controle pode operar.      |
+
+---
+
+## 📡 Eventos
+
+- `CreateSubAccountEvent`
+- `BalanceLiquidityEvent`
+- `ChangePausedEvent`
+
+---
+
+## 🔐 Segurança
+
+- Contas críticas como `bot` e `owner` são verificadas.
+- Operações sensíveis exigem que o token esteja pausado.
+- Todas as contas PDA são derivadas com seeds controlados.
+
+---
+
+## 🧪 Sugestões de Testes
+
+1. Criar subconta com nome duplicado.
+2. Adicionar e remover liquidez com tokens inexistentes.
+3. Operar liquidez com diferentes contratos usando CPI.
+4. Pausar e despausar tokens.
+5. Verificar saldos e estratégias.

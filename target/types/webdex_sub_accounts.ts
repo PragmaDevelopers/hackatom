@@ -645,6 +645,11 @@ export type WebdexSubAccounts = {
       "code": 6020,
       "name": "insufficientFunds",
       "msg": "Insufficient funds to subtract"
+    },
+    {
+      "code": 6021,
+      "name": "duplicateSubAccountName",
+      "msg": "Insufficient funds to subtract"
     }
   ],
   "types": [

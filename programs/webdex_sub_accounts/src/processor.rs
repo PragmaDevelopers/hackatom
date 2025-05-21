@@ -21,7 +21,15 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
         sub_account_list.contract_address = bot.manager_address;
     }
 
-    let sub_account_count = sub_account_list.sub_accounts.len();
+    // Verifica se já existe uma subconta com o mesmo nome para este usuário
+    let already_exists = sub_account_list
+        .sub_accounts
+        .iter()
+        .any(|entry| entry.user_address == user.key() && entry.name == name);
+
+    if already_exists {
+        return Err(ErrorCode::DuplicateSubAccountName.into());
+    }
 
     // ✅ Gera o PDA de forma determinística
     let (sub_account_id, _bump) = Pubkey::find_program_address(
@@ -35,7 +43,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     );
 
     // ✅ Inicializa a subconta
-    sub_account.id = sub_account_id.to_string();
+    sub_account.id = sub_account_id;
     sub_account.name = name.clone();
     sub_account.list_strategies = Vec::new();
     sub_account.strategies = Vec::new();
@@ -44,7 +52,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     sub_account_list.sub_accounts.push(SimpleSubAccount {
         user_address: user.key(),
         sub_account_address: sub_account.key(),
-        id: sub_account_id.to_string(),
+        id: sub_account_id,
         name: name.clone(),
     });
 
@@ -52,7 +60,7 @@ pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Resu
     emit!(CreateSubAccountEvent {
         signer: signer.key(),
         user: user.key(),
-        id: sub_account_id.to_string(),
+        id: sub_account_id,
         name,
     });
 
@@ -83,7 +91,7 @@ pub fn _get_sub_accounts(
 
 pub fn _find_sub_account_index_by_id(
     ctx: Context<FindSubAccountIndex>,
-    account_id: String,
+    account_id: Pubkey,
 ) -> Result<i64> {
     let list = &ctx.accounts.sub_account_list;
 
@@ -99,7 +107,7 @@ pub fn _find_sub_account_index_by_id(
 pub fn _add_liquidity<'info>(
     ctx: Context<AddLiquidity>,
     strategy_token: Pubkey,
-    account_id: String,
+    account_id: Pubkey,
     coin: Pubkey,
     amount: u64,
     name: String,
@@ -165,7 +173,7 @@ pub fn _add_liquidity<'info>(
 
 pub fn _get_balance(
     ctx: Context<GetBalance>,
-    account_id: String,
+    account_id: Pubkey,
     strategy_token: Pubkey,
     coin: Pubkey,
 ) -> Result<BalanceStrategy> {
@@ -201,7 +209,7 @@ pub fn _get_balance(
 
 pub fn _get_balances(
     ctx: Context<GetBalances>,
-    account_id: String,
+    account_id: Pubkey,
     strategy_token: Pubkey,
 ) -> Result<Vec<BalanceStrategy>> {
     let sub_account = &ctx.accounts.sub_account;
@@ -223,7 +231,7 @@ pub fn _get_balances(
 
 pub fn _get_sub_account_strategies(
     ctx: Context<GetSubAccountStrategies>,
-    account_id: String,
+    account_id: Pubkey,
 ) -> Result<Vec<Pubkey>> {
     let sub_account = &ctx.accounts.sub_account;
 
@@ -238,7 +246,7 @@ pub fn _get_sub_account_strategies(
 
 pub fn _toggle_pause(
     ctx: Context<TogglePause>,
-    account_id: String,
+    account_id: Pubkey,
     strategy_token: Pubkey,
     coin: Pubkey,
     paused: bool,
@@ -287,7 +295,7 @@ pub fn _toggle_pause(
 
 pub fn _remove_liquidity<'info>(
     mut ctx: CpiContext<'_, '_, '_, 'info, RemoveLiquidity<'info>>,
-    account_id: String,
+    account_id: Pubkey,
     strategy_token: Pubkey,
     coin: Pubkey,
     amount: u64,
@@ -341,10 +349,10 @@ pub fn _remove_liquidity<'info>(
 
 pub fn _position_liquidity<'info>(
     mut ctx: CpiContext<'_, '_, '_, 'info, PositionLiquidity<'info>>,
-    account_id: String,
+    account_id: Pubkey,
     strategy_token: Pubkey,
     coin: Pubkey,
-    amount: u64, // pode ser positivo ou negativo
+    amount: i64 // pode ser positivo ou negativo
 ) -> Result<u64> {
     let sub_account = &ctx.accounts.sub_account;
     let signer = &ctx.accounts.signer;
@@ -379,12 +387,13 @@ pub fn _position_liquidity<'info>(
 
     // ✅ Aplica a operação
     let new_balance = if amount >= 0 {
-        entry.amount.saturating_add(amount)
+        entry.amount.saturating_add(amount as u64)
     } else {
-        if entry.amount < amount {
+        let sub_amount = amount.abs() as u64;
+        if entry.amount < sub_amount {
             return Err(ErrorCode::InsufficientFunds.into());
         }
-        entry.amount.saturating_sub(amount)
+        entry.amount.saturating_sub(sub_amount)
     };
 
     entry.amount = new_balance;

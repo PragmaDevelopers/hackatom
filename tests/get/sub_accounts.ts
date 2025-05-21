@@ -12,6 +12,7 @@ describe("webdex_sub_accounts", () => {
     anchor.setProvider(provider);
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
+    const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
@@ -27,16 +28,20 @@ describe("webdex_sub_accounts", () => {
             subAccountsProgram.programId
         );
 
+        // Deriva o PDA do user
+        const [userPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("user"), user.publicKey.toBuffer()],
+            managerProgram.programId
+        );
+
         // Chamada da função get_sub_accounts
         const subAccounts = await subAccountsProgram.methods
-            .getSubAccounts(user.publicKey)
+            .getSubAccounts(userPda)
             .accounts({
                 subAccountList: subAccountListPda,
             })
             .view();
 
-        const subAccountsa = await subAccountsProgram.account.subAccountList.all();
-
-        console.log("📦 SubAccounts:", subAccountsa);
+        console.log("📦 SubAccounts:", subAccounts);
     });
 });

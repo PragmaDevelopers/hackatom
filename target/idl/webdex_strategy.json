@@ -59,19 +59,11 @@
           "signer": true
         },
         {
-          "name": "token_address"
-        },
-        {
           "name": "metadata_program"
         },
         {
           "name": "metadata",
           "writable": true
-        },
-        {
-          "name": "token_authority",
-          "writable": true,
-          "signer": true
         },
         {
           "name": "signer",

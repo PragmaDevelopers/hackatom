@@ -32,7 +32,7 @@ pub fn _add_strategy(
         return Err(ErrorCode::MaxStrategiesReached.into());
     }
 
-    let token_address = ctx.accounts.token_address.key();
+    let token_address = ctx.accounts.token_mint.key();
 
     // Criar estrutura DataV2 para metadados
     let metadata_data = DataV2 {
@@ -49,9 +49,9 @@ pub fn _add_strategy(
     let cpi_accounts = CreateMetadataAccountsV3 {
         metadata: ctx.accounts.metadata.to_account_info(),
         mint: ctx.accounts.token_mint.to_account_info(),
-        mint_authority: ctx.accounts.token_authority.to_account_info(),
+        mint_authority: ctx.accounts.signer.to_account_info(),
         payer: ctx.accounts.signer.to_account_info(),
-        update_authority: ctx.accounts.token_authority.to_account_info(),
+        update_authority: ctx.accounts.signer.to_account_info(),
         system_program: ctx.accounts.system_program.to_account_info(),
         rent: ctx.accounts.rent.to_account_info(),
     };
