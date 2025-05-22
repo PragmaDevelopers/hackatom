@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_payments.json`.
  */
 export type WebdexPayments = {
-  "address": "24xr25kWdRkLFZTfsxjrpyQWfezn3Eof65VaM9D7FXiy",
+  "address": "8Hd3LCFZz5K73YKLCenJWr29n8G7spym67esV1honot4",
   "metadata": {
     "name": "webdexPayments",
     "version": "0.1.0",
@@ -321,7 +321,7 @@ export type WebdexPayments = {
         },
         {
           "name": "subAccountProgram",
-          "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6"
+          "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
         }
       ],
       "args": [
@@ -331,7 +331,7 @@ export type WebdexPayments = {
         },
         {
           "name": "accountId",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategyToken",
@@ -339,7 +339,7 @@ export type WebdexPayments = {
         },
         {
           "name": "amount",
-          "type": "u64"
+          "type": "i64"
         },
         {
           "name": "coin",
@@ -811,7 +811,7 @@ export type WebdexPayments = {
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "details",
@@ -883,7 +883,7 @@ export type WebdexPayments = {
           },
           {
             "name": "profit",
-            "type": "u64"
+            "type": "i64"
           }
         ]
       }
@@ -969,7 +969,7 @@ export type WebdexPayments = {
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",

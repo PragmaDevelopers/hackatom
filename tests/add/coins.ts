@@ -75,7 +75,7 @@ describe("webdex_payments", () => {
             usdtMint,                    // Mint
             usdcTokenAccount.address, // Destination (ATA)
             user.payer,              // Authority (must match mint authority)
-            1000_000_000             // Amount (ex: 1000 tokens with 9 decimals)
+            100_000_000_000             // Amount (ex: 100 tokens with 9 decimals)
         );
 
         const tx = await paymentsProgram.methods
@@ -120,7 +120,7 @@ describe("webdex_payments", () => {
             webdexMint,                    // Mint
             webdexTokenAccount.address, // Destination (ATA)
             user.payer,              // Authority (must match mint authority)
-            1000_000_000             // Amount (ex: 1000 tokens with 9 decimals)
+            100_000_000_000             // Amount (ex: 100 tokens with 9 decimals)
         );
 
         const tx = await paymentsProgram.methods

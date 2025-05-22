@@ -91,13 +91,13 @@ export type WebdexNetwork = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ]
           }
         },
         {
-          "name": "usdtMint"
+          "name": "tokenMint"
         },
         {
           "name": "contractAddress"
@@ -113,10 +113,6 @@ export type WebdexNetwork = {
         }
       ],
       "args": [
-        {
-          "name": "subAccountName",
-          "type": "string"
-        },
         {
           "name": "contractAddress",
           "type": "pubkey"
@@ -723,7 +719,7 @@ export type WebdexNetwork = {
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",

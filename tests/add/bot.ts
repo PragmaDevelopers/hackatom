@@ -32,7 +32,6 @@ describe("webdex_factoty", () => {
             factoryProgram.programId
         );
 
-
         const tx = await factoryProgram.methods
             .addBot(
                 "Bot 2", // name

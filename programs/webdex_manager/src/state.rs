@@ -4,9 +4,11 @@ use shared_sub_accounts::state::{BalanceStrategy};
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
 use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
+use webdex_sub_accounts::program::WebdexSubAccounts;
 use webdex_payments::state::{FeeAccount};
 use anchor_spl::token::{Token,TokenAccount,Mint};
 use anchor_spl::associated_token::AssociatedToken;
+use crate::authority::*;
 use crate::error::ErrorCode;
 
 #[account]
@@ -55,6 +57,16 @@ pub struct RegisterEvent {
     pub manager: Pubkey,
 }
 
+#[event]
+pub struct AddLiquidityEvent {
+    pub id: Pubkey,
+    pub strategy_token: Pubkey,
+    pub coin: Pubkey,
+    pub amount: u64,
+    pub increase: bool,
+    pub is_operation: bool,
+}
+
 #[derive(Accounts)]
 pub struct GetInfoUser<'info> {
     pub user: Account<'info, User>,
@@ -70,17 +82,38 @@ pub struct AddGas<'info> {
     )]
     pub user: Account<'info, User>,
 
+    /// CHECK: Apenas para seeds
+    pub sol_mint: AccountInfo<'info>,
+
     #[account(
-        mut,
-        seeds = [b"vault_sol_account", user.key().as_ref()],
-        bump,
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = sol_mint,
+        associated_token::authority = signer,
     )]
-    pub vault_sol_account: SystemAccount<'info>, // onde o token vai
+    pub user_sol_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(
+        seeds = [b"vault_sol", user.key().as_ref()],
+        bump
+    )]
+    /// CHECK: Usado apenas como autoridade programática
+    pub vault_sol_authority: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = sol_mint,
+        associated_token::authority = vault_sol_authority,
+    )]
+    pub vault_sol_account: Account<'info, TokenAccount>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[derive(Accounts)]
@@ -93,17 +126,36 @@ pub struct RemoveGas<'info> {
     )]
     pub user: Account<'info, User>,
 
+    /// CHECK: Apenas para seeds
+    pub sol_mint: AccountInfo<'info>,
+
     #[account(
         mut,
-        seeds = [b"vault_sol_account", user.key().as_ref()],
+        associated_token::mint = sol_mint,
+        associated_token::authority = signer,
+    )]
+    pub user_sol_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(
+        seeds = [b"vault_sol", user.key().as_ref()],
         bump
     )]
-    pub vault_sol_account: SystemAccount<'info>, // onde o token vai
+    /// CHECK: Usado apenas como autoridade programática
+    pub vault_sol_authority: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = sol_mint,
+        associated_token::authority = vault_sol_authority,
+    )]
+    pub vault_sol_account: Account<'info, TokenAccount>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
 }
 
 #[derive(Accounts)]
@@ -128,10 +180,17 @@ pub struct PassAdd<'info> {
     pub user_webdex_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
+        seeds = [b"vault_webdex", user.key().as_ref()],
+        bump
+    )]
+    /// CHECK: Usado apenas como autoridade programática
+    pub vault_webdex_authority: AccountInfo<'info>,
+
+    #[account(
         init_if_needed,
         payer = signer,
         associated_token::mint = webdex_mint,
-        associated_token::authority = signer
+        associated_token::authority = vault_webdex_authority
     )]
     pub vault_webdex_account: Account<'info, TokenAccount>, // onde o token vai
 
@@ -164,9 +223,16 @@ pub struct PassRemove<'info> {
     pub user_webdex_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
+        seeds = [b"vault_webdex", user.key().as_ref()],
+        bump
+    )]
+    /// CHECK: Usado apenas como autoridade programática
+    pub vault_webdex_authority: AccountInfo<'info>,
+
+    #[account(
         mut,
         associated_token::mint = webdex_mint,
-        associated_token::authority = signer
+        associated_token::authority = vault_webdex_authority
     )]
     pub vault_webdex_account: Account<'info, TokenAccount>, // onde o token vai
 
@@ -204,6 +270,7 @@ pub struct LiquidityAdd<'info> {
 
     pub strategy_list: Account<'info,StrategyList>,
 
+    #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
 
     /// CHECK: Apenas para seeds
@@ -215,7 +282,7 @@ pub struct LiquidityAdd<'info> {
         associated_token::mint = token_mint,
         associated_token::authority = signer,
     )]
-    pub user_usdt_account: Account<'info, TokenAccount>, // do SPL depositado
+    pub user_token_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
         init_if_needed,
@@ -223,7 +290,7 @@ pub struct LiquidityAdd<'info> {
         associated_token::mint = token_mint,
         associated_token::authority = sub_account_authority,
     )]
-    pub vault_usdt_account: Account<'info, TokenAccount>, // onde o token vai
+    pub vault_token_account: Account<'info, TokenAccount>, // onde o token vai
 
     #[account(
         seeds = [b"sub_account",sub_account.key().as_ref()],
@@ -243,16 +310,13 @@ pub struct LiquidityAdd<'info> {
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
-    /// CHECK: A autoridade do user
-    pub user_authority: AccountInfo<'info>,
-
     #[account(
         init_if_needed,
         payer = signer,
         associated_token::mint = lp_token,
-        associated_token::authority = user_authority
+        associated_token::authority = sub_account_authority
     )]
-    pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
+    pub sub_account_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
     #[account(
         seeds = [b"mint_authority", strategy_token.key().as_ref()],
@@ -270,7 +334,7 @@ pub struct LiquidityAdd<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(strategy_token: Pubkey, decimals: u8)]
+#[instruction(strategy_token: Pubkey, decimals: u8, coin: Pubkey)]
 pub struct LiquidityRemove<'info> {
     pub user: Account<'info, User>,
 
@@ -284,22 +348,19 @@ pub struct LiquidityRemove<'info> {
     #[account(mut)]
     pub strategy_balance: Account<'info, StrategyBalanceList>,
 
-    /// CHECK: Apenas para seeds
-    pub token_mint: AccountInfo<'info>,
-
     #[account(
         mut,
-        associated_token::mint = token_mint,
+        associated_token::mint = coin,
         associated_token::authority = signer,
     )]
-    pub user_usdt_account: Account<'info, TokenAccount>, // do SPL depositado
+    pub user_token_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
         mut,
-        associated_token::mint = token_mint,
+        associated_token::mint = coin,
         associated_token::authority = sub_account_authority,
     )]
-    pub vault_usdt_account: Account<'info, TokenAccount>, // onde o token vai
+    pub vault_token_account: Account<'info, TokenAccount>, // onde o token vai
 
     #[account(
         seeds = [b"sub_account",sub_account.key().as_ref()],
@@ -310,7 +371,7 @@ pub struct LiquidityRemove<'info> {
 
     #[account(
         mut,
-        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),token_mint.key().as_ref()],
+        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),coin.key().as_ref()],
         bump,
         mint::decimals = decimals,
         mint::authority = lp_mint_authority,
@@ -318,15 +379,12 @@ pub struct LiquidityRemove<'info> {
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
-    /// CHECK: A autoridade do user
-    pub user_authority: AccountInfo<'info>,
-
-     #[account(
+    #[account(
         mut,
         associated_token::mint = lp_token,
-        associated_token::authority = user_authority
+        associated_token::authority = sub_account_authority
     )]
-    pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
+    pub sub_account_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
     #[account(
         seeds = [b"mint_authority", strategy_token.key().as_ref()],
@@ -338,8 +396,7 @@ pub struct LiquidityRemove<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    /// CHECK: CPI calls
-    pub sub_account_program: AccountInfo<'info>,
+    pub sub_account_program: Program<'info,WebdexSubAccounts>,
 
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
@@ -361,7 +418,17 @@ pub struct RebalancePosition<'info> {
     pub temporary_fee_account: Account<'info, FeeAccount>,
 
     /// CHECK: Apenas para seeds
+    pub sol_mint: AccountInfo<'info>,
+
+    /// CHECK: Apenas para seeds
     pub token_mint: AccountInfo<'info>,
+
+    #[account(
+        seeds = [b"sub_account",sub_account.key().as_ref()],
+        bump
+    )]
+    /// CHECK: É usado como signer programático
+    pub sub_account_authority: AccountInfo<'info>,
 
     #[account(
         mut,
@@ -373,39 +440,49 @@ pub struct RebalancePosition<'info> {
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 
-    /// CHECK: A autoridade do user
-    pub user_authority: AccountInfo<'info>,
-
     #[account(
         mut,
         associated_token::mint = lp_token,
-        associated_token::authority = user_authority
+        associated_token::authority = sub_account_authority
     )]
-    pub user_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
+    pub sub_account_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
-    /// CHECK: A autoridade do bot (dono)
+    /// CHECK: Autoridade fixa do bot owner
+    #[account(address = fixed_bot_owner_pubkey())]
     pub bot_owner: AccountInfo<'info>,
 
     #[account(
         init_if_needed,
-        payer = user,
+        payer = signer,
         associated_token::mint = lp_token,
         associated_token::authority = bot_owner
     )]
     pub bot_owner_lp_account: Box<Account<'info, TokenAccount>>,
 
-    /// CHECK: Coletore
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = sol_mint,
+        associated_token::authority = bot_owner
+    )]
+    pub bot_owner_sol_account: Box<Account<'info, TokenAccount>>,
+
+    /// CHECK: Autoridade fixa do collector 1
+    #[account(address = fixed_void_collector_1_pubkey())]
     pub void_collector_1: AccountInfo<'info>,
-    /// CHECK: Coletore
+    /// CHECK: Autoridade fixa do collector 2
+    #[account(address = fixed_void_collector_2_pubkey())]
     pub void_collector_2: AccountInfo<'info>,
-    /// CHECK: Coletore
+    /// CHECK: Autoridade fixa do collector 3
+    #[account(address = fixed_void_collector_3_pubkey())]
     pub void_collector_3: AccountInfo<'info>,
-    /// CHECK: Coletore
+    /// CHECK: Autoridade fixa do collector 4
+    #[account(address = fixed_void_collector_4_pubkey())]
     pub void_collector_4: AccountInfo<'info>,
 
     #[account(
         init_if_needed,
-        payer = user,
+        payer = signer,
         associated_token::mint = lp_token,
         associated_token::authority = void_collector_1
     )]
@@ -413,7 +490,7 @@ pub struct RebalancePosition<'info> {
 
     #[account(
         init_if_needed,
-        payer = user,
+        payer = signer,
         associated_token::mint = lp_token,
         associated_token::authority = void_collector_2
     )]
@@ -421,7 +498,7 @@ pub struct RebalancePosition<'info> {
 
     #[account(
         init_if_needed,
-        payer = user,
+        payer = signer,
         associated_token::mint = lp_token,
         associated_token::authority = void_collector_3
     )]
@@ -429,7 +506,7 @@ pub struct RebalancePosition<'info> {
 
     #[account(
         init_if_needed,
-        payer = user,
+        payer = signer,
         associated_token::mint = lp_token,
         associated_token::authority = void_collector_4
     )]
@@ -443,11 +520,18 @@ pub struct RebalancePosition<'info> {
     pub lp_mint_authority: AccountInfo<'info>,
 
     #[account(
-        mut,
-        seeds = [b"vault_sol_account", user.key().as_ref()],
+        seeds = [b"vault_sol", user.key().as_ref()],
         bump
     )]
-    pub vault_sol_account: SystemAccount<'info>, // onde o token vai
+    /// CHECK: Usado apenas como autoridade programática
+    pub vault_sol_authority: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = sol_mint,
+        associated_token::authority = vault_sol_authority,
+    )]
+    pub vault_sol_account: Account<'info, TokenAccount>,
 
     #[account(mut)]
     pub signer: Signer<'info>,

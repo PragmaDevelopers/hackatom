@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_sub_accounts.json`.
  */
 export type WebdexSubAccounts = {
-  "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6",
+  "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6",
   "metadata": {
     "name": "webdexSubAccounts",
     "version": "0.1.0",
@@ -94,7 +94,7 @@ export type WebdexSubAccounts = {
         },
         {
           "name": "accountId",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "coin",
@@ -239,7 +239,7 @@ export type WebdexSubAccounts = {
       "args": [
         {
           "name": "accountId",
-          "type": "string"
+          "type": "pubkey"
         }
       ],
       "returns": "i64"
@@ -267,7 +267,7 @@ export type WebdexSubAccounts = {
       "args": [
         {
           "name": "accountId",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategyToken",
@@ -307,7 +307,7 @@ export type WebdexSubAccounts = {
       "args": [
         {
           "name": "accountId",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategyToken",
@@ -342,7 +342,7 @@ export type WebdexSubAccounts = {
       "args": [
         {
           "name": "accountId",
-          "type": "string"
+          "type": "pubkey"
         }
       ],
       "returns": {
@@ -415,7 +415,7 @@ export type WebdexSubAccounts = {
       "args": [
         {
           "name": "accountId",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategyToken",
@@ -500,6 +500,19 @@ export type WebdexSubAccounts = {
     }
   ],
   "events": [
+    {
+      "name": "addAndRemoveLiquidityEvent",
+      "discriminator": [
+        214,
+        43,
+        244,
+        121,
+        157,
+        226,
+        90,
+        107
+      ]
+    },
     {
       "name": "balanceLiquidityEvent",
       "discriminator": [
@@ -654,13 +667,13 @@ export type WebdexSubAccounts = {
   ],
   "types": [
     {
-      "name": "balanceLiquidityEvent",
+      "name": "addAndRemoveLiquidityEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "strategyToken",
@@ -673,6 +686,38 @@ export type WebdexSubAccounts = {
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "increase",
+            "type": "bool"
+          },
+          {
+            "name": "isOperation",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "balanceLiquidityEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "pubkey"
+          },
+          {
+            "name": "strategyToken",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "i64"
           },
           {
             "name": "increase",
@@ -800,7 +845,7 @@ export type WebdexSubAccounts = {
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "strategyToken",
@@ -832,7 +877,7 @@ export type WebdexSubAccounts = {
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",
@@ -856,7 +901,7 @@ export type WebdexSubAccounts = {
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",
@@ -904,7 +949,7 @@ export type WebdexSubAccounts = {
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",

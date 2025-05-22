@@ -10,7 +10,7 @@ use crate::state::*;
 
 use shared_sub_accounts::state::{BalanceStrategy};
 
-declare_id!("2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6");
+declare_id!("FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6");
 
 #[program]
 pub mod webdex_sub_accounts {
@@ -30,7 +30,7 @@ pub mod webdex_sub_accounts {
 
     pub fn find_sub_account_index_by_id(
         ctx: Context<FindSubAccountIndex>,
-        account_id: String,
+        account_id: Pubkey,
     ) -> Result<i64> {
         _find_sub_account_index_by_id(ctx,account_id)
     }
@@ -38,7 +38,7 @@ pub mod webdex_sub_accounts {
     pub fn add_liquidity(
         ctx: Context<AddLiquidity>,
         strategy_token: Pubkey,
-        account_id: String,
+        account_id: Pubkey,
         coin: Pubkey,
         amount: u64,
         coin_name: String,
@@ -50,7 +50,7 @@ pub mod webdex_sub_accounts {
 
     pub fn get_balance(
         ctx: Context<GetBalance>,
-        account_id: String,
+        account_id: Pubkey,
         strategy_token: Pubkey,
         coin: Pubkey,
     ) -> Result<BalanceStrategy> {
@@ -59,7 +59,7 @@ pub mod webdex_sub_accounts {
 
     pub fn get_balances(
         ctx: Context<GetBalances>,
-        account_id: String,
+        account_id: Pubkey,
         strategy_token: Pubkey,
     ) -> Result<Vec<BalanceStrategy>> {
         _get_balances(ctx,account_id,strategy_token)
@@ -67,14 +67,14 @@ pub mod webdex_sub_accounts {
 
     pub fn get_sub_account_strategies(
         ctx: Context<GetSubAccountStrategies>,
-        account_id: String,
+        account_id: Pubkey,
     ) -> Result<Vec<Pubkey>> {
         _get_sub_account_strategies(ctx,account_id)
     }
 
     pub fn toggle_pause(
         ctx: Context<TogglePause>,
-        account_id: String,
+        account_id: Pubkey,
         strategy_token: Pubkey,
         coin: Pubkey,
         paused: bool,

@@ -16,9 +16,6 @@ describe("webdex_sub_accounts", () => {
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
-    // 👉 Variáveis compartilhadas entre os testes
-    let subAccountListPda: PublicKey;
-
     it("Create SubAccount", async () => {
         const name = "Main Account";
 
@@ -29,11 +26,6 @@ describe("webdex_sub_accounts", () => {
         const [userPda] = PublicKey.findProgramAddressSync(
             [Buffer.from("user"), user.publicKey.toBuffer()],
             managerProgram.programId
-        );
-
-        [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
         );
 
         const tx = await subAccountsProgram.methods

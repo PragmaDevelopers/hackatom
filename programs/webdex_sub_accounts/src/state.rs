@@ -2,7 +2,6 @@ use anchor_lang::prelude::*;
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
 use shared_sub_accounts::state::{BalanceStrategy};
-use anchor_spl::token::{Mint, Token,TokenAccount};
 
 #[account]
 pub struct StrategyBalanceList {
@@ -31,15 +30,15 @@ pub struct SubAccount {
 }
 
 impl SubAccount {
-    pub const MAX_ID_LEN: usize = 32; // Defina o comprimento máximo esperado para 'id'
-    pub const MAX_STRATEGIES: usize = 10; // Número máximo de estratégias
-
+    pub const MAX_NAME_LEN: usize = 64;
+    pub const MAX_STRATEGIES: usize = 10;
+    
     pub const SPACE: usize =
-        8 + // discriminator
-        4 + Self::MAX_ID_LEN + 
-        4 + 64 + // name
-        4 + (32 * Self::MAX_STRATEGIES) + // list_strategies
-        4 + (32 * Self::MAX_STRATEGIES); // strategies
+        8 + // Anchor discriminator
+        32 + // Pubkey 'id'
+        4 + Self::MAX_NAME_LEN + // String 'name' (4 bytes do comprimento + conteúdo)
+        4 + (32 * Self::MAX_STRATEGIES) + // Vec<Pubkey> 'list_strategies'
+        4 + (32 * Self::MAX_STRATEGIES); // Vec<Pubkey> 'strategies'
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize, Clone)]
@@ -58,7 +57,7 @@ pub struct SubAccountList {
 
 impl SubAccountList {
     pub const MAX_SUBACCOUNTS: usize = 50;
-    pub const MAX_ID_LEN: usize = 64;
+    pub const MAX_ID_LEN: usize = 32;
     pub const MAX_NAME_LEN: usize = 64;
 
     pub const SPACE: usize = 8 // discriminator
@@ -80,11 +79,21 @@ pub struct CreateSubAccountEvent {
 }
 
 #[event]
-pub struct BalanceLiquidityEvent {
+pub struct AddAndRemoveLiquidityEvent {
     pub id: Pubkey,
     pub strategy_token: Pubkey,
     pub coin: Pubkey,
     pub amount: u64,
+    pub increase: bool,
+    pub is_operation: bool,
+}
+
+#[event]
+pub struct BalanceLiquidityEvent {
+    pub id: Pubkey,
+    pub strategy_token: Pubkey,
+    pub coin: Pubkey,
+    pub amount: i64,
     pub increase: bool,
     pub is_operation: bool,
 }
@@ -147,7 +156,7 @@ pub struct AddLiquidity<'info> {
 
     pub user: Account<'info, User>,
 
-    #[account(mut,)]
+    #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(

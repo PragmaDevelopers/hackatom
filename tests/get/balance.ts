@@ -1,13 +1,14 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexManager } from "../../target/types/webdex_manager";
 import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
-import { WebdexPayments } from "../../target/types/webdex_payments";
+import { expect } from "chai";
 import { WebdexFactory } from "../../target/types/webdex_factory";
 import { WebdexStrategy } from "../../target/types/webdex_strategy";
+import { WebdexPayments } from "../../target/types/webdex_payments";
+import { WebdexManager } from "../../target/types/webdex_manager";
 
-describe("webdex_manager", () => {
+describe("webdex_sub_accounts", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
@@ -18,10 +19,7 @@ describe("webdex_manager", () => {
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
-    // 👉 Variáveis compartilhadas entre os testes
-    const amount = new anchor.BN(100_000_000_000);
-
-    it("Liquidity Add - Transfer And Mint", async () => {
+    it("Get Balance", async () => {
         const payments = await paymentsProgram.account.payments.all();
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
 
@@ -60,44 +58,21 @@ describe("webdex_manager", () => {
 
         const subAccountPda = subAccounts[0].subAccountAddress;
 
-        const tx = await managerProgram.methods
-            .liquidityAdd(
-                strategies[0].tokenAddress,
-                usdtMint.coin.decimals,
-                amount,
-            )
+        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
+            subAccountsProgram.programId
+        );
+
+        const result = await subAccountsProgram.methods
+            .getBalance(subAccounts[0].id, strategies[0].tokenAddress, usdtMint.pubkey)
             .accounts({
-                bot: botPda,
-                user: userPda,
                 subAccount: subAccountPda,
-                strategyList: strategyListPda,
-                tokenMint: usdtMint.pubkey,
-                signer: user.publicKey,
+                strategyBalance: strategyBalancePda,
             })
-            .rpc();
+            .view();
 
-        console.log("✅ liquidityAdd tx:", tx);
+        result.amount = result.amount.toNumber() // Convertendo BN pra Number
 
-        console.log("Add Liquidity - Atualiza o saldo")
-
-        const txa = await subAccountsProgram.methods
-            .addLiquidity(
-                strategies[0].tokenAddress,
-                subAccounts[0].id,
-                usdtMint.pubkey,
-                amount,
-                usdtMint.coin.name,
-                usdtMint.coin.symbol,
-                usdtMint.coin.decimals,
-            )
-            .accounts({
-                user: userPda,
-                bot: botPda,
-                subAccount: subAccountPda,
-                signer: user.publicKey,
-            })
-            .rpc();
-
-        console.log("✅ TX Hash:", txa);
+        console.log("BalanceStrategy:", result);
     });
 });

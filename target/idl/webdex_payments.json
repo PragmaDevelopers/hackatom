@@ -1,5 +1,5 @@
 {
-  "address": "24xr25kWdRkLFZTfsxjrpyQWfezn3Eof65VaM9D7FXiy",
+  "address": "8Hd3LCFZz5K73YKLCenJWr29n8G7spym67esV1honot4",
   "metadata": {
     "name": "webdex_payments",
     "version": "0.1.0",
@@ -315,7 +315,7 @@
         },
         {
           "name": "sub_account_program",
-          "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6"
+          "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
         }
       ],
       "args": [
@@ -325,7 +325,7 @@
         },
         {
           "name": "account_id",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategy_token",
@@ -333,7 +333,7 @@
         },
         {
           "name": "amount",
-          "type": "u64"
+          "type": "i64"
         },
         {
           "name": "coin",
@@ -805,7 +805,7 @@
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "details",
@@ -877,7 +877,7 @@
           },
           {
             "name": "profit",
-            "type": "u64"
+            "type": "i64"
           }
         ]
       }
@@ -963,7 +963,7 @@
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",

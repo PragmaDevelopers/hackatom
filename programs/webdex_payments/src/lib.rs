@@ -10,7 +10,7 @@ use crate::state::*;
 
 use crate::processor::*;
 
-declare_id!("24xr25kWdRkLFZTfsxjrpyQWfezn3Eof65VaM9D7FXiy");
+declare_id!("8Hd3LCFZz5K73YKLCenJWr29n8G7spym67esV1honot4");
 
 #[program]
 pub mod webdex_payments {
@@ -56,9 +56,9 @@ pub mod webdex_payments {
     pub fn open_position(
         ctx: Context<OpenPosition>,
         _decimals: u8,
-        account_id: String,
+        account_id: Pubkey,
         strategy_token: Pubkey,
-        amount: u64,
+        amount: i64,
         coin: Pubkey,
         gas: u64,
         currrencys: Vec<Currencys>,

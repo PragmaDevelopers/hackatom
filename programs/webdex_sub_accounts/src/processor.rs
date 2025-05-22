@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
-use anchor_spl::token::{Transfer, Burn, transfer, burn};
 
 use shared_sub_accounts::state::{BalanceStrategy};
 
@@ -159,7 +158,7 @@ pub fn _add_liquidity<'info>(
     }
 
     // Emite evento
-    emit!(BalanceLiquidityEvent {
+    emit!(AddAndRemoveLiquidityEvent {
         id: account_id,
         strategy_token,
         coin,
@@ -335,7 +334,7 @@ pub fn _remove_liquidity<'info>(
     balance_entry.amount = balance_entry.amount.saturating_sub(amount);
 
     // ✅ Emite evento de saída
-    emit!(BalanceLiquidityEvent {
+    emit!(AddAndRemoveLiquidityEvent {
         id: account_id,
         strategy_token,
         coin,

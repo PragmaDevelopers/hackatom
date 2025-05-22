@@ -1,5 +1,5 @@
 {
-  "address": "2ybNsGNJiEmDT3gkX3Tbm4ewdrfxRZS7gvd9Ff3gZFj6",
+  "address": "EcVT3zGP8uC7bYtDEXks43b7tQ219KUCq8XvsCbdq1gQ",
   "metadata": {
     "name": "webdex_manager",
     "version": "0.1.0",
@@ -42,8 +42,100 @@
           }
         },
         {
-          "name": "vault_sol_account",
+          "name": "sol_mint"
+        },
+        {
+          "name": "user_sol_account",
           "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "vault_sol_authority",
           "pda": {
             "seeds": [
               {
@@ -57,15 +149,7 @@
                   95,
                   115,
                   111,
-                  108,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
+                  108
                 ]
               },
               {
@@ -76,6 +160,96 @@
           }
         },
         {
+          "name": "vault_sol_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vault_sol_authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
           "name": "signer",
           "writable": true,
           "signer": true
@@ -83,6 +257,14 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
@@ -139,13 +321,14 @@
           "name": "strategy_list"
         },
         {
-          "name": "sub_account"
+          "name": "sub_account",
+          "writable": true
         },
         {
           "name": "token_mint"
         },
         {
-          "name": "user_usdt_account",
+          "name": "user_token_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -235,7 +418,7 @@
           }
         },
         {
-          "name": "vault_usdt_account",
+          "name": "vault_token_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -385,16 +568,13 @@
           }
         },
         {
-          "name": "user_authority"
-        },
-        {
-          "name": "user_lp_token_account",
+          "name": "sub_account_lp_token_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user_authority"
+                "path": "sub_account_authority"
               },
               {
                 "kind": "const",
@@ -571,10 +751,7 @@
           "writable": true
         },
         {
-          "name": "token_mint"
-        },
-        {
-          "name": "user_usdt_account",
+          "name": "user_token_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -620,8 +797,8 @@
                 ]
               },
               {
-                "kind": "account",
-                "path": "token_mint"
+                "kind": "arg",
+                "path": "coin"
               }
             ],
             "program": {
@@ -664,7 +841,7 @@
           }
         },
         {
-          "name": "vault_usdt_account",
+          "name": "vault_token_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -710,8 +887,8 @@
                 ]
               },
               {
-                "kind": "account",
-                "path": "token_mint"
+                "kind": "arg",
+                "path": "coin"
               }
             ],
             "program": {
@@ -807,23 +984,20 @@
                 "path": "sub_account"
               },
               {
-                "kind": "account",
-                "path": "token_mint"
+                "kind": "arg",
+                "path": "coin"
               }
             ]
           }
         },
         {
-          "name": "user_authority"
-        },
-        {
-          "name": "user_lp_token_account",
+          "name": "sub_account_lp_token_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user_authority"
+                "path": "sub_account_authority"
               },
               {
                 "kind": "const",
@@ -942,7 +1116,8 @@
           "signer": true
         },
         {
-          "name": "sub_account_program"
+          "name": "sub_account_program",
+          "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
         },
         {
           "name": "token_program",
@@ -963,11 +1138,11 @@
           "type": "u8"
         },
         {
-          "name": "account_id",
-          "type": "string"
+          "name": "coin",
+          "type": "pubkey"
         },
         {
-          "name": "coin",
+          "name": "account_id",
           "type": "pubkey"
         },
         {
@@ -1104,13 +1279,41 @@
           }
         },
         {
+          "name": "vault_webdex_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  119,
+                  101,
+                  98,
+                  100,
+                  101,
+                  120
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
           "name": "vault_webdex_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "signer"
+                "path": "vault_webdex_authority"
               },
               {
                 "kind": "const",
@@ -1346,13 +1549,41 @@
           }
         },
         {
+          "name": "vault_webdex_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116,
+                  95,
+                  119,
+                  101,
+                  98,
+                  100,
+                  101,
+                  120
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
           "name": "vault_webdex_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "signer"
+                "path": "vault_webdex_authority"
               },
               {
                 "kind": "const",
@@ -1486,7 +1717,37 @@
           "writable": true
         },
         {
+          "name": "sol_mint"
+        },
+        {
           "name": "token_mint"
+        },
+        {
+          "name": "sub_account_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              }
+            ]
+          }
         },
         {
           "name": "lp_token",
@@ -1522,16 +1783,13 @@
           }
         },
         {
-          "name": "user_authority"
-        },
-        {
-          "name": "user_lp_token_account",
+          "name": "sub_account_lp_token_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "user_authority"
+                "path": "sub_account_authority"
               },
               {
                 "kind": "const",
@@ -1615,7 +1873,8 @@
           }
         },
         {
-          "name": "bot_owner"
+          "name": "bot_owner",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
           "name": "bot_owner_lp_account",
@@ -1708,16 +1967,110 @@
           }
         },
         {
-          "name": "void_collector_1"
+          "name": "bot_owner_sol_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "bot_owner"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
-          "name": "void_collector_2"
+          "name": "void_collector_1",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
-          "name": "void_collector_3"
+          "name": "void_collector_2",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
-          "name": "void_collector_4"
+          "name": "void_collector_3",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
+        },
+        {
+          "name": "void_collector_4",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
           "name": "void_collector_1_lp_account",
@@ -2110,8 +2463,7 @@
           }
         },
         {
-          "name": "vault_sol_account",
-          "writable": true,
+          "name": "vault_sol_authority",
           "pda": {
             "seeds": [
               {
@@ -2125,15 +2477,7 @@
                   95,
                   115,
                   111,
-                  108,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
+                  108
                 ]
               },
               {
@@ -2141,6 +2485,96 @@
                 "path": "user"
               }
             ]
+          }
+        },
+        {
+          "name": "vault_sol_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vault_sol_authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
           }
         },
         {
@@ -2265,8 +2699,100 @@
           }
         },
         {
-          "name": "vault_sol_account",
+          "name": "sol_mint"
+        },
+        {
+          "name": "user_sol_account",
           "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "signer"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "vault_sol_authority",
           "pda": {
             "seeds": [
               {
@@ -2280,15 +2806,7 @@
                   95,
                   115,
                   111,
-                  108,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
+                  108
                 ]
               },
               {
@@ -2299,6 +2817,96 @@
           }
         },
         {
+          "name": "vault_sol_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vault_sol_authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
           "name": "signer",
           "writable": true,
           "signer": true
@@ -2306,6 +2914,14 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "token_program",
+          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
         }
       ],
       "args": [
@@ -2397,6 +3013,19 @@
     }
   ],
   "events": [
+    {
+      "name": "AddLiquidityEvent",
+      "discriminator": [
+        27,
+        178,
+        153,
+        186,
+        47,
+        196,
+        140,
+        45
+      ]
+    },
     {
       "name": "BalanceGasEvent",
       "discriminator": [
@@ -2555,6 +3184,38 @@
     }
   ],
   "types": [
+    {
+      "name": "AddLiquidityEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "pubkey"
+          },
+          {
+            "name": "strategy_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "increase",
+            "type": "bool"
+          },
+          {
+            "name": "is_operation",
+            "type": "bool"
+          }
+        ]
+      }
+    },
     {
       "name": "BalanceGasEvent",
       "type": {
@@ -2820,7 +3481,7 @@
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",

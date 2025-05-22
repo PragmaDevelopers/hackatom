@@ -5,7 +5,6 @@ use anchor_spl::token::{transfer, Transfer};
 
 pub fn _pay_fee(
     ctx: Context<PayFee>,
-    sub_account_name: String,
     contract_address: Pubkey,
     amount: u64,
 ) -> Result<()> {
@@ -19,7 +18,7 @@ pub fn _pay_fee(
 
     // Se ainda não estava inicializado
     if balance_info.token == Pubkey::default() {
-        balance_info.token = ctx.accounts.usdt_mint.key();
+        balance_info.token = ctx.accounts.token_mint.key();
         balance_info.user = ctx.accounts.user.key();
         balance_info.contract_address = contract_address;
     }
@@ -32,7 +31,7 @@ pub fn _pay_fee(
     emit!(BalanceNetworkAdd {
         contract_address: contract_address,
         user: ctx.accounts.user.key(),
-        token: ctx.accounts.usdt_mint.key(),
+        token: ctx.accounts.token_mint.key(),
         new_balance: balance_info.balance,
         amount
     });

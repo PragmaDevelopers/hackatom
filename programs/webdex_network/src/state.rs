@@ -49,13 +49,13 @@ pub struct PayFee<'info> {
         init_if_needed,
         payer = signer,
         space = 8 + std::mem::size_of::<BalanceInfo>(),
-        seeds = [b"balance_info", contract_address.key().as_ref(), user.key().as_ref(), usdt_mint.key().as_ref()],
+        seeds = [b"balance_info", contract_address.key().as_ref(), user.key().as_ref(), token_mint.key().as_ref()],
         bump
     )]
     pub balance_info: Account<'info, BalanceInfo>,
 
     /// CHECK: Apenas para seeds
-    pub usdt_mint: Account<'info, Mint>,
+    pub token_mint: Account<'info, Mint>,
 
     /// CHECK: Apenas para seeds
     pub contract_address: AccountInfo<'info>,

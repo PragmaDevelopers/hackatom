@@ -1,5 +1,5 @@
 {
-  "address": "2dCrz8q5LcBcc3zmVq7GcLT8Ud9R2FtmLCgWxFvAhyo6",
+  "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6",
   "metadata": {
     "name": "webdex_sub_accounts",
     "version": "0.1.0",
@@ -88,7 +88,7 @@
         },
         {
           "name": "account_id",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "coin",
@@ -233,7 +233,7 @@
       "args": [
         {
           "name": "account_id",
-          "type": "string"
+          "type": "pubkey"
         }
       ],
       "returns": "i64"
@@ -261,7 +261,7 @@
       "args": [
         {
           "name": "account_id",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategy_token",
@@ -301,7 +301,7 @@
       "args": [
         {
           "name": "account_id",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategy_token",
@@ -336,7 +336,7 @@
       "args": [
         {
           "name": "account_id",
-          "type": "string"
+          "type": "pubkey"
         }
       ],
       "returns": {
@@ -409,7 +409,7 @@
       "args": [
         {
           "name": "account_id",
-          "type": "string"
+          "type": "pubkey"
         },
         {
           "name": "strategy_token",
@@ -494,6 +494,19 @@
     }
   ],
   "events": [
+    {
+      "name": "AddAndRemoveLiquidityEvent",
+      "discriminator": [
+        214,
+        43,
+        244,
+        121,
+        157,
+        226,
+        90,
+        107
+      ]
+    },
     {
       "name": "BalanceLiquidityEvent",
       "discriminator": [
@@ -648,13 +661,13 @@
   ],
   "types": [
     {
-      "name": "BalanceLiquidityEvent",
+      "name": "AddAndRemoveLiquidityEvent",
       "type": {
         "kind": "struct",
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "strategy_token",
@@ -667,6 +680,38 @@
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "increase",
+            "type": "bool"
+          },
+          {
+            "name": "is_operation",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BalanceLiquidityEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "pubkey"
+          },
+          {
+            "name": "strategy_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "i64"
           },
           {
             "name": "increase",
@@ -794,7 +839,7 @@
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "strategy_token",
@@ -826,7 +871,7 @@
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",
@@ -850,7 +895,7 @@
           },
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",
@@ -898,7 +943,7 @@
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",

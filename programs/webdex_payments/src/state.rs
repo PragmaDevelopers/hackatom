@@ -67,7 +67,7 @@ pub struct PositionDetails {
     pub old_balance: u64,
     pub fee: u64,
     pub gas: u64,
-    pub profit: u64,
+    pub profit: i64,
 }
 
 #[derive(Accounts)]
@@ -154,7 +154,7 @@ pub struct OpenPosition<'info> {
 pub struct OpenPositionEvent {
     pub contract_address: Pubkey,
     pub user: Pubkey,
-    pub id: String,
+    pub id: Pubkey,
     pub details: PositionDetails,
 }
 

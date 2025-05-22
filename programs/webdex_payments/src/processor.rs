@@ -142,9 +142,9 @@ pub fn _remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
 pub fn _open_position(
     ctx: Context<OpenPosition>,
     _decimals: u8,
-    account_id: String,
+    account_id: Pubkey,
     strategy_token: Pubkey,
-    amount: u64,
+    amount: i64,
     coin: Pubkey,
     gas: u64,
     currrencys: Vec<Currencys>,
@@ -194,7 +194,7 @@ pub fn _open_position(
 
     let old_balance = _position_liquidity(
         cpi_ctx_sub_accounts,
-        account_id.clone(),
+        account_id,
         strategy_token,
         coin,
         amount,

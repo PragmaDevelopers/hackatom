@@ -1,27 +1,25 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
+import { WebdexFactory } from "../../target/types/webdex_factory";
+import { WebdexPayments } from "../../target/types/webdex_payments";
+import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { WebdexManager } from "../../target/types/webdex_manager";
 import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
-import { WebdexPayments } from "../../target/types/webdex_payments";
-import { WebdexFactory } from "../../target/types/webdex_factory";
-import { WebdexStrategy } from "../../target/types/webdex_strategy";
+import { BN } from "bn.js";
 
-describe("webdex_manager", () => {
+describe("webdex_close", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
-    const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
     const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
+    const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
-    // 👉 Variáveis compartilhadas entre os testes
-    const amount = new anchor.BN(100_000_000_000);
-
-    it("Liquidity Add - Transfer And Mint", async () => {
+    it("Liquidity Remove - Burn And Transfer", async () => {
         const payments = await paymentsProgram.account.payments.all();
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
 
@@ -60,10 +58,19 @@ describe("webdex_manager", () => {
 
         const subAccountPda = subAccounts[0].subAccountAddress;
 
+        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
+            subAccountsProgram.programId
+        );
+
+        const amount = new BN(50_000_000_000);
+
         const tx = await managerProgram.methods
-            .liquidityAdd(
+            .liquidityRemove(
                 strategies[0].tokenAddress,
                 usdtMint.coin.decimals,
+                usdtMint.pubkey,
+                subAccounts[0].id,
                 amount,
             )
             .accounts({
@@ -71,33 +78,11 @@ describe("webdex_manager", () => {
                 user: userPda,
                 subAccount: subAccountPda,
                 strategyList: strategyListPda,
-                tokenMint: usdtMint.pubkey,
+                strategyBalance: strategyBalancePda,
                 signer: user.publicKey,
             })
             .rpc();
 
-        console.log("✅ liquidityAdd tx:", tx);
-
-        console.log("Add Liquidity - Atualiza o saldo")
-
-        const txa = await subAccountsProgram.methods
-            .addLiquidity(
-                strategies[0].tokenAddress,
-                subAccounts[0].id,
-                usdtMint.pubkey,
-                amount,
-                usdtMint.coin.name,
-                usdtMint.coin.symbol,
-                usdtMint.coin.decimals,
-            )
-            .accounts({
-                user: userPda,
-                bot: botPda,
-                subAccount: subAccountPda,
-                signer: user.publicKey,
-            })
-            .rpc();
-
-        console.log("✅ TX Hash:", txa);
+        console.log("✅ liquidityRemove tx:", tx);
     });
 });

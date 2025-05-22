@@ -85,13 +85,13 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "token_mint"
               }
             ]
           }
         },
         {
-          "name": "usdt_mint"
+          "name": "token_mint"
         },
         {
           "name": "contract_address"
@@ -107,10 +107,6 @@
         }
       ],
       "args": [
-        {
-          "name": "sub_account_name",
-          "type": "string"
-        },
         {
           "name": "contract_address",
           "type": "pubkey"
@@ -717,7 +713,7 @@
         "fields": [
           {
             "name": "id",
-            "type": "string"
+            "type": "pubkey"
           },
           {
             "name": "name",
