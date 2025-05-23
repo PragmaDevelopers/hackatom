@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_manager.json`.
  */
 export type WebdexManager = {
-  "address": "EcVT3zGP8uC7bYtDEXks43b7tQ219KUCq8XvsCbdq1gQ",
+  "address": "B3AQgsRyHeJ4rVm9JmAvzrFtTBCvLTSUAYW9HwhVaa92",
   "metadata": {
     "name": "webdexManager",
     "version": "0.1.0",
@@ -48,10 +48,7 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "solMint"
-        },
-        {
-          "name": "userSolAccount",
+          "name": "userWsolAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -98,7 +95,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "solMint"
+                "path": "wsolMint"
               }
             ],
             "program": {
@@ -141,7 +138,8 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "vaultSolAuthority",
+          "name": "vaultSol",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -166,13 +164,13 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "vaultSolAccount",
+          "name": "wsolVault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vaultSolAuthority"
+                "path": "vaultSol"
               },
               {
                 "kind": "const",
@@ -213,7 +211,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "solMint"
+                "path": "wsolMint"
               }
             ],
             "program": {
@@ -254,6 +252,10 @@ export type WebdexManager = {
               ]
             }
           }
+        },
+        {
+          "name": "wsolMint",
+          "address": "So11111111111111111111111111111111111111112"
         },
         {
           "name": "signer",
@@ -740,12 +742,6 @@ export type WebdexManager = {
       ],
       "accounts": [
         {
-          "name": "user"
-        },
-        {
-          "name": "bot"
-        },
-        {
           "name": "subAccount",
           "writable": true
         },
@@ -753,8 +749,7 @@ export type WebdexManager = {
           "name": "strategyList"
         },
         {
-          "name": "strategyBalance",
-          "writable": true
+          "name": "tokenMint"
         },
         {
           "name": "userTokenAccount",
@@ -803,8 +798,8 @@ export type WebdexManager = {
                 ]
               },
               {
-                "kind": "arg",
-                "path": "coin"
+                "kind": "account",
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -893,8 +888,8 @@ export type WebdexManager = {
                 ]
               },
               {
-                "kind": "arg",
-                "path": "coin"
+                "kind": "account",
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -990,8 +985,8 @@ export type WebdexManager = {
                 "path": "subAccount"
               },
               {
-                "kind": "arg",
-                "path": "coin"
+                "kind": "account",
+                "path": "tokenMint"
               }
             ]
           }
@@ -1123,7 +1118,7 @@ export type WebdexManager = {
         },
         {
           "name": "subAccountProgram",
-          "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
+          "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
         },
         {
           "name": "tokenProgram",
@@ -1142,14 +1137,6 @@ export type WebdexManager = {
         {
           "name": "decimals",
           "type": "u8"
-        },
-        {
-          "name": "coin",
-          "type": "pubkey"
-        },
-        {
-          "name": "accountId",
-          "type": "pubkey"
         },
         {
           "name": "amount",
@@ -1723,9 +1710,6 @@ export type WebdexManager = {
           "writable": true
         },
         {
-          "name": "solMint"
-        },
-        {
           "name": "tokenMint"
         },
         {
@@ -1883,562 +1867,6 @@ export type WebdexManager = {
           "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
-          "name": "botOwnerLpAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "botOwner"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lpToken"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "botOwnerSolAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "botOwner"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "solMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "voidCollector1",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "voidCollector2",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "voidCollector3",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "voidCollector4",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "voidCollector1LpAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "voidCollector1"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lpToken"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "voidCollector2LpAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "voidCollector2"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lpToken"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "voidCollector3LpAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "voidCollector3"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lpToken"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "voidCollector4LpAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "voidCollector4"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lpToken"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
           "name": "lpMintAuthority",
           "pda": {
             "seeds": [
@@ -2469,7 +1897,8 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "vaultSolAuthority",
+          "name": "vaultSolAccount",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -2491,96 +1920,6 @@ export type WebdexManager = {
                 "path": "user"
               }
             ]
-          }
-        },
-        {
-          "name": "vaultSolAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vaultSolAuthority"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "solMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
           }
         },
         {
@@ -2705,10 +2044,7 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "solMint"
-        },
-        {
-          "name": "userSolAccount",
+          "name": "userWsolAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2755,7 +2091,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "solMint"
+                "path": "wsolMint"
               }
             ],
             "program": {
@@ -2798,7 +2134,8 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "vaultSolAuthority",
+          "name": "vaultSol",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -2823,13 +2160,13 @@ export type WebdexManager = {
           }
         },
         {
-          "name": "vaultSolAccount",
+          "name": "wsolVault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vaultSolAuthority"
+                "path": "vaultSol"
               },
               {
                 "kind": "const",
@@ -2870,7 +2207,7 @@ export type WebdexManager = {
               },
               {
                 "kind": "account",
-                "path": "solMint"
+                "path": "wsolMint"
               }
             ],
             "program": {
@@ -2911,6 +2248,10 @@ export type WebdexManager = {
               ]
             }
           }
+        },
+        {
+          "name": "wsolMint",
+          "address": "So11111111111111111111111111111111111111112"
         },
         {
           "name": "signer",
@@ -2963,19 +2304,6 @@ export type WebdexManager = {
         222,
         43,
         138
-      ]
-    },
-    {
-      "name": "strategyBalanceList",
-      "discriminator": [
-        101,
-        190,
-        24,
-        107,
-        186,
-        122,
-        101,
-        70
       ]
     },
     {
@@ -3187,6 +2515,11 @@ export type WebdexManager = {
       "code": 6022,
       "name": "invalidAuthority",
       "msg": "Invalid Authority"
+    },
+    {
+      "code": 6023,
+      "name": "invalidTemporaryFee",
+      "msg": "Invalid Temporary Fee"
     }
   ],
   "types": [
@@ -3279,42 +2612,6 @@ export type WebdexManager = {
       }
     },
     {
-      "name": "balanceStrategy",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "token",
-            "type": "pubkey"
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
-          },
-          {
-            "name": "ico",
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "status",
-            "type": "bool"
-          },
-          {
-            "name": "paused",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
       "name": "bot",
       "type": {
         "kind": "struct",
@@ -3346,6 +2643,10 @@ export type WebdexManager = {
           {
             "name": "voidCollector4",
             "type": "pubkey"
+          },
+          {
+            "name": "feeWithdrawVoid",
+            "type": "u64"
           },
           {
             "name": "managerAddress",
@@ -3422,38 +2723,6 @@ export type WebdexManager = {
           {
             "name": "isActive",
             "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "strategyBalanceList",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "strategyToken",
-            "type": "pubkey"
-          },
-          {
-            "name": "status",
-            "type": "bool"
-          },
-          {
-            "name": "listCoins",
-            "type": {
-              "vec": "pubkey"
-            }
-          },
-          {
-            "name": "balance",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "balanceStrategy"
-                }
-              }
-            }
           }
         ]
       }

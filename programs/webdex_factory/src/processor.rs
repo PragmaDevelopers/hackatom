@@ -1,13 +1,20 @@
 use anchor_lang::prelude::*;
 use crate::state::*;
 use shared_factory::state::{Bot};
-use crate::authority::{_get_authorized_owner};
 use crate::error::ErrorCode;
+use shared_factory::authority::{
+    _fixed_authorized_owner,
+    _fixed_fee_collector_network,
+    _fixed_void_collector_1,
+    _fixed_void_collector_2,
+    _fixed_void_collector_3,
+    _fixed_void_collector_4
+};
 
 pub fn assert_only_owner(signer: &Pubkey, bot: &Account<Bot>) -> Result<()> {
     require!(
         *signer == bot.owner,
-        ErrorCode::Unauthorized
+        ErrorCode::UnauthorizedOwner
     );
     Ok(())
 }
@@ -21,6 +28,7 @@ pub fn _add_bot(
     void_collector_2: Pubkey,
     void_collector_3: Pubkey,
     void_collector_4: Pubkey,
+    fee_withdraw_void: u64,
     contract_address: Pubkey,
     strategy_address: Pubkey,
     sub_account_address: Pubkey,
@@ -29,10 +37,13 @@ pub fn _add_bot(
     fee_withdraw_network: u64,
     fee_collector_network_address: Pubkey,
 ) -> Result<()> {
-    let allowed_owner = _get_authorized_owner();
-
-    // Restrição estilo onlyOwner
-    require_keys_eq!(ctx.accounts.signer.key(), allowed_owner, ErrorCode::Unauthorized);
+    // ✅ Verificações de campos fixos
+    require_keys_eq!(owner, _fixed_authorized_owner(), ErrorCode::UnauthorizedOwner);
+    require_keys_eq!(void_collector_1, _fixed_void_collector_1(), ErrorCode::UnauthorizedVoidCollector);
+    require_keys_eq!(void_collector_2, _fixed_void_collector_2(), ErrorCode::UnauthorizedVoidCollector);
+    require_keys_eq!(void_collector_3, _fixed_void_collector_3(), ErrorCode::UnauthorizedVoidCollector);
+    require_keys_eq!(void_collector_4, _fixed_void_collector_4(), ErrorCode::UnauthorizedVoidCollector);
+    require_keys_eq!(fee_collector_network_address, _fixed_fee_collector_network(), ErrorCode::UnauthorizedFeeCollectorNetwork);
 
     let bot = &mut ctx.accounts.bot;
 
@@ -48,6 +59,7 @@ pub fn _add_bot(
     bot.void_collector_2 = void_collector_2;
     bot.void_collector_3 = void_collector_3;
     bot.void_collector_4 = void_collector_4;
+    bot.fee_withdraw_void = fee_withdraw_void;
     bot.manager_address = contract_address;
     bot.strategy_address = strategy_address;
     bot.sub_account_address = sub_account_address;
@@ -80,6 +92,7 @@ pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Resu
         void_collector_2: bot.void_collector_2,
         void_collector_3: bot.void_collector_3,
         void_collector_4: bot.void_collector_4,
+        fee_withdraw_void: bot.fee_withdraw_void,
         manager_address: bot.manager_address,
         strategy_address: bot.strategy_address,
         sub_account_address: bot.sub_account_address,

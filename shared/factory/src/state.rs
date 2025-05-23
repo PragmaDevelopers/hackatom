@@ -9,6 +9,7 @@ pub struct Bot {
     pub void_collector_2: Pubkey,
     pub void_collector_3: Pubkey,
     pub void_collector_4: Pubkey,
+    pub fee_withdraw_void: u64,
     pub manager_address: Pubkey,
     pub strategy_address: Pubkey,
     pub sub_account_address: Pubkey,
@@ -19,5 +20,14 @@ pub struct Bot {
 }
 
 impl Bot {
-    pub const INIT_SPACE: usize = 8 + 36 + 14 + 32 * 12 + 8;
+    pub const INIT_SPACE: usize = 480;
 }
+
+// Discriminator:                     8
+// name:                              4 + 36 = 40
+// prefix:                            4 + 14 = 18
+// owner + 12 Pubkeys:               32 * 12 = 384
+// fee_withdraw_void (u64):           8
+// fee_withdraw_network (u64):        8
+// ---------------------------------------------
+// TOTAL:                           8 + 40 + 18 + 384 + 8 + 8 = 466 bytes

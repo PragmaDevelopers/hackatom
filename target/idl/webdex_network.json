@@ -1,5 +1,5 @@
 {
-  "address": "66E8D8LRoAwze5aAURujjiKgMMFDejZADFzoX8sRSBwp",
+  "address": "4SqHQNaCovQM1XTfPFFb2sMc4mhnkFL2Khz5JQT4D6M8",
   "metadata": {
     "name": "webdex_network",
     "version": "0.1.0",
@@ -131,11 +131,11 @@
       ],
       "accounts": [
         {
-          "name": "user",
+          "name": "bot",
           "writable": true
         },
         {
-          "name": "bot",
+          "name": "sub_account",
           "writable": true
         },
         {
@@ -143,7 +143,10 @@
           "writable": true
         },
         {
-          "name": "user_network_account",
+          "name": "token_mint"
+        },
+        {
+          "name": "user_token_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -190,7 +193,7 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "token_mint"
               }
             ],
             "program": {
@@ -233,13 +236,13 @@
           }
         },
         {
-          "name": "vault_network_account",
+          "name": "vault_token_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "fee_collector_network_address"
+                "path": "sub_account_authority"
               },
               {
                 "kind": "const",
@@ -280,7 +283,7 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "token_mint"
               }
             ],
             "program": {
@@ -321,6 +324,37 @@
               ]
             }
           }
+        },
+        {
+          "name": "sub_account_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              }
+            ]
+          }
+        },
+        {
+          "name": "fee_collector_network_address",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
           "name": "fee_collector_network_account",
@@ -370,7 +404,7 @@
               },
               {
                 "kind": "account",
-                "path": "usdt_mint"
+                "path": "token_mint"
               }
             ],
             "program": {
@@ -413,12 +447,380 @@
           }
         },
         {
-          "name": "fee_collector_network_address",
-          "writable": true,
-          "signer": true
+          "name": "void_collector_1",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
-          "name": "usdt_mint"
+          "name": "void_collector_2",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
+        },
+        {
+          "name": "void_collector_3",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
+        },
+        {
+          "name": "void_collector_4",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
+        },
+        {
+          "name": "void_collector_1_lp_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "void_collector_1"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "void_collector_2_lp_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "void_collector_2"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "void_collector_3_lp_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "void_collector_3"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "void_collector_4_lp_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "void_collector_4"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "token_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           "name": "signer",
@@ -543,6 +945,11 @@
       "code": 6002,
       "name": "Overflow",
       "msg": "Overflow"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidFeePercent",
+      "msg": "InvalidFeePercent"
     }
   ],
   "types": [
@@ -674,6 +1081,10 @@
           {
             "name": "void_collector_4",
             "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_void",
+            "type": "u64"
           },
           {
             "name": "manager_address",

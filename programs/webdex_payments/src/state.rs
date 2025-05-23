@@ -74,10 +74,19 @@ pub struct PositionDetails {
 pub struct AddFeeTiers<'info> {
     pub bot: Account<'info, Bot>,
     
-    #[account(mut)]
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = Payments::INIT_SPACE, // ou calcule o espaço necessário
+        seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
+        bump
+    )]
     pub payments: Account<'info, Payments>,
 
+    #[account(mut)]
     pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]

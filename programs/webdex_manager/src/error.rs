@@ -48,4 +48,6 @@ pub enum ErrorCode {
     StrategyNotFound,
     #[msg("Invalid Authority")]
     InvalidAuthority,
+    #[msg("Invalid Temporary Fee")]
+    InvalidTemporaryFee
 }

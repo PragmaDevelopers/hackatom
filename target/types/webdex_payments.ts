@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_payments.json`.
  */
 export type WebdexPayments = {
-  "address": "8Hd3LCFZz5K73YKLCenJWr29n8G7spym67esV1honot4",
+  "address": "Gp1yoP72LTgD3pQrnkKw9BTCTbEDC2aDWBVkjDadaV3f",
   "metadata": {
     "name": "webdexPayments",
     "version": "0.1.0",
@@ -31,11 +31,37 @@ export type WebdexPayments = {
         },
         {
           "name": "payments",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
+          "writable": true,
           "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
@@ -321,7 +347,7 @@ export type WebdexPayments = {
         },
         {
           "name": "subAccountProgram",
-          "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
+          "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
         }
       ],
       "args": [
@@ -676,6 +702,10 @@ export type WebdexPayments = {
           {
             "name": "voidCollector4",
             "type": "pubkey"
+          },
+          {
+            "name": "feeWithdrawVoid",
+            "type": "u64"
           },
           {
             "name": "managerAddress",

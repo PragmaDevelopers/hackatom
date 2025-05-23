@@ -25,6 +25,9 @@ describe("webdex_manager", () => {
             })
             .view();
 
+        user.gasBalance = user.gasBalance.toNumber();
+        user.passBalance = user.passBalance.toNumber();
+
         console.log("📦 User:", user);
     });
 });

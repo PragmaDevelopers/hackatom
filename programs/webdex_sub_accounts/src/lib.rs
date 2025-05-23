@@ -10,7 +10,7 @@ use crate::state::*;
 
 use shared_sub_accounts::state::{BalanceStrategy};
 
-declare_id!("FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6");
+declare_id!("C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX");
 
 #[program]
 pub mod webdex_sub_accounts {
@@ -80,5 +80,15 @@ pub mod webdex_sub_accounts {
         paused: bool,
     ) -> Result<()> {
         _toggle_pause(ctx,account_id,strategy_token,coin,paused)
+    }
+
+    pub fn remove_liquidity(
+        ctx: Context<RemoveLiquidity>,
+        account_id: Pubkey,
+        strategy_token: Pubkey,
+        coin: Pubkey,
+        amount: u64,
+    ) -> Result<()> {
+        _remove_liquidity(ctx,account_id,strategy_token,coin,amount)
     }
 }

@@ -1,5 +1,5 @@
 {
-  "address": "FiogR2EQUviZr5zNZPjCkid27HshpEdRZyfjuGKH1Q8a",
+  "address": "CVuroprVgA34wFb5kdQbFcfV4vyk6AfMvcpWkvVnNApK",
   "metadata": {
     "name": "webdex_strategy",
     "version": "0.1.0",
@@ -414,6 +414,10 @@
           {
             "name": "void_collector_4",
             "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_void",
+            "type": "u64"
           },
           {
             "name": "manager_address",

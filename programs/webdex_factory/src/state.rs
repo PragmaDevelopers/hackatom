@@ -10,6 +10,7 @@ pub struct BotInfo {
     pub void_collector_2: Pubkey,
     pub void_collector_3: Pubkey,
     pub void_collector_4: Pubkey,
+    pub fee_withdraw_void: u64,
     pub manager_address: Pubkey,
     pub strategy_address: Pubkey,
     pub sub_account_address: Pubkey,

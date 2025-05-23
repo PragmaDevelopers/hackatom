@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_network.json`.
  */
 export type WebdexNetwork = {
-  "address": "66E8D8LRoAwze5aAURujjiKgMMFDejZADFzoX8sRSBwp",
+  "address": "4SqHQNaCovQM1XTfPFFb2sMc4mhnkFL2Khz5JQT4D6M8",
   "metadata": {
     "name": "webdexNetwork",
     "version": "0.1.0",
@@ -137,11 +137,11 @@ export type WebdexNetwork = {
       ],
       "accounts": [
         {
-          "name": "user",
+          "name": "bot",
           "writable": true
         },
         {
-          "name": "bot",
+          "name": "subAccount",
           "writable": true
         },
         {
@@ -149,7 +149,10 @@ export type WebdexNetwork = {
           "writable": true
         },
         {
-          "name": "userNetworkAccount",
+          "name": "tokenMint"
+        },
+        {
+          "name": "userTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -196,7 +199,7 @@ export type WebdexNetwork = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -239,13 +242,13 @@ export type WebdexNetwork = {
           }
         },
         {
-          "name": "vaultNetworkAccount",
+          "name": "vaultTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "feeCollectorNetworkAddress"
+                "path": "subAccountAuthority"
               },
               {
                 "kind": "const",
@@ -286,7 +289,7 @@ export type WebdexNetwork = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -327,6 +330,37 @@ export type WebdexNetwork = {
               ]
             }
           }
+        },
+        {
+          "name": "subAccountAuthority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "subAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "feeCollectorNetworkAddress",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
           "name": "feeCollectorNetworkAccount",
@@ -376,7 +410,7 @@ export type WebdexNetwork = {
               },
               {
                 "kind": "account",
-                "path": "usdtMint"
+                "path": "tokenMint"
               }
             ],
             "program": {
@@ -419,12 +453,380 @@ export type WebdexNetwork = {
           }
         },
         {
-          "name": "feeCollectorNetworkAddress",
-          "writable": true,
-          "signer": true
+          "name": "voidCollector1",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
-          "name": "usdtMint"
+          "name": "voidCollector2",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
+        },
+        {
+          "name": "voidCollector3",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
+        },
+        {
+          "name": "voidCollector4",
+          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
+        },
+        {
+          "name": "voidCollector1LpAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "voidCollector1"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "voidCollector2LpAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "voidCollector2"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "voidCollector3LpAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "voidCollector3"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "voidCollector4LpAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "voidCollector4"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           "name": "signer",
@@ -549,6 +951,11 @@ export type WebdexNetwork = {
       "code": 6002,
       "name": "overflow",
       "msg": "overflow"
+    },
+    {
+      "code": 6003,
+      "name": "invalidFeePercent",
+      "msg": "invalidFeePercent"
     }
   ],
   "types": [
@@ -680,6 +1087,10 @@ export type WebdexNetwork = {
           {
             "name": "voidCollector4",
             "type": "pubkey"
+          },
+          {
+            "name": "feeWithdrawVoid",
+            "type": "u64"
           },
           {
             "name": "managerAddress",

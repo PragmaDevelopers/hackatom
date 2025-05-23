@@ -292,8 +292,8 @@ pub fn _toggle_pause(
     Ok(())
 }
 
-pub fn _remove_liquidity<'info>(
-    mut ctx: CpiContext<'_, '_, '_, 'info, RemoveLiquidity<'info>>,
+pub fn _remove_liquidity(
+    ctx: Context<RemoveLiquidity>,
     account_id: Pubkey,
     strategy_token: Pubkey,
     coin: Pubkey,

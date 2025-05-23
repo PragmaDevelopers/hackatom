@@ -7,5 +7,7 @@ pub enum ErrorCode {
     #[msg("Insufficient Balance")]
     InsufficientBalance,
     #[msg("Overflow")]
-    Overflow
+    Overflow,
+    #[msg("InvalidFeePercent")]
+    InvalidFeePercent
 }

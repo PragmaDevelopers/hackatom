@@ -6,24 +6,24 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-webdex_factory = "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i"
-webdex_manager = "EcVT3zGP8uC7bYtDEXks43b7tQ219KUCq8XvsCbdq1gQ"
-webdex_network = "66E8D8LRoAwze5aAURujjiKgMMFDejZADFzoX8sRSBwp"
-webdex_payments = "8Hd3LCFZz5K73YKLCenJWr29n8G7spym67esV1honot4"
-webdex_strategy = "FiogR2EQUviZr5zNZPjCkid27HshpEdRZyfjuGKH1Q8a"
-webdex_sub_accounts = "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
+webdex_factory = "9i1mJt5ioM5RaffYiQxLdv1dQnotfoDXDzENZnGsoqjX"
+webdex_manager = "B3AQgsRyHeJ4rVm9JmAvzrFtTBCvLTSUAYW9HwhVaa92"
+webdex_network = "4SqHQNaCovQM1XTfPFFb2sMc4mhnkFL2Khz5JQT4D6M8"
+webdex_payments = "Gp1yoP72LTgD3pQrnkKw9BTCTbEDC2aDWBVkjDadaV3f"
+webdex_strategy = "CVuroprVgA34wFb5kdQbFcfV4vyk6AfMvcpWkvVnNApK"
+webdex_sub_accounts = "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
 
 [programs.devnet]
-webdex_factory = "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i"
-webdex_manager = "EcVT3zGP8uC7bYtDEXks43b7tQ219KUCq8XvsCbdq1gQ"
-webdex_network = "66E8D8LRoAwze5aAURujjiKgMMFDejZADFzoX8sRSBwp"
-webdex_payments = "8Hd3LCFZz5K73YKLCenJWr29n8G7spym67esV1honot4"
-webdex_strategy = "FiogR2EQUviZr5zNZPjCkid27HshpEdRZyfjuGKH1Q8a"
-webdex_sub_accounts = "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
+webdex_factory = "9i1mJt5ioM5RaffYiQxLdv1dQnotfoDXDzENZnGsoqjX"
+webdex_manager = "B3AQgsRyHeJ4rVm9JmAvzrFtTBCvLTSUAYW9HwhVaa92"
+webdex_network = "4SqHQNaCovQM1XTfPFFb2sMc4mhnkFL2Khz5JQT4D6M8"
+webdex_payments = "Gp1yoP72LTgD3pQrnkKw9BTCTbEDC2aDWBVkjDadaV3f"
+webdex_strategy = "CVuroprVgA34wFb5kdQbFcfV4vyk6AfMvcpWkvVnNApK"
+webdex_sub_accounts = "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "~/.config/solana/id.json"

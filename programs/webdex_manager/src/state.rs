@@ -8,7 +8,10 @@ use webdex_sub_accounts::program::WebdexSubAccounts;
 use webdex_payments::state::{FeeAccount};
 use anchor_spl::token::{Token,TokenAccount,Mint};
 use anchor_spl::associated_token::AssociatedToken;
-use crate::authority::*;
+use shared_factory::authority::{
+    _fixed_authorized_owner,
+    _fixed_native_mint,
+};
 use crate::error::ErrorCode;
 
 #[account]
@@ -82,31 +85,34 @@ pub struct AddGas<'info> {
     )]
     pub user: Account<'info, User>,
 
-    /// CHECK: Apenas para seeds
-    pub sol_mint: AccountInfo<'info>,
-
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = sol_mint,
+        associated_token::mint = wsol_mint,
         associated_token::authority = signer,
     )]
-    pub user_sol_account: Account<'info, TokenAccount>, // do SPL depositado
-
-    #[account(
-        seeds = [b"vault_sol", user.key().as_ref()],
-        bump
-    )]
-    /// CHECK: Usado apenas como autoridade programática
-    pub vault_sol_authority: AccountInfo<'info>,
+    pub user_wsol_account: Account<'info, TokenAccount>,
 
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = sol_mint,
-        associated_token::authority = vault_sol_authority,
+        space = 0,
+        seeds = [b"vault_sol", user.key().as_ref()],
+        bump,
     )]
-    pub vault_sol_account: Account<'info, TokenAccount>,
+    /// CHECK: conta PDA para armazenar SOL (lamports)
+    pub vault_sol: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = wsol_mint,
+        associated_token::authority = vault_sol,
+    )]
+    pub wsol_vault: Account<'info, TokenAccount>,
+
+    #[account(address = _fixed_native_mint())]
+    pub wsol_mint: Account<'info, Mint>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -126,29 +132,30 @@ pub struct RemoveGas<'info> {
     )]
     pub user: Account<'info, User>,
 
-    /// CHECK: Apenas para seeds
-    pub sol_mint: AccountInfo<'info>,
-
     #[account(
         mut,
-        associated_token::mint = sol_mint,
+        associated_token::mint = wsol_mint,
         associated_token::authority = signer,
     )]
-    pub user_sol_account: Account<'info, TokenAccount>, // do SPL depositado
-
-    #[account(
-        seeds = [b"vault_sol", user.key().as_ref()],
-        bump
-    )]
-    /// CHECK: Usado apenas como autoridade programática
-    pub vault_sol_authority: AccountInfo<'info>,
+    pub user_wsol_account: Account<'info, TokenAccount>,
 
     #[account(
         mut,
-        associated_token::mint = sol_mint,
-        associated_token::authority = vault_sol_authority,
+        seeds = [b"vault_sol", user.key().as_ref()],
+        bump,
     )]
-    pub vault_sol_account: Account<'info, TokenAccount>,
+    /// CHECK: conta PDA para armazenar SOL (lamports)
+    pub vault_sol: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = wsol_mint,
+        associated_token::authority = vault_sol,
+    )]
+    pub wsol_vault: Account<'info, TokenAccount>,
+
+    #[account(address = _fixed_native_mint())]
+    pub wsol_mint: Account<'info, Mint>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -334,30 +341,26 @@ pub struct LiquidityAdd<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(strategy_token: Pubkey, decimals: u8, coin: Pubkey)]
+#[instruction(strategy_token: Pubkey, decimals: u8)]
 pub struct LiquidityRemove<'info> {
-    pub user: Account<'info, User>,
-
-    pub bot: Account<'info, Bot>,
-
     #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
     
     pub strategy_list: Account<'info,StrategyList>,
 
-    #[account(mut)]
-    pub strategy_balance: Account<'info, StrategyBalanceList>,
+    /// CHECK: Apenas para seeds
+    pub token_mint: AccountInfo<'info>,
 
     #[account(
         mut,
-        associated_token::mint = coin,
+        associated_token::mint = token_mint,
         associated_token::authority = signer,
     )]
     pub user_token_account: Account<'info, TokenAccount>, // do SPL depositado
 
     #[account(
         mut,
-        associated_token::mint = coin,
+        associated_token::mint = token_mint,
         associated_token::authority = sub_account_authority,
     )]
     pub vault_token_account: Account<'info, TokenAccount>, // onde o token vai
@@ -371,7 +374,7 @@ pub struct LiquidityRemove<'info> {
 
     #[account(
         mut,
-        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),coin.key().as_ref()],
+        seeds = [b"lp_token",strategy_token.key().as_ref(),sub_account.key().as_ref(),token_mint.key().as_ref()],
         bump,
         mint::decimals = decimals,
         mint::authority = lp_mint_authority,
@@ -418,9 +421,6 @@ pub struct RebalancePosition<'info> {
     pub temporary_fee_account: Account<'info, FeeAccount>,
 
     /// CHECK: Apenas para seeds
-    pub sol_mint: AccountInfo<'info>,
-
-    /// CHECK: Apenas para seeds
     pub token_mint: AccountInfo<'info>,
 
     #[account(
@@ -448,69 +448,8 @@ pub struct RebalancePosition<'info> {
     pub sub_account_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
     /// CHECK: Autoridade fixa do bot owner
-    #[account(address = fixed_bot_owner_pubkey())]
+    #[account(address = _fixed_authorized_owner())]
     pub bot_owner: AccountInfo<'info>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = lp_token,
-        associated_token::authority = bot_owner
-    )]
-    pub bot_owner_lp_account: Box<Account<'info, TokenAccount>>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = sol_mint,
-        associated_token::authority = bot_owner
-    )]
-    pub bot_owner_sol_account: Box<Account<'info, TokenAccount>>,
-
-    /// CHECK: Autoridade fixa do collector 1
-    #[account(address = fixed_void_collector_1_pubkey())]
-    pub void_collector_1: AccountInfo<'info>,
-    /// CHECK: Autoridade fixa do collector 2
-    #[account(address = fixed_void_collector_2_pubkey())]
-    pub void_collector_2: AccountInfo<'info>,
-    /// CHECK: Autoridade fixa do collector 3
-    #[account(address = fixed_void_collector_3_pubkey())]
-    pub void_collector_3: AccountInfo<'info>,
-    /// CHECK: Autoridade fixa do collector 4
-    #[account(address = fixed_void_collector_4_pubkey())]
-    pub void_collector_4: AccountInfo<'info>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = lp_token,
-        associated_token::authority = void_collector_1
-    )]
-    pub void_collector_1_lp_account: Box<Account<'info, TokenAccount>>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = lp_token,
-        associated_token::authority = void_collector_2
-    )]
-    pub void_collector_2_lp_account: Box<Account<'info, TokenAccount>>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = lp_token,
-        associated_token::authority = void_collector_3
-    )]
-    pub void_collector_3_lp_account: Box<Account<'info, TokenAccount>>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        associated_token::mint = lp_token,
-        associated_token::authority = void_collector_4
-    )]
-    pub void_collector_4_lp_account: Box<Account<'info, TokenAccount>>,
 
     #[account(
         seeds = [b"mint_authority", strategy_token.key().as_ref()],
@@ -520,18 +459,12 @@ pub struct RebalancePosition<'info> {
     pub lp_mint_authority: AccountInfo<'info>,
 
     #[account(
-        seeds = [b"vault_sol", user.key().as_ref()],
-        bump
-    )]
-    /// CHECK: Usado apenas como autoridade programática
-    pub vault_sol_authority: AccountInfo<'info>,
-
-    #[account(
         mut,
-        associated_token::mint = sol_mint,
-        associated_token::authority = vault_sol_authority,
+        seeds = [b"vault_sol", user.key().as_ref()],
+        bump,
     )]
-    pub vault_sol_account: Account<'info, TokenAccount>,
+    /// CHECK: conta PDA para armazenar SOL (lamports)
+    pub vault_sol_account: AccountInfo<'info>,
 
     #[account(mut)]
     pub signer: Signer<'info>,

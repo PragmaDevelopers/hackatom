@@ -10,7 +10,7 @@ use crate::state::*;
 
 use crate::processor::*;
 
-declare_id!("8Hd3LCFZz5K73YKLCenJWr29n8G7spym67esV1honot4");
+declare_id!("Gp1yoP72LTgD3pQrnkKw9BTCTbEDC2aDWBVkjDadaV3f");
 
 #[program]
 pub mod webdex_payments {

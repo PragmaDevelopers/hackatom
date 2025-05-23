@@ -1,5 +1,5 @@
 {
-  "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6",
+  "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX",
   "metadata": {
     "name": "webdex_sub_accounts",
     "version": "0.1.0",
@@ -373,6 +373,50 @@
           }
         }
       }
+    },
+    {
+      "name": "remove_liquidity",
+      "discriminator": [
+        80,
+        85,
+        209,
+        72,
+        24,
+        206,
+        177,
+        108
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "sub_account",
+          "writable": true
+        },
+        {
+          "name": "strategy_balance",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "account_id",
+          "type": "pubkey"
+        },
+        {
+          "name": "strategy_token",
+          "type": "pubkey"
+        },
+        {
+          "name": "coin",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "toggle_pause",
@@ -792,6 +836,10 @@
           {
             "name": "void_collector_4",
             "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_void",
+            "type": "u64"
           },
           {
             "name": "manager_address",

@@ -16,8 +16,12 @@ pub enum ErrorCode {
     CoinAlreadyExists,
     #[msg("Max strategies reached")]
     MaxStrategiesReached,
-    #[msg("Unauthorized")]
-    Unauthorized,
+    #[msg("Unauthorized Owner")]
+    UnauthorizedOwner,
+    #[msg("Unauthorized Void Collector")]
+    UnauthorizedVoidCollector,
+    #[msg("Unauthorized Fee Collector Network")]
+    UnauthorizedFeeCollectorNetwork,
     #[msg("Você não tem permissão para acessar esta subconta.")]
     UnauthorizedSubAccount,
     #[msg("Account not linked to currency")]

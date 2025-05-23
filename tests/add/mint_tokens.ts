@@ -1,8 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexPayments } from "../../target/types/webdex_payments";
-import { WebdexFactory } from "../../target/types/webdex_factory";
-import { PublicKey } from "@solana/web3.js";
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
 import {
     fetchMetadata,
@@ -11,7 +9,7 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import { fetchMint } from "@metaplex-foundation/mpl-toolbox";
 import { publicKey } from "@metaplex-foundation/umi";
-import { createMint, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
+import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 
 export async function fetchTokenInfoFromChain(mint: String): Promise<{ name: string; symbol: string; decimals: number }> {
     const umi = createUmi('http://127.0.0.1:8899').use(mplTokenMetadata())
@@ -45,7 +43,7 @@ describe("webdex_payments", () => {
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
         const webdexMint = payments[0].account.coins.find(token => token.coin.symbol == "WEBDEX");
 
-        const usdcTokenAccount = await getOrCreateAssociatedTokenAccount(
+        const usdtTokenAccount = await getOrCreateAssociatedTokenAccount(
             provider.connection,
             user.payer,            // payer
             usdtMint.pubkey,                  // mint address
@@ -56,7 +54,7 @@ describe("webdex_payments", () => {
             provider.connection,
             user.payer,
             usdtMint.pubkey,                    // Mint
-            usdcTokenAccount.address, // Destination (ATA)
+            usdtTokenAccount.address, // Destination (ATA)
             user.payer,              // Authority (must match mint authority)
             100_000_000_000             // Amount (ex: 100 tokens with 9 decimals)
         );

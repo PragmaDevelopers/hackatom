@@ -1,5 +1,5 @@
 {
-  "address": "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i",
+  "address": "9i1mJt5ioM5RaffYiQxLdv1dQnotfoDXDzENZnGsoqjX",
   "metadata": {
     "name": "webdex_factory",
     "version": "0.1.0",
@@ -84,6 +84,10 @@
         {
           "name": "void_collector_4",
           "type": "pubkey"
+        },
+        {
+          "name": "fee_withdraw_void",
+          "type": "u64"
         },
         {
           "name": "contract_address",
@@ -306,41 +310,51 @@
     },
     {
       "code": 6007,
-      "name": "Unauthorized",
-      "msg": "Unauthorized"
+      "name": "UnauthorizedOwner",
+      "msg": "Unauthorized Owner"
     },
     {
       "code": 6008,
+      "name": "UnauthorizedVoidCollector",
+      "msg": "Unauthorized Void Collector"
+    },
+    {
+      "code": 6009,
+      "name": "UnauthorizedFeeCollectorNetwork",
+      "msg": "Unauthorized Fee Collector Network"
+    },
+    {
+      "code": 6010,
       "name": "UnauthorizedSubAccount",
       "msg": "Você não tem permissão para acessar esta subconta."
     },
     {
-      "code": 6009,
+      "code": 6011,
       "name": "AccountNotLinkedToCurrency",
       "msg": "Account not linked to currency"
     },
     {
-      "code": 6010,
+      "code": 6012,
       "name": "InvalidSubAccountId",
       "msg": "Invalid Sub Account Id"
     },
     {
-      "code": 6011,
+      "code": 6013,
       "name": "StrategyNotLinked",
       "msg": "Strategy Not Linked"
     },
     {
-      "code": 6012,
+      "code": 6014,
       "name": "StrategyBalanceNotFound",
       "msg": "Strategy Balance Not Found"
     },
     {
-      "code": 6013,
+      "code": 6015,
       "name": "CoinNotLinked",
       "msg": "Coin Not Linked"
     },
     {
-      "code": 6014,
+      "code": 6016,
       "name": "AccountNotFound",
       "msg": "Account not found"
     }
@@ -378,6 +392,10 @@
           {
             "name": "void_collector_4",
             "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_void",
+            "type": "u64"
           },
           {
             "name": "manager_address",
@@ -462,6 +480,10 @@
           {
             "name": "void_collector_4",
             "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_void",
+            "type": "u64"
           },
           {
             "name": "manager_address",

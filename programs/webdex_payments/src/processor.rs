@@ -21,11 +21,14 @@ pub fn _add_fee_tiers<'info>(
 ) -> Result<()> {
     assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
 
+    let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
 
-    // Verifica se o bot está registrado
-    if payments.contract_address != contract_address {
-        return Err(ErrorCode::BotNotFound.into());
+    // ✅ Se a conta payments já tinha contract_address, não sobrescreve
+    if payments.contract_address == Pubkey::default() {
+        payments.contract_address = bot.manager_address;
+    } else if payments.contract_address != bot.manager_address {
+        return Err(ErrorCode::InvalidContractAddress.into());
     }
 
     // Remove todos os tiers existentes
@@ -68,11 +71,6 @@ pub fn _revoke_or_allow_currency(
     
     let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
-
-    // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.signer.key() {
-        return Err(ErrorCode::Unauthorized.into());
-    }
 
     // ✅ Se a conta payments já tinha contract_address, não sobrescreve
     if payments.contract_address == Pubkey::default() {
@@ -118,11 +116,6 @@ pub fn _remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
 
     let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
-
-    // ✅ Verifica que quem está chamando é o dono do bot
-    if bot.owner != ctx.accounts.signer.key() {
-        return Err(ErrorCode::Unauthorized.into());
-    }
 
     // Verifica se o bot está registrado
     if bot.manager_address != payments.contract_address {

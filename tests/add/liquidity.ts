@@ -60,6 +60,7 @@ describe("webdex_manager", () => {
 
         const subAccountPda = subAccounts[0].subAccountAddress;
 
+        // FAZ O MINT
         const tx = await managerProgram.methods
             .liquidityAdd(
                 strategies[0].tokenAddress,
@@ -80,6 +81,7 @@ describe("webdex_manager", () => {
 
         console.log("Add Liquidity - Atualiza o saldo")
 
+        // ATUALIZA O SALDO
         const txa = await subAccountsProgram.methods
             .addLiquidity(
                 strategies[0].tokenAddress,

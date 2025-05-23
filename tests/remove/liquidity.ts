@@ -58,31 +58,47 @@ describe("webdex_close", () => {
 
         const subAccountPda = subAccounts[0].subAccountAddress;
 
+        const amount = new BN(50_000_000_000);
+
+        // FAZ O BURN
+        const tx = await managerProgram.methods
+            .liquidityRemove(
+                strategies[0].tokenAddress,
+                usdtMint.coin.decimals,
+                amount,
+            )
+            .accounts({
+                subAccount: subAccountPda,
+                strategyList: strategyListPda,
+                signer: user.publicKey,
+                tokenMint: usdtMint.pubkey,
+            })
+            .rpc();
+
+        console.log("✅ liquidityRemove tx:", tx);
+
+        console.log("Add Liquidity - Atualiza o saldo")
+
         const [strategyBalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
             subAccountsProgram.programId
         );
 
-        const amount = new BN(50_000_000_000);
-
-        const tx = await managerProgram.methods
-            .liquidityRemove(
-                strategies[0].tokenAddress,
-                usdtMint.coin.decimals,
-                usdtMint.pubkey,
+        // ATUALIZA O SALDO
+        const txa = await subAccountsProgram.methods
+            .removeLiquidity(
                 subAccounts[0].id,
+                strategies[0].tokenAddress,
+                usdtMint.pubkey,
                 amount,
             )
             .accounts({
                 bot: botPda,
-                user: userPda,
                 subAccount: subAccountPda,
-                strategyList: strategyListPda,
                 strategyBalance: strategyBalancePda,
-                signer: user.publicKey,
             })
             .rpc();
 
-        console.log("✅ liquidityRemove tx:", tx);
+        console.log("✅ TX Hash:", txa);
     });
 });

@@ -48,7 +48,7 @@ describe("webdex_payments", () => {
         // const { name, symbol, decimals } = await fetchTokenInfoFromChain(usdcMint);
 
         const bots = await factoryProgram.account.bot.all();
-        const botPda = bots.map((bot) => bot.publicKey)[0] // BOT 1 - ONE;
+        const botPda = bots[0].publicKey; // BOT 1 - ONE;
 
         const usdtName = "Tether USD";
         const usdtSymbol = "USDT";
@@ -61,22 +61,6 @@ describe("webdex_payments", () => {
             null,              // freezeAuthority
             usdtDecimals
         )
-
-        const usdcTokenAccount = await getOrCreateAssociatedTokenAccount(
-            provider.connection,
-            user.payer,            // payer
-            usdtMint,                  // mint address
-            user.publicKey         // owner of the token account (Anchor wallet here)
-        );
-
-        await mintTo(
-            provider.connection,
-            user.payer,
-            usdtMint,                    // Mint
-            usdcTokenAccount.address, // Destination (ATA)
-            user.payer,              // Authority (must match mint authority)
-            100_000_000_000             // Amount (ex: 100 tokens with 9 decimals)
-        );
 
         const tx = await paymentsProgram.methods
             .currencyAllow(usdtMint, usdtName, usdtSymbol, usdtDecimals)
@@ -93,7 +77,7 @@ describe("webdex_payments", () => {
         // const { name, symbol, decimals } = await fetchTokenInfoFromChain(usdcMint);
 
         const bots = await factoryProgram.account.bot.all();
-        const botPda = bots.map((bot) => bot.publicKey)[0] // BOT 1 - ONE;
+        const botPda = bots[0].publicKey; // BOT 1 - ONE;
 
         const webdexName = "WEbdEX";
         const webdexSymbol = "WEBDEX";
@@ -102,26 +86,10 @@ describe("webdex_payments", () => {
         const webdexMint = await createMint(
             provider.connection,
             user.payer,              // Payer
-            user.publicKey,    // mintAuthority
+            user.publicKey,    // mintAuthoritys
             null,              // freezeAuthority
             webdexDecimals
         )
-
-        const webdexTokenAccount = await getOrCreateAssociatedTokenAccount(
-            provider.connection,
-            user.payer,            // payer
-            webdexMint,                  // mint address
-            user.publicKey         // owner of the token account (Anchor wallet here)
-        );
-
-        await mintTo(
-            provider.connection,
-            user.payer,
-            webdexMint,                    // Mint
-            webdexTokenAccount.address, // Destination (ATA)
-            user.payer,              // Authority (must match mint authority)
-            100_000_000_000             // Amount (ex: 100 tokens with 9 decimals)
-        );
 
         const tx = await paymentsProgram.methods
             .currencyAllow(webdexMint, webdexName, webdexSymbol, webdexDecimals)
@@ -136,7 +104,7 @@ describe("webdex_payments", () => {
 
     it("Currency Allow (Solana)", async () => {
         const bots = await factoryProgram.account.bot.all();
-        const botPda = bots.map((bot) => bot.publicKey)[0]; // BOT 1 - ONE;
+        const botPda = bots[0].publicKey; // BOT 1 - ONE;
 
         const solName = "Solana";
         const solSymbol = "SOL";

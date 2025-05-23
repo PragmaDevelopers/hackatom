@@ -20,8 +20,13 @@ describe("webdex_factoty", () => {
         const subAccountAddress = PublicKey.default;
         const tokenPassAddress = PublicKey.default;
         const paymentsAddress = PublicKey.default;
-        const fee_withdraw_network = new BN(0.06);
+        const fee_withdraw_void = new BN(5);
+        const fee_withdraw_network = new BN(15);
 
+        const void_collector_1 = user.publicKey;
+        const void_collector_2 = user.publicKey;
+        const void_collector_3 = user.publicKey;
+        const void_collector_4 = user.publicKey;
         const fee_collector_network_address = user.publicKey;
 
         // 🔀 contractAddress aleatório
@@ -34,13 +39,14 @@ describe("webdex_factoty", () => {
 
         const tx = await factoryProgram.methods
             .addBot(
-                "Bot 2", // name
-                "TWO",         // prefix
+                "Bot 1", // name
+                "ONE",         // prefix
                 user.publicKey, // owner é quem paga
-                user.publicKey, // 
-                user.publicKey, // 
-                user.publicKey, // 
-                user.publicKey, // 
+                void_collector_1, // 
+                void_collector_2, // 
+                void_collector_3, // 
+                void_collector_4, // 
+                fee_withdraw_void,
                 contractAddress,
                 strategyAddress,
                 subAccountAddress,

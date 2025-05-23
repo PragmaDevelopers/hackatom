@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_sub_accounts.json`.
  */
 export type WebdexSubAccounts = {
-  "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6",
+  "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX",
   "metadata": {
     "name": "webdexSubAccounts",
     "version": "0.1.0",
@@ -379,6 +379,50 @@ export type WebdexSubAccounts = {
           }
         }
       }
+    },
+    {
+      "name": "removeLiquidity",
+      "discriminator": [
+        80,
+        85,
+        209,
+        72,
+        24,
+        206,
+        177,
+        108
+      ],
+      "accounts": [
+        {
+          "name": "bot"
+        },
+        {
+          "name": "subAccount",
+          "writable": true
+        },
+        {
+          "name": "strategyBalance",
+          "writable": true
+        }
+      ],
+      "args": [
+        {
+          "name": "accountId",
+          "type": "pubkey"
+        },
+        {
+          "name": "strategyToken",
+          "type": "pubkey"
+        },
+        {
+          "name": "coin",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     },
     {
       "name": "togglePause",
@@ -798,6 +842,10 @@ export type WebdexSubAccounts = {
           {
             "name": "voidCollector4",
             "type": "pubkey"
+          },
+          {
+            "name": "feeWithdrawVoid",
+            "type": "u64"
           },
           {
             "name": "managerAddress",

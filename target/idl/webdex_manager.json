@@ -1,5 +1,5 @@
 {
-  "address": "EcVT3zGP8uC7bYtDEXks43b7tQ219KUCq8XvsCbdq1gQ",
+  "address": "B3AQgsRyHeJ4rVm9JmAvzrFtTBCvLTSUAYW9HwhVaa92",
   "metadata": {
     "name": "webdex_manager",
     "version": "0.1.0",
@@ -42,10 +42,7 @@
           }
         },
         {
-          "name": "sol_mint"
-        },
-        {
-          "name": "user_sol_account",
+          "name": "user_wsol_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -92,7 +89,7 @@
               },
               {
                 "kind": "account",
-                "path": "sol_mint"
+                "path": "wsol_mint"
               }
             ],
             "program": {
@@ -135,7 +132,8 @@
           }
         },
         {
-          "name": "vault_sol_authority",
+          "name": "vault_sol",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -160,13 +158,13 @@
           }
         },
         {
-          "name": "vault_sol_account",
+          "name": "wsol_vault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vault_sol_authority"
+                "path": "vault_sol"
               },
               {
                 "kind": "const",
@@ -207,7 +205,7 @@
               },
               {
                 "kind": "account",
-                "path": "sol_mint"
+                "path": "wsol_mint"
               }
             ],
             "program": {
@@ -248,6 +246,10 @@
               ]
             }
           }
+        },
+        {
+          "name": "wsol_mint",
+          "address": "So11111111111111111111111111111111111111112"
         },
         {
           "name": "signer",
@@ -734,12 +736,6 @@
       ],
       "accounts": [
         {
-          "name": "user"
-        },
-        {
-          "name": "bot"
-        },
-        {
           "name": "sub_account",
           "writable": true
         },
@@ -747,8 +743,7 @@
           "name": "strategy_list"
         },
         {
-          "name": "strategy_balance",
-          "writable": true
+          "name": "token_mint"
         },
         {
           "name": "user_token_account",
@@ -797,8 +792,8 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "coin"
+                "kind": "account",
+                "path": "token_mint"
               }
             ],
             "program": {
@@ -887,8 +882,8 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "coin"
+                "kind": "account",
+                "path": "token_mint"
               }
             ],
             "program": {
@@ -984,8 +979,8 @@
                 "path": "sub_account"
               },
               {
-                "kind": "arg",
-                "path": "coin"
+                "kind": "account",
+                "path": "token_mint"
               }
             ]
           }
@@ -1117,7 +1112,7 @@
         },
         {
           "name": "sub_account_program",
-          "address": "FG9xLyLYu7sjMFJDhBWFRtaYB33yrQeFx7JGb2EmFGF6"
+          "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
         },
         {
           "name": "token_program",
@@ -1136,14 +1131,6 @@
         {
           "name": "_decimals",
           "type": "u8"
-        },
-        {
-          "name": "coin",
-          "type": "pubkey"
-        },
-        {
-          "name": "account_id",
-          "type": "pubkey"
         },
         {
           "name": "amount",
@@ -1717,9 +1704,6 @@
           "writable": true
         },
         {
-          "name": "sol_mint"
-        },
-        {
           "name": "token_mint"
         },
         {
@@ -1877,562 +1861,6 @@
           "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
         {
-          "name": "bot_owner_lp_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "bot_owner"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lp_token"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "bot_owner_sol_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "bot_owner"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "sol_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "void_collector_1",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "void_collector_2",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "void_collector_3",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "void_collector_4",
-          "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
-        },
-        {
-          "name": "void_collector_1_lp_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "void_collector_1"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lp_token"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "void_collector_2_lp_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "void_collector_2"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lp_token"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "void_collector_3_lp_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "void_collector_3"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lp_token"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "void_collector_4_lp_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "void_collector_4"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "lp_token"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
           "name": "lp_mint_authority",
           "pda": {
             "seeds": [
@@ -2463,7 +1891,8 @@
           }
         },
         {
-          "name": "vault_sol_authority",
+          "name": "vault_sol_account",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -2485,96 +1914,6 @@
                 "path": "user"
               }
             ]
-          }
-        },
-        {
-          "name": "vault_sol_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "vault_sol_authority"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "sol_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
           }
         },
         {
@@ -2699,10 +2038,7 @@
           }
         },
         {
-          "name": "sol_mint"
-        },
-        {
-          "name": "user_sol_account",
+          "name": "user_wsol_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -2749,7 +2085,7 @@
               },
               {
                 "kind": "account",
-                "path": "sol_mint"
+                "path": "wsol_mint"
               }
             ],
             "program": {
@@ -2792,7 +2128,8 @@
           }
         },
         {
-          "name": "vault_sol_authority",
+          "name": "vault_sol",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -2817,13 +2154,13 @@
           }
         },
         {
-          "name": "vault_sol_account",
+          "name": "wsol_vault",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vault_sol_authority"
+                "path": "vault_sol"
               },
               {
                 "kind": "const",
@@ -2864,7 +2201,7 @@
               },
               {
                 "kind": "account",
-                "path": "sol_mint"
+                "path": "wsol_mint"
               }
             ],
             "program": {
@@ -2905,6 +2242,10 @@
               ]
             }
           }
+        },
+        {
+          "name": "wsol_mint",
+          "address": "So11111111111111111111111111111111111111112"
         },
         {
           "name": "signer",
@@ -2957,19 +2298,6 @@
         222,
         43,
         138
-      ]
-    },
-    {
-      "name": "StrategyBalanceList",
-      "discriminator": [
-        101,
-        190,
-        24,
-        107,
-        186,
-        122,
-        101,
-        70
       ]
     },
     {
@@ -3181,6 +2509,11 @@
       "code": 6022,
       "name": "InvalidAuthority",
       "msg": "Invalid Authority"
+    },
+    {
+      "code": 6023,
+      "name": "InvalidTemporaryFee",
+      "msg": "Invalid Temporary Fee"
     }
   ],
   "types": [
@@ -3273,42 +2606,6 @@
       }
     },
     {
-      "name": "BalanceStrategy",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "token",
-            "type": "pubkey"
-          },
-          {
-            "name": "decimals",
-            "type": "u8"
-          },
-          {
-            "name": "ico",
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "type": "string"
-          },
-          {
-            "name": "status",
-            "type": "bool"
-          },
-          {
-            "name": "paused",
-            "type": "bool"
-          }
-        ]
-      }
-    },
-    {
       "name": "Bot",
       "type": {
         "kind": "struct",
@@ -3340,6 +2637,10 @@
           {
             "name": "void_collector_4",
             "type": "pubkey"
+          },
+          {
+            "name": "fee_withdraw_void",
+            "type": "u64"
           },
           {
             "name": "manager_address",
@@ -3416,38 +2717,6 @@
           {
             "name": "is_active",
             "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "StrategyBalanceList",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "strategy_token",
-            "type": "pubkey"
-          },
-          {
-            "name": "status",
-            "type": "bool"
-          },
-          {
-            "name": "list_coins",
-            "type": {
-              "vec": "pubkey"
-            }
-          },
-          {
-            "name": "balance",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "BalanceStrategy"
-                }
-              }
-            }
           }
         ]
       }

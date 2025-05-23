@@ -43,50 +43,76 @@ pub fn _withdrawal(ctx: Context<Withdrawal>, amount: u64) -> Result<()> {
     let balance_info = &mut ctx.accounts.balance_info;
     let bot = &ctx.accounts.bot;
 
+    // Verifica saldo suficiente
     require!(
         balance_info.balance >= amount,
         ErrorCode::InsufficientBalance
     );
 
-    let fee = amount
-        .checked_mul(bot.fee_withdraw_network)
-        .unwrap()
-        .checked_div(100)
-        .unwrap();
-
-    let amount_after_fee = amount.checked_sub(fee).unwrap();
-
+    // Atualiza o saldo lógico
     balance_info.balance = balance_info.balance.checked_sub(amount).unwrap();
 
-    // Transfere para usuário
-    let cpi_ctx = CpiContext::new(
+    // Cálculo de taxas
+    let total_fee_percent = bot.fee_withdraw_network + bot.fee_withdraw_void;
+    require!(total_fee_percent <= 100, ErrorCode::InvalidFeePercent);
+
+    let user_percent = 100u64.checked_sub(total_fee_percent).unwrap();
+
+    let user_share = amount.checked_mul(user_percent).unwrap().checked_div(100).unwrap();
+    let network_fee = amount.checked_mul(bot.fee_withdraw_network).unwrap().checked_div(100).unwrap();
+    let total_void_fee = amount.checked_mul(bot.fee_withdraw_void).unwrap().checked_div(100).unwrap();
+    let collector_amount = total_void_fee.checked_div(4).unwrap(); // 4 collectors
+
+    // --- Transferência para o usuário
+    let cpi_ctx_user = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from: ctx.accounts.vault_network_account.to_account_info(),
-            to: ctx.accounts.user_network_account.to_account_info(), // assume que signer é dono do ATA
-            authority: ctx.accounts.fee_collector_network_address.to_account_info(),
+            from: ctx.accounts.vault_token_account.to_account_info(),
+            to: ctx.accounts.user_token_account.to_account_info(),
+            authority: ctx.accounts.sub_account_authority.to_account_info(),
         },
     );
-    transfer(cpi_ctx, amount_after_fee)?;
+    transfer(cpi_ctx_user, user_share)?;
 
-    // Transfere fee para fee_collector
+    // --- Transferência para fee_collector_network
     let cpi_ctx_fee = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from: ctx.accounts.vault_network_account.to_account_info(),
+            from: ctx.accounts.vault_token_account.to_account_info(),
             to: ctx.accounts.fee_collector_network_account.to_account_info(),
-            authority: ctx.accounts.fee_collector_network_address.to_account_info(),
+            authority: ctx.accounts.sub_account_authority.to_account_info(),
         },
     );
-    transfer(cpi_ctx_fee, fee)?;
+    transfer(cpi_ctx_fee, network_fee)?;
 
+    // --- Transferência para os 4 void collectors
+    let collector_accounts = [
+        &ctx.accounts.void_collector_1_lp_account,
+        &ctx.accounts.void_collector_2_lp_account,
+        &ctx.accounts.void_collector_3_lp_account,
+        &ctx.accounts.void_collector_4_lp_account,
+    ];
+
+    for collector_account in collector_accounts.iter() {
+        let cpi_ctx_collector = CpiContext::new(
+            ctx.accounts.token_program.to_account_info(),
+            Transfer {
+                from: ctx.accounts.vault_token_account.to_account_info(),
+                to: collector_account.to_account_info(),
+                authority: ctx.accounts.sub_account_authority.to_account_info(),
+            },
+        );
+        transfer(cpi_ctx_collector, collector_amount)?;
+    }
+
+    // --- Evento
     emit!(BalanceNetworkRemove {
         contract_address: balance_info.contract_address,
         user: balance_info.user,
         token: balance_info.token,
         new_balance: balance_info.balance,
         amount,
-        fee,
+        fee: network_fee + total_void_fee,
     });
 
     Ok(())

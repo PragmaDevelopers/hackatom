@@ -2,14 +2,13 @@ use anchor_lang::prelude::*;
 
 pub mod state;
 pub mod processor;
-pub mod authority;
 
 pub mod error;
 
 use crate::state::*;
 use crate::processor::*;
 
-declare_id!("6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i");
+declare_id!("9i1mJt5ioM5RaffYiQxLdv1dQnotfoDXDzENZnGsoqjX");
 
 #[program]
 pub mod webdex_factory {
@@ -25,6 +24,7 @@ pub mod webdex_factory {
         void_collector_2: Pubkey,
         void_collector_3: Pubkey,
         void_collector_4: Pubkey,
+        fee_withdraw_void: u64,
         contract_address: Pubkey,
         strategy_address: Pubkey,
         sub_account_address: Pubkey,
@@ -33,7 +33,7 @@ pub mod webdex_factory {
         fee_withdraw_network: u64,
         fee_collector_network_address: Pubkey,
     ) -> Result<()> {
-        _add_bot(ctx,name,prefix,owner,void_collector_1,void_collector_2,void_collector_3,void_collector_4,contract_address,strategy_address,sub_account_address,payments_address,token_pass_address,fee_withdraw_network,fee_collector_network_address)
+        _add_bot(ctx,name,prefix,owner,void_collector_1,void_collector_2,void_collector_3,void_collector_4,fee_withdraw_void,contract_address,strategy_address,sub_account_address,payments_address,token_pass_address,fee_withdraw_network,fee_collector_network_address)
     }
 
     pub fn get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Result<BotInfo> {

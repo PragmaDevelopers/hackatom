@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_factory.json`.
  */
 export type WebdexFactory = {
-  "address": "6LaJ7n5DXTn4ntXb75JKqJZJsku3QHBPjiNAmjsdFi2i",
+  "address": "9i1mJt5ioM5RaffYiQxLdv1dQnotfoDXDzENZnGsoqjX",
   "metadata": {
     "name": "webdexFactory",
     "version": "0.1.0",
@@ -90,6 +90,10 @@ export type WebdexFactory = {
         {
           "name": "voidCollector4",
           "type": "pubkey"
+        },
+        {
+          "name": "feeWithdrawVoid",
+          "type": "u64"
         },
         {
           "name": "contractAddress",
@@ -312,41 +316,51 @@ export type WebdexFactory = {
     },
     {
       "code": 6007,
-      "name": "unauthorized",
-      "msg": "unauthorized"
+      "name": "unauthorizedOwner",
+      "msg": "Unauthorized Owner"
     },
     {
       "code": 6008,
+      "name": "unauthorizedVoidCollector",
+      "msg": "Unauthorized Void Collector"
+    },
+    {
+      "code": 6009,
+      "name": "unauthorizedFeeCollectorNetwork",
+      "msg": "Unauthorized Fee Collector Network"
+    },
+    {
+      "code": 6010,
       "name": "unauthorizedSubAccount",
       "msg": "Você não tem permissão para acessar esta subconta."
     },
     {
-      "code": 6009,
+      "code": 6011,
       "name": "accountNotLinkedToCurrency",
       "msg": "Account not linked to currency"
     },
     {
-      "code": 6010,
+      "code": 6012,
       "name": "invalidSubAccountId",
       "msg": "Invalid Sub Account Id"
     },
     {
-      "code": 6011,
+      "code": 6013,
       "name": "strategyNotLinked",
       "msg": "Strategy Not Linked"
     },
     {
-      "code": 6012,
+      "code": 6014,
       "name": "strategyBalanceNotFound",
       "msg": "Strategy Balance Not Found"
     },
     {
-      "code": 6013,
+      "code": 6015,
       "name": "coinNotLinked",
       "msg": "Coin Not Linked"
     },
     {
-      "code": 6014,
+      "code": 6016,
       "name": "accountNotFound",
       "msg": "Account not found"
     }
@@ -384,6 +398,10 @@ export type WebdexFactory = {
           {
             "name": "voidCollector4",
             "type": "pubkey"
+          },
+          {
+            "name": "feeWithdrawVoid",
+            "type": "u64"
           },
           {
             "name": "managerAddress",
@@ -468,6 +486,10 @@ export type WebdexFactory = {
           {
             "name": "voidCollector4",
             "type": "pubkey"
+          },
+          {
+            "name": "feeWithdrawVoid",
+            "type": "u64"
           },
           {
             "name": "managerAddress",

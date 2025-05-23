@@ -14,13 +14,9 @@ describe("webdex_sub_accounts", () => {
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
     const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
-    const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
-
-    // 👉 Variáveis compartilhadas entre os testes
-    let isPausedCoin: Boolean;
 
     it("Get Balances", async () => {
         const bots = await factoryProgram.account.bot.all();

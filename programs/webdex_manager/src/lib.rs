@@ -1,6 +1,5 @@
 use anchor_lang::prelude::*;
 
-pub mod authority;
 pub mod processor;
 pub mod state;
 
@@ -9,7 +8,7 @@ pub mod error;
 use crate::processor::*;
 use crate::state::*;
 
-declare_id!("EcVT3zGP8uC7bYtDEXks43b7tQ219KUCq8XvsCbdq1gQ");
+declare_id!("B3AQgsRyHeJ4rVm9JmAvzrFtTBCvLTSUAYW9HwhVaa92");
 
 #[program]
 pub mod webdex_manager {
@@ -53,11 +52,9 @@ pub mod webdex_manager {
         ctx: Context<LiquidityRemove>,
         strategy_token: Pubkey,
         _decimals: u8,
-        coin: Pubkey, // Token base, por exemplo, USDT
-        account_id: Pubkey,
         amount: u64,
     ) -> Result<()> {
-        _liquidity_remove(ctx,strategy_token,_decimals,coin,account_id,amount)
+        _liquidity_remove(ctx,strategy_token,_decimals,amount)
     }
 
     pub fn rebalance_position(
