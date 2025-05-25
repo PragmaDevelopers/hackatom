@@ -21,20 +21,6 @@ pub mod webdex_sub_accounts {
         _create_sub_account(ctx,name)
     }
 
-    pub fn get_sub_accounts(
-        ctx: Context<GetSubAccounts>,
-        contract_address: Pubkey,
-    ) -> Result<Vec<SimpleSubAccount>> {
-        _get_sub_accounts(ctx, contract_address)
-    }
-
-    pub fn find_sub_account_index_by_id(
-        ctx: Context<FindSubAccountIndex>,
-        account_id: Pubkey,
-    ) -> Result<i64> {
-        _find_sub_account_index_by_id(ctx,account_id)
-    }
-
     pub fn add_liquidity(
         ctx: Context<AddLiquidity>,
         strategy_token: Pubkey,
@@ -90,5 +76,17 @@ pub mod webdex_sub_accounts {
         amount: u64,
     ) -> Result<()> {
         _remove_liquidity(ctx,account_id,strategy_token,coin,amount)
+    }
+
+    pub fn position_liquidity(
+        ctx: Context<PositionLiquidity>,
+        account_id: Pubkey,
+        strategy_token: Pubkey,
+        amount: i64,
+        coin: Pubkey,
+        gas: u64,
+        currrencys: Vec<Currencys>,
+    ) -> Result<()> {
+        _position_liquidity(ctx,account_id,strategy_token,amount,coin,gas,currrencys)
     }
 }

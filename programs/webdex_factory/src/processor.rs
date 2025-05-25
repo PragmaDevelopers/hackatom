@@ -31,7 +31,6 @@ pub fn _add_bot(
     fee_withdraw_void: u64,
     contract_address: Pubkey,
     strategy_address: Pubkey,
-    sub_account_address: Pubkey,
     payments_address: Pubkey,
     token_pass_address: Pubkey,
     fee_withdraw_network: u64,
@@ -62,7 +61,6 @@ pub fn _add_bot(
     bot.fee_withdraw_void = fee_withdraw_void;
     bot.manager_address = contract_address;
     bot.strategy_address = strategy_address;
-    bot.sub_account_address = sub_account_address;
     bot.payments_address = payments_address;
     bot.token_pass_address = token_pass_address;
     bot.fee_withdraw_network = fee_withdraw_network;
@@ -95,7 +93,6 @@ pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Resu
         fee_withdraw_void: bot.fee_withdraw_void,
         manager_address: bot.manager_address,
         strategy_address: bot.strategy_address,
-        sub_account_address: bot.sub_account_address,
         payments_address: bot.payments_address,
         token_pass_address: bot.token_pass_address,
         fee_withdraw_network: bot.fee_withdraw_network,
@@ -106,7 +103,6 @@ pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Resu
 pub fn _update_bot(
     ctx: Context<UpdateBot>,
     strategy_address: Option<Pubkey>,
-    sub_account_address: Option<Pubkey>,
     payments_address: Option<Pubkey>,
 ) -> Result<()> {
     assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
@@ -116,9 +112,6 @@ pub fn _update_bot(
     if let Some(addr) = strategy_address {
         bot.strategy_address = addr;
     }
-    if let Some(addr) = sub_account_address {
-        bot.sub_account_address = addr;
-    }
     if let Some(addr) = payments_address {
         bot.payments_address = addr;
     }
@@ -126,7 +119,6 @@ pub fn _update_bot(
     emit!(BotUpdated {
         bot: bot.key(),
         strategy_address: bot.strategy_address,
-        sub_account_address: bot.sub_account_address,
         payments_address: bot.payments_address,
     });
 

@@ -17,7 +17,6 @@ describe("webdex_factoty", () => {
 
     it("Add Bot", async () => {
         const strategyAddress = PublicKey.default;
-        const subAccountAddress = PublicKey.default;
         const tokenPassAddress = PublicKey.default;
         const paymentsAddress = PublicKey.default;
         const fee_withdraw_void = new BN(5);
@@ -49,7 +48,6 @@ describe("webdex_factoty", () => {
                 fee_withdraw_void,
                 contractAddress,
                 strategyAddress,
-                subAccountAddress,
                 paymentsAddress,
                 tokenPassAddress,
                 fee_withdraw_network,

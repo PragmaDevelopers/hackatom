@@ -56,7 +56,7 @@ describe("webdex_payments", () => {
             usdtMint.pubkey,                    // Mint
             usdtTokenAccount.address, // Destination (ATA)
             user.payer,              // Authority (must match mint authority)
-            100_000_000_000             // Amount (ex: 100 tokens with 9 decimals)
+            500_000_000_000             // Amount (ex: 100 tokens with 9 decimals)
         );
 
         const webdexTokenAccount = await getOrCreateAssociatedTokenAccount(

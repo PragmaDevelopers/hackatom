@@ -52,17 +52,4 @@ pub mod webdex_payments {
     pub fn remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
         _remove_coin(ctx,coin)
     }
-
-    pub fn open_position(
-        ctx: Context<OpenPosition>,
-        _decimals: u8,
-        account_id: Pubkey,
-        strategy_token: Pubkey,
-        amount: i64,
-        coin: Pubkey,
-        gas: u64,
-        currrencys: Vec<Currencys>,
-    ) -> Result<()> {
-        _open_position(ctx,_decimals,account_id,strategy_token,amount,coin,gas,currrencys)
-    }
 }

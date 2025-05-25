@@ -1,10 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
-import { PublicKey } from "@solana/web3.js";
-import { expect } from "chai";
-import { getAccount } from "@solana/spl-token";
-import { WebdexManager } from "../../target/types/webdex_manager";
 import { WebdexFactory } from "../../target/types/webdex_factory";
 
 describe("webdex_sub_accounts", () => {
@@ -12,26 +8,17 @@ describe("webdex_sub_accounts", () => {
     anchor.setProvider(provider);
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
-    const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
-    const user = provider.wallet;
 
-    it("Get Sub Accounts - User", async () => {
+    it("Get Sub Accounts List - Bot", async () => {
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots.map((bot) => bot.publicKey)[0]; // BOT 1 - ONE
 
-        // Deriva o PDA do user
-        const [userPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("user"), user.publicKey.toBuffer()],
-            managerProgram.programId
-        );
-
-        // Chamada da função get_sub_accounts
         const subAccounts = await subAccountsProgram.account.subAccount.all([
             {
                 memcmp: {
-                    offset: 8 + 32, // pula discriminator + bot
-                    bytes: userPda.toBase58(),
+                    offset: 8, // pula o discriminator
+                    bytes: botPda.toBase58(), // começa no campo `bot`
                 },
             },
         ]);

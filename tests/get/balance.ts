@@ -19,7 +19,7 @@ describe("webdex_sub_accounts", () => {
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
-    it("Get Balance", async () => {
+    it("Get Balance - Liquidity", async () => {
         const payments = await paymentsProgram.account.payments.all();
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
 
@@ -44,19 +44,17 @@ describe("webdex_sub_accounts", () => {
             managerProgram.programId
         );
 
-        const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
-        );
+        // Chamada da função get_sub_accounts
+        const subAccounts = await subAccountsProgram.account.subAccount.all([
+            {
+                memcmp: {
+                    offset: 8 + 32, // pula discriminator + bot
+                    bytes: userPda.toBase58(),
+                },
+            },
+        ]);
 
-        const subAccounts = await subAccountsProgram.methods
-            .getSubAccounts(userPda)
-            .accounts({
-                subAccountList: subAccountListPda,
-            })
-            .view();
-
-        const subAccountPda = subAccounts[0].subAccountAddress;
+        const subAccountPda = subAccounts[0].publicKey;
 
         const [strategyBalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
@@ -64,7 +62,7 @@ describe("webdex_sub_accounts", () => {
         );
 
         const result = await subAccountsProgram.methods
-            .getBalance(subAccounts[0].id, strategies[0].tokenAddress, usdtMint.pubkey)
+            .getBalance(subAccounts[0].account.id, strategies[0].tokenAddress, usdtMint.pubkey)
             .accounts({
                 subAccount: subAccountPda,
                 strategyBalance: strategyBalancePda,

@@ -13,7 +13,6 @@ pub struct BotInfo {
     pub fee_withdraw_void: u64,
     pub manager_address: Pubkey,
     pub strategy_address: Pubkey,
-    pub sub_account_address: Pubkey,
     pub payments_address: Pubkey,
     pub token_pass_address: Pubkey,
     pub fee_withdraw_network: u64,
@@ -31,7 +30,6 @@ pub struct BotCreated {
 pub struct BotUpdated {
     pub bot: Pubkey,
     pub strategy_address: Pubkey,
-    pub sub_account_address: Pubkey,
     pub payments_address: Pubkey,
 }
 

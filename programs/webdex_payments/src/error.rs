@@ -34,8 +34,4 @@ pub enum ErrorCode {
     StatusMustBeDifferent,
     #[msg("Coin Not Registered")]
     CoinNotRegistered,
-    #[msg("Invalid Coin")]
-    InvalidCoin,
-    #[msg("Invalid Coin")]
-    InvalidAuthority
 }

@@ -434,10 +434,6 @@ export type WebdexStrategy = {
             "type": "pubkey"
           },
           {
-            "name": "subAccountAddress",
-            "type": "pubkey"
-          },
-          {
             "name": "paymentsAddress",
             "type": "pubkey"
           },

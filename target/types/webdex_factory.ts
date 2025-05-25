@@ -104,10 +104,6 @@ export type WebdexFactory = {
           "type": "pubkey"
         },
         {
-          "name": "subAccountAddress",
-          "type": "pubkey"
-        },
-        {
           "name": "paymentsAddress",
           "type": "pubkey"
         },
@@ -203,12 +199,6 @@ export type WebdexFactory = {
       "args": [
         {
           "name": "strategyAddress",
-          "type": {
-            "option": "pubkey"
-          }
-        },
-        {
-          "name": "subAccountAddress",
           "type": {
             "option": "pubkey"
           }
@@ -412,10 +402,6 @@ export type WebdexFactory = {
             "type": "pubkey"
           },
           {
-            "name": "subAccountAddress",
-            "type": "pubkey"
-          },
-          {
             "name": "paymentsAddress",
             "type": "pubkey"
           },
@@ -500,10 +486,6 @@ export type WebdexFactory = {
             "type": "pubkey"
           },
           {
-            "name": "subAccountAddress",
-            "type": "pubkey"
-          },
-          {
             "name": "paymentsAddress",
             "type": "pubkey"
           },
@@ -549,10 +531,6 @@ export type WebdexFactory = {
           },
           {
             "name": "strategyAddress",
-            "type": "pubkey"
-          },
-          {
-            "name": "subAccountAddress",
             "type": "pubkey"
           },
           {

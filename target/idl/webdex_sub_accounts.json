@@ -132,39 +132,6 @@
           "name": "user"
         },
         {
-          "name": "sub_account_list",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116,
-                  95,
-                  108,
-                  105,
-                  115,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
-              }
-            ]
-          }
-        },
-        {
           "name": "sub_account",
           "writable": true,
           "pda": {
@@ -187,11 +154,43 @@
               },
               {
                 "kind": "account",
+                "path": "bot"
+              },
+              {
+                "kind": "account",
                 "path": "user"
               },
               {
                 "kind": "arg",
                 "path": "name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "tracker",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  97,
+                  99,
+                  107,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              },
+              {
+                "kind": "account",
+                "path": "user"
               }
             ]
           }
@@ -212,31 +211,6 @@
           "type": "string"
         }
       ]
-    },
-    {
-      "name": "find_sub_account_index_by_id",
-      "discriminator": [
-        148,
-        160,
-        82,
-        235,
-        60,
-        6,
-        225,
-        200
-      ],
-      "accounts": [
-        {
-          "name": "sub_account_list"
-        }
-      ],
-      "args": [
-        {
-          "name": "account_id",
-          "type": "pubkey"
-        }
-      ],
-      "returns": "i64"
     },
     {
       "name": "get_balance",
@@ -344,35 +318,134 @@
       }
     },
     {
-      "name": "get_sub_accounts",
+      "name": "position_liquidity",
       "discriminator": [
-        28,
-        197,
-        164,
-        187,
-        19,
-        229,
-        3,
-        247
+        5,
+        2,
+        75,
+        207,
+        182,
+        79,
+        10,
+        13
       ],
       "accounts": [
         {
-          "name": "sub_account_list"
+          "name": "bot",
+          "writable": true
+        },
+        {
+          "name": "payments"
+        },
+        {
+          "name": "strategy_list"
+        },
+        {
+          "name": "sub_account",
+          "writable": true
+        },
+        {
+          "name": "strategy_balance",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "temporary_rebalance",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  101,
+                  109,
+                  112,
+                  111,
+                  114,
+                  97,
+                  114,
+                  121,
+                  95,
+                  114,
+                  101,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              },
+              {
+                "kind": "account",
+                "path": "strategy_balance"
+              },
+              {
+                "kind": "account",
+                "path": "payments"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
       "args": [
         {
-          "name": "contract_address",
+          "name": "account_id",
           "type": "pubkey"
-        }
-      ],
-      "returns": {
-        "vec": {
-          "defined": {
-            "name": "SimpleSubAccount"
+        },
+        {
+          "name": "strategy_token",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "i64"
+        },
+        {
+          "name": "coin",
+          "type": "pubkey"
+        },
+        {
+          "name": "gas",
+          "type": "u64"
+        },
+        {
+          "name": "currrencys",
+          "type": {
+            "vec": {
+              "defined": {
+                "name": "Currencys"
+              }
+            }
           }
         }
-      }
+      ]
     },
     {
       "name": "remove_liquidity",
@@ -485,6 +558,19 @@
       ]
     },
     {
+      "name": "Payments",
+      "discriminator": [
+        172,
+        186,
+        73,
+        99,
+        243,
+        28,
+        103,
+        34
+      ]
+    },
+    {
       "name": "StrategyBalanceList",
       "discriminator": [
         101,
@@ -495,6 +581,19 @@
         122,
         101,
         70
+      ]
+    },
+    {
+      "name": "StrategyList",
+      "discriminator": [
+        128,
+        85,
+        53,
+        230,
+        250,
+        80,
+        204,
+        252
       ]
     },
     {
@@ -511,16 +610,16 @@
       ]
     },
     {
-      "name": "SubAccountList",
+      "name": "TemporaryRebalance",
       "discriminator": [
-        38,
-        246,
-        153,
-        110,
-        100,
-        224,
-        230,
-        98
+        62,
+        159,
+        173,
+        85,
+        87,
+        147,
+        54,
+        113
       ]
     },
     {
@@ -534,6 +633,19 @@
         151,
         58,
         236
+      ]
+    },
+    {
+      "name": "UserSubAccountTracker",
+      "discriminator": [
+        26,
+        66,
+        149,
+        140,
+        159,
+        57,
+        235,
+        41
       ]
     }
   ],
@@ -588,6 +700,32 @@
         212,
         46,
         2
+      ]
+    },
+    {
+      "name": "OpenPositionEvent",
+      "discriminator": [
+        83,
+        43,
+        164,
+        147,
+        169,
+        87,
+        81,
+        172
+      ]
+    },
+    {
+      "name": "TraderEvent",
+      "discriminator": [
+        54,
+        131,
+        40,
+        86,
+        169,
+        250,
+        106,
+        144
       ]
     }
   ],
@@ -701,6 +839,11 @@
       "code": 6021,
       "name": "DuplicateSubAccountName",
       "msg": "Insufficient funds to subtract"
+    },
+    {
+      "code": 6022,
+      "name": "InvalidCoin",
+      "msg": "Invalid Coin"
     }
   ],
   "types": [
@@ -850,10 +993,6 @@
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
-            "type": "pubkey"
-          },
-          {
             "name": "payments_address",
             "type": "pubkey"
           },
@@ -905,14 +1044,54 @@
       }
     },
     {
-      "name": "CreateSubAccountEvent",
+      "name": "CoinData",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "signer",
+            "name": "pubkey",
             "type": "pubkey"
           },
+          {
+            "name": "coin",
+            "type": {
+              "defined": {
+                "name": "Coins"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Coins",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "symbol",
+            "type": "string"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateSubAccountEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
           {
             "name": "user",
             "type": "pubkey"
@@ -929,16 +1108,48 @@
       }
     },
     {
-      "name": "SimpleSubAccount",
+      "name": "Currencys",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "user_address",
+            "name": "from",
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
+            "name": "to",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "FeeTier",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "limit",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "OpenPositionEvent",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contract_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
             "type": "pubkey"
           },
           {
@@ -946,8 +1157,96 @@
             "type": "pubkey"
           },
           {
+            "name": "details",
+            "type": {
+              "defined": {
+                "name": "PositionDetails"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Payments",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contract_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "fee_tiers",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "FeeTier"
+                }
+              }
+            }
+          },
+          {
+            "name": "coins",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "CoinData"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "PositionDetails",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strategy",
+            "type": "pubkey"
+          },
+          {
+            "name": "coin",
+            "type": "pubkey"
+          },
+          {
+            "name": "old_balance",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "gas",
+            "type": "u64"
+          },
+          {
+            "name": "profit",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Strategy",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "token_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_active",
+            "type": "bool"
           }
         ]
       }
@@ -985,10 +1284,40 @@
       }
     },
     {
+      "name": "StrategyList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "contract_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "strategies",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "Strategy"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "SubAccount",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "bot",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
           {
             "name": "id",
             "type": "pubkey"
@@ -1013,7 +1342,19 @@
       }
     },
     {
-      "name": "SubAccountList",
+      "name": "TemporaryRebalance",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "TraderEvent",
       "type": {
         "kind": "struct",
         "fields": [
@@ -1022,14 +1363,12 @@
             "type": "pubkey"
           },
           {
-            "name": "sub_accounts",
-            "type": {
-              "vec": {
-                "defined": {
-                  "name": "SimpleSubAccount"
-                }
-              }
-            }
+            "name": "from",
+            "type": "pubkey"
+          },
+          {
+            "name": "to",
+            "type": "pubkey"
           }
         ]
       }
@@ -1054,6 +1393,28 @@
           {
             "name": "status",
             "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserSubAccountTracker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "count",
+            "type": "u8"
+          },
+          {
+            "name": "names",
+            "type": {
+              "vec": "string"
+            }
           }
         ]
       }

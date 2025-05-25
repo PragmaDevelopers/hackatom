@@ -1,30 +1,46 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
+import { WebdexNetwork } from "../../target/types/webdex_network";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
+import BN from "bn.js";
+import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'
+import {
+    fetchMetadata,
+    findMetadataPda,
+    mplTokenMetadata,
+} from "@metaplex-foundation/mpl-token-metadata";
+import { fetchMint } from "@metaplex-foundation/mpl-toolbox";
+import { publicKey } from "@metaplex-foundation/umi";
+import { getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
 import { WebdexFactory } from "../../target/types/webdex_factory";
-import { WebdexPayments } from "../../target/types/webdex_payments";
 import { WebdexStrategy } from "../../target/types/webdex_strategy";
+import { WebdexPayments } from "../../target/types/webdex_payments";
 import { WebdexManager } from "../../target/types/webdex_manager";
 import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
-import { PublicKey } from "@solana/web3.js";
-import { BN } from "bn.js";
 
-describe("webdex_close", () => {
+describe("webdex_network", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
-    const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
+    const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
+    const networkProgram = anchor.workspace.WebdexNetwork as Program<WebdexNetwork>;
     const user = provider.wallet;
 
-    it("Liquidity Remove - Burn And Transfer", async () => {
+    it("Pay Fee", async () => {
         const payments = await paymentsProgram.account.payments.all();
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
 
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
+
+        const [userPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("user"), user.publicKey.toBuffer()],
+            managerProgram.programId
+        );
 
         const [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_list"), botPda.toBuffer()],
@@ -39,16 +55,6 @@ describe("webdex_close", () => {
             })
             .view(); // <- importante: view() para funções que retornam valores
 
-        const [userPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("user"), user.publicKey.toBuffer()],
-            managerProgram.programId
-        );
-
-        const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
-        );
-
         // Chamada da função get_sub_accounts
         const subAccounts = await subAccountsProgram.account.subAccount.all([
             {
@@ -61,47 +67,32 @@ describe("webdex_close", () => {
 
         const subAccountPda = subAccounts[0].publicKey;
 
-        const amount = new BN(50_000_000_000);
-
-        // FAZ O BURN
-        const tx = await managerProgram.methods
-            .liquidityRemove(
-                strategies[0].tokenAddress,
-                usdtMint.coin.decimals,
-                amount,
-            )
-            .accounts({
-                subAccount: subAccountPda,
-                strategyList: strategyListPda,
-                signer: user.publicKey,
-                tokenMint: usdtMint.pubkey,
-            })
-            .rpc();
-
-        console.log("✅ liquidityRemove tx:", tx);
-
-        console.log("Add Liquidity - Atualiza o saldo")
-
         const [strategyBalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
             subAccountsProgram.programId
         );
 
-        // ATUALIZA O SALDO
-        const txa = await subAccountsProgram.methods
-            .removeLiquidity(
-                subAccounts[0].account.id,
-                strategies[0].tokenAddress,
-                usdtMint.pubkey,
-                amount,
-            )
+        const balance = await subAccountsProgram.methods
+            .getBalance(subAccounts[0].account.id, strategies[0].tokenAddress, usdtMint.pubkey)
             .accounts({
-                bot: botPda,
                 subAccount: subAccountPda,
                 strategyBalance: strategyBalancePda,
             })
+            .view();
+
+        const tx = await networkProgram.methods
+            .payFee(
+                bots[0].account.managerAddress,
+                usdtMint.pubkey,
+                new BN(balance.amount),
+            )
+            .accounts({
+                bot: botPda,
+                user: userPda,
+                signer: user.publicKey,
+            })
             .rpc();
 
-        console.log("✅ TX Hash:", txa);
+        console.log("✅ Transaction signature:", tx);
     });
 });

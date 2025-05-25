@@ -21,7 +21,6 @@ idl-build = ["anchor-spl/idl-build"]
 anchor-lang = { version = "0.31.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.31.0", features = ["metadata"] }
 serde = { version = "1.0", features = ["derive"] }
-webdex_strategy = { path = "../webdex_strategy", features = ["no-entrypoint"] }
-webdex_sub_accounts = { path = "../webdex_sub_accounts", features = ["no-entrypoint", "cpi"] }
+shared_sub_accounts = { path = "../../shared/sub_accounts" }
 shared_factory = { path = "../../shared/factory" }
 shared_manager = { path = "../../shared/manager" }

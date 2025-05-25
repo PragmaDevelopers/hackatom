@@ -428,10 +428,6 @@
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
-            "type": "pubkey"
-          },
-          {
             "name": "payments_address",
             "type": "pubkey"
           },

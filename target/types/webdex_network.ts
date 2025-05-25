@@ -57,9 +57,6 @@ export type WebdexNetwork = {
           "name": "user"
         },
         {
-          "name": "subAccount"
-        },
-        {
           "name": "balanceInfo",
           "writable": true,
           "pda": {
@@ -82,7 +79,7 @@ export type WebdexNetwork = {
                 ]
               },
               {
-                "kind": "account",
+                "kind": "arg",
                 "path": "contractAddress"
               },
               {
@@ -90,17 +87,11 @@ export type WebdexNetwork = {
                 "path": "user"
               },
               {
-                "kind": "account",
-                "path": "tokenMint"
+                "kind": "arg",
+                "path": "token"
               }
             ]
           }
-        },
-        {
-          "name": "tokenMint"
-        },
-        {
-          "name": "contractAddress"
         },
         {
           "name": "signer",
@@ -115,6 +106,10 @@ export type WebdexNetwork = {
       "args": [
         {
           "name": "contractAddress",
+          "type": "pubkey"
+        },
+        {
+          "name": "token",
           "type": "pubkey"
         },
         {
@@ -1101,10 +1096,6 @@ export type WebdexNetwork = {
             "type": "pubkey"
           },
           {
-            "name": "subAccountAddress",
-            "type": "pubkey"
-          },
-          {
             "name": "paymentsAddress",
             "type": "pubkey"
           },
@@ -1128,6 +1119,14 @@ export type WebdexNetwork = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "bot",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
           {
             "name": "id",
             "type": "pubkey"

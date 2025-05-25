@@ -49,14 +49,17 @@ describe("webdex_sub_accounts", () => {
             subAccountsProgram.programId
         );
 
-        const subAccounts = await subAccountsProgram.methods
-            .getSubAccounts(userPda)
-            .accounts({
-                subAccountList: subAccountListPda,
-            })
-            .view();
+        // Chamada da função get_sub_accounts
+        const subAccounts = await subAccountsProgram.account.subAccount.all([
+            {
+                memcmp: {
+                    offset: 8 + 32, // pula discriminator + bot
+                    bytes: userPda.toBase58(),
+                },
+            },
+        ]);
 
-        const subAccountPda = subAccounts[0].subAccountAddress;
+        const subAccountPda = subAccounts[0].publicKey;
 
         const [strategyBalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
@@ -64,7 +67,7 @@ describe("webdex_sub_accounts", () => {
         );
 
         const balanceStrategy = await subAccountsProgram.methods
-            .getBalance(subAccounts[0].id, strategies[0].tokenAddress, usdtMint.pubkey)
+            .getBalance(subAccounts[0].account.id, strategies[0].tokenAddress, usdtMint.pubkey)
             .accounts({
                 subAccount: subAccountPda,
                 strategyBalance: strategyBalancePda,
@@ -73,7 +76,7 @@ describe("webdex_sub_accounts", () => {
 
         const tx = await subAccountsProgram.methods
             .togglePause(
-                subAccounts[0].id,
+                subAccounts[0].account.id,
                 strategies[0].tokenAddress,
                 usdtMint.pubkey,
                 !balanceStrategy.paused,

@@ -57,16 +57,16 @@ pub fn _add_gas(ctx: Context<AddGas>, amount: u64) -> Result<()> {
 
     let user = &mut ctx.accounts.user;
 
-    // Transfere lamports do usuário (signer) para a conta PDA (vault_sol)
+    // Transfere lamports do usuário (signer) para a conta PDA (vault_wsol_account)
     invoke(
         &system_instruction::transfer(
             &ctx.accounts.signer.key(),
-            &ctx.accounts.wsol_vault.key(),
+            &ctx.accounts.vault_wsol_account.key(),
             amount,
         ),
         &[
             ctx.accounts.signer.to_account_info(),
-            ctx.accounts.wsol_vault.to_account_info(),
+            ctx.accounts.vault_wsol_account.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
         ],
     )?;
@@ -75,7 +75,7 @@ pub fn _add_gas(ctx: Context<AddGas>, amount: u64) -> Result<()> {
     let cpi_ctx = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         anchor_spl::token::SyncNative {
-            account: ctx.accounts.wsol_vault.to_account_info(),
+            account: ctx.accounts.vault_wsol_account.to_account_info(),
         },
     );
     anchor_spl::token::sync_native(cpi_ctx)?;
@@ -102,17 +102,17 @@ pub fn _remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
 
     user.gas_balance = user.gas_balance.saturating_sub(amount);
 
-    // Seeds e bump para PDA (vault_sol_account)
-    let bump = ctx.bumps.vault_sol;
+    // Seeds e bump para PDA (vault_wsol_account)
+    let bump = ctx.bumps.vault_wsol_authority;
     let signer_seeds: &[&[&[u8]]] = &[&[b"vault_sol",user_key.as_ref(), &[bump]]];
 
     // Transfere WSOL da vault para o destino
     let cpi_ctx = CpiContext::new_with_signer(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from: ctx.accounts.wsol_vault.to_account_info(),
+            from: ctx.accounts.vault_wsol_account.to_account_info(),
             to: ctx.accounts.user_wsol_account.to_account_info(),
-            authority: ctx.accounts.vault_sol.to_account_info(),
+            authority: ctx.accounts.vault_wsol_authority.to_account_info(),
         },
         signer_seeds
     );
@@ -323,7 +323,7 @@ pub fn _rebalance_position(
     let user = &mut ctx.accounts.user;
     let user_key = user.key();
     let signer = &mut ctx.accounts.signer;
-    let temporary_fee_account = &mut ctx.accounts.temporary_fee_account;
+    let temporary_rebalance = &mut ctx.accounts.temporary_rebalance;
     let sub_account = &mut ctx.accounts.sub_account;
     let sub_account_key = sub_account.key();
 
@@ -331,7 +331,7 @@ pub fn _rebalance_position(
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 
-    if temporary_fee_account.fee == 0 {
+    if temporary_rebalance.fee == 0 {
         return Err(ErrorCode::InvalidTemporaryFee.into());
     }
 
@@ -339,13 +339,13 @@ pub fn _rebalance_position(
     if user.gas_balance < gas {
         return Err(ErrorCode::InsufficientGasBalance.into());
     }
-    if user.pass_balance < temporary_fee_account.fee {
+    if user.pass_balance < temporary_rebalance.fee {
         return Err(ErrorCode::InsufficientPassBalance.into());
     }
 
     // Atualiza saldos
     user.gas_balance = user.gas_balance.saturating_sub(gas);
-    user.pass_balance = user.pass_balance.saturating_sub(temporary_fee_account.fee);
+    user.pass_balance = user.pass_balance.saturating_sub(temporary_rebalance.fee);
 
     if amount > 0 {
         let bump = ctx.bumps.lp_mint_authority;
@@ -383,26 +383,22 @@ pub fn _rebalance_position(
         burn(cpi_ctx, amount)?;
     }
 
-    // Recupera o bump para a PDA vault_sol_account
-    let bump = ctx.bumps.vault_sol_account;
-    let seeds = &[b"vault_sol", user_key.as_ref(), &[bump]];
+    // Transfere WSOL da vault para o bot_owner
+    let bump = ctx.bumps.vault_wsol_authority;
+    let signer_seeds: &[&[&[u8]]] = &[&[b"vault_sol",user_key.as_ref(), &[bump]]];
 
-    // Transfere lamports da vault_sol_account para o bot_owner
-    invoke_signed(
-        &system_instruction::transfer(
-            &ctx.accounts.vault_sol_account.key(),
-            &ctx.accounts.bot_owner.key(),
-            gas,
-        ),
-        &[
-            ctx.accounts.vault_sol_account.to_account_info(),
-            ctx.accounts.bot_owner.to_account_info(),
-            ctx.accounts.system_program.to_account_info(),
-        ],
-        &[seeds],
-    )?;
+    let cpi_ctx = CpiContext::new_with_signer(
+        ctx.accounts.token_program.to_account_info(),
+        Transfer {
+            from: ctx.accounts.vault_wsol_account.to_account_info(),
+            to: ctx.accounts.owner_wsol_account.to_account_info(),
+            authority: ctx.accounts.vault_wsol_authority.to_account_info(),
+        },
+        signer_seeds
+    );
+    transfer(cpi_ctx, gas)?;
 
-    temporary_fee_account.fee = 0;
+    temporary_rebalance.fee = 0;
 
     // Emite eventos (você pode adaptar para seus eventos atuais)
     emit!(BalanceGasEvent {
@@ -416,7 +412,7 @@ pub fn _rebalance_position(
     emit!(BalancePassEvent {
         user: user_key,
         balance: user.pass_balance,
-        value: temporary_fee_account.fee,
+        value: temporary_rebalance.fee,
         increase: false,
         is_operation: true,
     });

@@ -25,3 +25,5 @@ mpl-token-metadata = "5.1.0"
 shared_factory = { path = "../../shared/factory" }
 shared_manager = { path = "../../shared/manager" }
 shared_sub_accounts = { path = "../../shared/sub_accounts" }
+webdex_payments = { path = "../webdex_payments", features = ["no-entrypoint"] }
+webdex_strategy = { path = "../webdex_strategy", features = ["no-entrypoint"] }

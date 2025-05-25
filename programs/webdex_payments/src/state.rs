@@ -3,11 +3,7 @@ use serde::{Deserialize, Serialize};
 
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
-
-use webdex_sub_accounts::program::WebdexSubAccounts;
-
-use webdex_strategy::state::{StrategyList};
-use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
+use shared_sub_accounts::state::{SubAccount,StrategyBalanceList};
 
 use anchor_spl::token::{Token};
 use anchor_spl::associated_token::AssociatedToken;
@@ -29,11 +25,6 @@ impl Payments {
         + 4 + MAX_COINS * (32 + 52); // coins (Pubkey + Coins)
 }
 
-#[account]
-pub struct FeeAccount {
-    pub fee: u64, // Armazena o valor do fee
-}
-
 #[derive(AnchorSerialize, AnchorDeserialize, Serialize, Deserialize, Clone, Default)]
 pub struct FeeTier {
     pub limit: u64,
@@ -52,22 +43,6 @@ pub struct Coins {
 pub struct CoinData {
     pub pubkey: Pubkey,
     pub coin: Coins,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
-pub struct Currencys {
-    pub from: Pubkey,
-    pub to: Pubkey,
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
-pub struct PositionDetails {
-    pub strategy: Pubkey,
-    pub coin: Pubkey,
-    pub old_balance: u64,
-    pub fee: u64,
-    pub gas: u64,
-    pub profit: i64,
 }
 
 #[derive(Accounts)]
@@ -118,58 +93,4 @@ pub struct RemoveCoin<'info> {
     #[account(mut)]
     pub payments: Account<'info, Payments>,
     pub signer: Signer<'info>,
-}
-
-#[derive(Accounts)]
-#[instruction(decimals: u8)]
-pub struct OpenPosition<'info> {
-    #[account(mut)]
-    pub bot: Account<'info, Bot>,
-
-    pub payments: Account<'info, Payments>,
-
-    pub strategy_list: Account<'info, StrategyList>, 
-
-    #[account(mut)]
-    pub sub_account: Account<'info, SubAccount>,
-
-    #[account(mut)]
-    pub strategy_balance: Account<'info, StrategyBalanceList>, 
-
-    #[account(mut)]
-    pub user: Account<'info, User>,
-
-    #[account(
-        init_if_needed,
-        payer = signer,
-        space = 8 + std::mem::size_of::<FeeAccount>(),
-        seeds = [b"temporary_fee", bot.key().as_ref(), user.key().as_ref(), sub_account.key().as_ref(), strategy_balance.key().as_ref(), payments.key().as_ref()],
-        bump
-    )]
-    pub temporary_fee_account: Account<'info, FeeAccount>,
-
-    #[account(mut)]
-    pub signer: Signer<'info>,
-
-    pub system_program: Program<'info, System>,
-    pub token_program: Program<'info, Token>,
-    pub associated_token_program: Program<'info, AssociatedToken>,
-
-    /// CHECK: CPI calls
-    pub sub_account_program: Program<'info, WebdexSubAccounts>,
-}
-
-#[event]
-pub struct OpenPositionEvent {
-    pub contract_address: Pubkey,
-    pub user: Pubkey,
-    pub id: Pubkey,
-    pub details: PositionDetails,
-}
-
-#[event]
-pub struct TraderEvent {
-    pub contract_address: Pubkey,
-    pub from: Pubkey,
-    pub to: Pubkey,
 }

@@ -98,10 +98,6 @@
           "type": "pubkey"
         },
         {
-          "name": "sub_account_address",
-          "type": "pubkey"
-        },
-        {
           "name": "payments_address",
           "type": "pubkey"
         },
@@ -197,12 +193,6 @@
       "args": [
         {
           "name": "strategy_address",
-          "type": {
-            "option": "pubkey"
-          }
-        },
-        {
-          "name": "sub_account_address",
           "type": {
             "option": "pubkey"
           }
@@ -406,10 +396,6 @@
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
-            "type": "pubkey"
-          },
-          {
             "name": "payments_address",
             "type": "pubkey"
           },
@@ -494,10 +480,6 @@
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
-            "type": "pubkey"
-          },
-          {
             "name": "payments_address",
             "type": "pubkey"
           },
@@ -543,10 +525,6 @@
           },
           {
             "name": "strategy_address",
-            "type": "pubkey"
-          },
-          {
-            "name": "sub_account_address",
             "type": "pubkey"
           },
           {

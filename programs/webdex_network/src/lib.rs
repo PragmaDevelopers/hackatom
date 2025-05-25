@@ -19,9 +19,10 @@ pub mod webdex_network {
     pub fn pay_fee(
         ctx: Context<PayFee>,
         contract_address: Pubkey,
+        token: Pubkey,
         amount: u64,
     ) -> Result<()> {
-        _pay_fee(ctx,contract_address,amount)
+        _pay_fee(ctx,contract_address,token,amount)
     }
 
     pub fn withdrawal(

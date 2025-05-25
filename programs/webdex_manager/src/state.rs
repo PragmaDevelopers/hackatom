@@ -1,11 +1,9 @@
 use anchor_lang::prelude::*;
 use webdex_strategy::state::{StrategyList};
-use shared_sub_accounts::state::{BalanceStrategy};
+use shared_sub_accounts::state::{BalanceStrategy,SubAccount,StrategyBalanceList};
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
-use webdex_sub_accounts::state::{SubAccount,StrategyBalanceList};
-use webdex_sub_accounts::program::WebdexSubAccounts;
-use webdex_payments::state::{FeeAccount};
+use webdex_sub_accounts::state::{TemporaryRebalance};
 use anchor_spl::token::{Token,TokenAccount,Mint};
 use anchor_spl::associated_token::AssociatedToken;
 use shared_factory::authority::{
@@ -94,22 +92,19 @@ pub struct AddGas<'info> {
     pub user_wsol_account: Account<'info, TokenAccount>,
 
     #[account(
-        init_if_needed,
-        payer = signer,
-        space = 0,
         seeds = [b"vault_sol", user.key().as_ref()],
         bump,
     )]
     /// CHECK: conta PDA para armazenar SOL (lamports)
-    pub vault_sol: AccountInfo<'info>,
+    pub vault_wsol_authority: AccountInfo<'info>,
 
     #[account(
         init_if_needed,
         payer = signer,
         associated_token::mint = wsol_mint,
-        associated_token::authority = vault_sol,
+        associated_token::authority = vault_wsol_authority,
     )]
-    pub wsol_vault: Account<'info, TokenAccount>,
+    pub vault_wsol_account: Account<'info, TokenAccount>,
 
     #[account(address = _fixed_native_mint())]
     pub wsol_mint: Account<'info, Mint>,
@@ -140,19 +135,18 @@ pub struct RemoveGas<'info> {
     pub user_wsol_account: Account<'info, TokenAccount>,
 
     #[account(
-        mut,
         seeds = [b"vault_sol", user.key().as_ref()],
         bump,
     )]
     /// CHECK: conta PDA para armazenar SOL (lamports)
-    pub vault_sol: AccountInfo<'info>,
+    pub vault_wsol_authority: AccountInfo<'info>,
 
     #[account(
         mut,
         associated_token::mint = wsol_mint,
-        associated_token::authority = vault_sol,
+        associated_token::authority = vault_wsol_authority,
     )]
-    pub wsol_vault: Account<'info, TokenAccount>,
+    pub vault_wsol_account: Account<'info, TokenAccount>,
 
     #[account(address = _fixed_native_mint())]
     pub wsol_mint: Account<'info, Mint>,
@@ -399,8 +393,6 @@ pub struct LiquidityRemove<'info> {
     #[account(mut)]
     pub signer: Signer<'info>,
 
-    pub sub_account_program: Program<'info,WebdexSubAccounts>,
-
     pub token_program: Program<'info, Token>,
     pub associated_token_program: Program<'info, AssociatedToken>,
 }
@@ -418,7 +410,7 @@ pub struct RebalancePosition<'info> {
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(mut)]
-    pub temporary_fee_account: Account<'info, FeeAccount>,
+    pub temporary_rebalance: Account<'info, TemporaryRebalance>,
 
     /// CHECK: Apenas para seeds
     pub token_mint: AccountInfo<'info>,
@@ -447,6 +439,14 @@ pub struct RebalancePosition<'info> {
     )]
     pub sub_account_lp_token_account: Account<'info, TokenAccount>, // recebe LP tokens
 
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = wsol_mint,
+        associated_token::authority = bot_owner,
+    )]
+    pub owner_wsol_account: Account<'info, TokenAccount>,
+
     /// CHECK: Autoridade fixa do bot owner
     #[account(address = _fixed_authorized_owner())]
     pub bot_owner: AccountInfo<'info>,
@@ -459,12 +459,21 @@ pub struct RebalancePosition<'info> {
     pub lp_mint_authority: AccountInfo<'info>,
 
     #[account(
-        mut,
         seeds = [b"vault_sol", user.key().as_ref()],
         bump,
     )]
     /// CHECK: conta PDA para armazenar SOL (lamports)
-    pub vault_sol_account: AccountInfo<'info>,
+    pub vault_wsol_authority: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = wsol_mint,
+        associated_token::authority = vault_wsol_authority,
+    )]
+    pub vault_wsol_account: Account<'info, TokenAccount>,
+
+    #[account(address = _fixed_native_mint())]
+    pub wsol_mint: Account<'info, Mint>,
 
     #[account(mut)]
     pub signer: Signer<'info>,

@@ -46,19 +46,17 @@ describe("webdex_manager", () => {
             managerProgram.programId
         );
 
-        const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
-        );
+        // Chamada da função get_sub_accounts
+        const subAccounts = await subAccountsProgram.account.subAccount.all([
+            {
+                memcmp: {
+                    offset: 8 + 32, // pula discriminator + bot
+                    bytes: userPda.toBase58(),
+                },
+            },
+        ]);
 
-        const subAccounts = await subAccountsProgram.methods
-            .getSubAccounts(userPda)
-            .accounts({
-                subAccountList: subAccountListPda,
-            })
-            .view();
-
-        const subAccountPda = subAccounts[0].subAccountAddress;
+        const subAccountPda = subAccounts[0].publicKey;
 
         // FAZ O MINT
         const tx = await managerProgram.methods
@@ -85,7 +83,7 @@ describe("webdex_manager", () => {
         const txa = await subAccountsProgram.methods
             .addLiquidity(
                 strategies[0].tokenAddress,
-                subAccounts[0].id,
+                subAccounts[0].account.id,
                 usdtMint.pubkey,
                 amount,
                 usdtMint.coin.name,

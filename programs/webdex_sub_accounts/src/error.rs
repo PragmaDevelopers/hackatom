@@ -45,5 +45,7 @@ pub enum ErrorCode {
     #[msg("Insufficient funds to subtract")]
     InsufficientFunds,
     #[msg("Insufficient funds to subtract")]
-    DuplicateSubAccountName
+    DuplicateSubAccountName,
+    #[msg("Invalid Coin")]
+    InvalidCoin,
 }

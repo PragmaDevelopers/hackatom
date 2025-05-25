@@ -3,104 +3,56 @@ use crate::state::*;
 use crate::error::ErrorCode;
 
 use shared_sub_accounts::state::{BalanceStrategy};
+use webdex_payments::state::{Payments};
 
-pub fn _create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Result<()> {
-    let sub_account_list = &mut ctx.accounts.sub_account_list;
-    let sub_account = &mut ctx.accounts.sub_account;
-    let signer = &ctx.accounts.signer;
-    let user = &ctx.accounts.user;
+pub fn _create_sub_account(
+    ctx: Context<CreateSubAccount>,
+    name: String,
+) -> Result<()> {
+    let user_key = ctx.accounts.user.key();
     let bot = &ctx.accounts.bot;
+    let sub_account = &mut ctx.accounts.sub_account;
+    let tracker = &mut ctx.accounts.tracker;
 
-    if bot.manager_address == Pubkey::default() {
-       return Err(ErrorCode::Unauthorized.into());
+    // Valida limite de subcontas
+    if tracker.count >= UserSubAccountTracker::MAX_SUBACCOUNTS as u8 {
+        return Err(ErrorCode::MaxSubAccountsReached.into());
     }
 
-    // ✅ Garante que o contrato da lista pertence ao mesmo bot
-    if sub_account_list.contract_address == Pubkey::default() {
-        sub_account_list.contract_address = bot.manager_address;
-    }
-
-    // Verifica se já existe uma subconta com o mesmo nome para este usuário
-    let already_exists = sub_account_list
-        .sub_accounts
-        .iter()
-        .any(|entry| entry.user_address == user.key() && entry.name == name);
-
-    if already_exists {
+    // Valida nome duplicado
+    if tracker.names.iter().any(|n| n == &name) {
         return Err(ErrorCode::DuplicateSubAccountName.into());
     }
 
-    // ✅ Gera o PDA de forma determinística
+    // Gera id determinístico (opcional, pode usar o próprio address)
     let (sub_account_id, _bump) = Pubkey::find_program_address(
         &[
             b"sub_account_id",
-            user.key().as_ref(),
+            user_key.as_ref(),
             name.as_bytes(),
-            bot.prefix.as_bytes(),
+            bot.prefix.as_ref(),
         ],
         ctx.program_id,
     );
 
-    // ✅ Inicializa a subconta
+    // Inicializa subconta
+    sub_account.user = user_key;
+    sub_account.bot = bot.manager_address;
     sub_account.id = sub_account_id;
     sub_account.name = name.clone();
-    sub_account.list_strategies = Vec::new();
-    sub_account.strategies = Vec::new();
 
-    // ✅ Atualiza a lista de subcontas
-    sub_account_list.sub_accounts.push(SimpleSubAccount {
-        user_address: user.key(),
-        sub_account_address: sub_account.key(),
-        id: sub_account_id,
-        name: name.clone(),
-    });
+    // Atualiza o tracker
+    tracker.count += 1;
+    tracker.names.push(name.clone());
 
-    // ✅ Emite o evento
+    // Evento
     emit!(CreateSubAccountEvent {
-        signer: signer.key(),
-        user: user.key(),
+        user: user_key,
         id: sub_account_id,
         name,
     });
 
     Ok(())
-}
-
-pub fn _get_sub_accounts(
-    ctx: Context<GetSubAccounts>,
-    user: Pubkey,
-) -> Result<Vec<SimpleSubAccount>> {
-    let list = &ctx.accounts.sub_account_list;
-
-    // Filtra sub_accounts que pertencem ao usuário informado
-    let sub_accounts: Vec<SimpleSubAccount> = list
-        .sub_accounts
-        .iter()
-        .filter(|entry| entry.user_address == user)  // <-- filtro pelo user
-        .map(|entry| SimpleSubAccount {
-            user_address: entry.user_address,
-            sub_account_address: entry.sub_account_address.clone(),
-            id: entry.id.clone(),
-            name: entry.name.clone(),
-        })
-        .collect();
-
-    Ok(sub_accounts)
-}
-
-pub fn _find_sub_account_index_by_id(
-    ctx: Context<FindSubAccountIndex>,
-    account_id: Pubkey,
-) -> Result<i64> {
-    let list = &ctx.accounts.sub_account_list;
-
-    for (i, entry) in list.sub_accounts.iter().enumerate() {
-        if entry.id == account_id {
-            return Ok(i as i64);
-        }
-    }
-
-    Ok(-1)
 }
 
 pub fn _add_liquidity<'info>(
@@ -346,15 +298,21 @@ pub fn _remove_liquidity(
     Ok(())
 }
 
-pub fn _position_liquidity<'info>(
-    mut ctx: CpiContext<'_, '_, '_, 'info, PositionLiquidity<'info>>,
+pub fn _position_liquidity(
+    ctx: Context<PositionLiquidity>,
     account_id: Pubkey,
     strategy_token: Pubkey,
+    amount: i64,
     coin: Pubkey,
-    amount: i64 // pode ser positivo ou negativo
-) -> Result<u64> {
+    gas: u64,
+    currrencys: Vec<Currencys>,
+) -> Result<()> {
     let sub_account = &ctx.accounts.sub_account;
     let signer = &ctx.accounts.signer;
+    let payments = &ctx.accounts.payments;
+    let user = &ctx.accounts.user;
+    let strategy_list = &ctx.accounts.strategy_list;
+    let temporary_rebalance = &mut ctx.accounts.temporary_rebalance;
 
     if ctx.accounts.bot.manager_address == Pubkey::default() {
        return Err(ErrorCode::Unauthorized.into());
@@ -366,6 +324,31 @@ pub fn _position_liquidity<'info>(
 
     if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountId.into());
+    }
+
+    let strategy = strategy_list
+        .strategies
+        .iter()
+        .find(|s| s.token_address == strategy_token)
+        .ok_or(ErrorCode::StrategyNotFound)?;
+
+    // ✅ Verifica se está ativa
+    require!(strategy.is_active, ErrorCode::StrategyNotFound);
+
+    // 2. Verifica moedas ativadas
+    for pair in currrencys.iter() {
+        let from_valid = payments
+            .coins
+            .iter()
+            .any(|c| c.pubkey == pair.from && c.coin.status);
+        let to_valid = payments
+            .coins
+            .iter()
+            .any(|c| c.pubkey == pair.to && c.coin.status);
+
+        if !from_valid || !to_valid {
+            return Err(ErrorCode::InvalidCoin.into());
+        }
     }
 
     let strat_balance = &mut ctx.accounts.strategy_balance;
@@ -384,6 +367,9 @@ pub fn _position_liquidity<'info>(
 
     let old_balance = entry.amount;
 
+    // 4. Calcula a fee
+    let fee = _calculate_fee(&payments, old_balance);
+
     // ✅ Aplica a operação
     let new_balance = if amount >= 0 {
         entry.amount.saturating_add(amount as u64)
@@ -397,6 +383,11 @@ pub fn _position_liquidity<'info>(
 
     entry.amount = new_balance;
 
+    // Armazena a fee no PDA temporário
+    temporary_rebalance.fee = fee;
+
+    // CHAMAR A FUNÇÂO REBALANCE POSITION DO CONTRATO MANAGER LOGO DEPOIS PARA FAZER USO DO "temp_fee_account"
+
     emit!(BalanceLiquidityEvent {
         id: account_id,
         strategy_token,
@@ -406,5 +397,44 @@ pub fn _position_liquidity<'info>(
         is_operation: true,
     });
 
-    Ok(old_balance)
+    let details = PositionDetails {
+        strategy: strategy_token,
+        coin,
+        old_balance,
+        fee,
+        gas,
+        profit: amount,
+    };
+
+    // 5. Emite eventos (Anchor Events ou logs)
+    emit!(OpenPositionEvent {
+        contract_address: ctx.accounts.bot.manager_address.key(),
+        user: ctx.accounts.user.key(),
+        id: account_id.clone(),
+        details,
+    });
+
+    for pair in currrencys.iter() {
+        emit!(TraderEvent {
+            contract_address: ctx.accounts.bot.manager_address.key(),
+            from: pair.from,
+            to: pair.to,
+        });
+    }
+
+    Ok(())
+}
+
+pub fn _calculate_fee(payments: &Payments, value: u64) -> u64 {
+    for tier in &payments.fee_tiers {
+        if value <= tier.limit {
+            return tier.fee;
+        }
+    }
+
+    // Se nenhum limite bateu, retorna o último tier
+    return payments.fee_tiers
+        .last()
+        .map(|tier| tier.fee)
+        .unwrap_or(0) // retorna 0 se não houver tiers
 }

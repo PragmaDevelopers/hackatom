@@ -1,78 +1,56 @@
 use anchor_lang::prelude::*;
 use shared_factory::state::{Bot};
 use shared_manager::state::{User};
-use shared_sub_accounts::state::{BalanceStrategy};
+use shared_sub_accounts::state::{BalanceStrategy,StrategyBalanceList,SubAccount};
+use webdex_strategy::state::{StrategyList};
+use webdex_payments::state::{Payments};
 
 #[account]
-pub struct StrategyBalanceList {
-    pub strategy_token: Pubkey,
-    pub status: bool,
-    pub list_coins: Vec<Pubkey>,
-    pub balance: Vec<BalanceStrategy>,
+pub struct TemporaryRebalance {
+    pub fee: u64, // 8 bytes
 }
 
-impl StrategyBalanceList {
-    pub const MAX_LIST_COINS: usize = 10; // Tokens aceitos pela estratégia - USDT - LP - WEBDEX
-    pub const MAX_BALANCES: usize = 10; // Informações detalhadas de cada token que tem saldo ou foi operado - USDT
-
-    pub const SPACE: usize = 1 // status
-        + 32 // strategy_token
-        + 4 + (Self::MAX_LIST_COINS * 32) // list_coins
-        + 4 + (Self::MAX_BALANCES * BalanceStrategy::SPACE); // balance
+impl TemporaryRebalance {
+    pub const LEN: usize = 8 + 8; // = 16
 }
 
-#[account]
-pub struct SubAccount {
-    pub id: Pubkey,
-    pub name: String,
-    pub list_strategies: Vec<Pubkey>,
-    pub strategies: Vec<Pubkey>, // StrategyBalanceList
-}
 
-impl SubAccount {
-    pub const MAX_NAME_LEN: usize = 64;
-    pub const MAX_STRATEGIES: usize = 10;
-    
-    pub const SPACE: usize =
-        8 + // Anchor discriminator
-        32 + // Pubkey 'id'
-        4 + Self::MAX_NAME_LEN + // String 'name' (4 bytes do comprimento + conteúdo)
-        4 + (32 * Self::MAX_STRATEGIES) + // Vec<Pubkey> 'list_strategies'
-        4 + (32 * Self::MAX_STRATEGIES); // Vec<Pubkey> 'strategies'
-}
-
-#[derive(AnchorSerialize, AnchorDeserialize, Clone)]
-pub struct SimpleSubAccount {
-    pub user_address: Pubkey,
-    pub sub_account_address: Pubkey,
-    pub id: Pubkey,
-    pub name: String,
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct PositionDetails {
+    pub strategy: Pubkey,
+    pub coin: Pubkey,
+    pub old_balance: u64,
+    pub fee: u64,
+    pub gas: u64,
+    pub profit: i64,
 }
 
 #[account]
-pub struct SubAccountList {
-    pub contract_address: Pubkey,
-    pub sub_accounts: Vec<SimpleSubAccount>,
+pub struct UserSubAccountTracker {
+    pub user: Pubkey,
+    pub count: u8,
+    pub names: Vec<String>, // opcional, se quiser impedir duplicação
 }
 
-impl SubAccountList {
+impl UserSubAccountTracker {
     pub const MAX_SUBACCOUNTS: usize = 50;
-    pub const MAX_ID_LEN: usize = 32;
     pub const MAX_NAME_LEN: usize = 64;
 
-    pub const SPACE: usize = 8 // discriminator
-        + 32 // contract_address
-        + 4 // len of vec
-        + Self::MAX_SUBACCOUNTS * (
-            32 // key
-            + 4 + Self::MAX_ID_LEN // id (Pubkey)
-            + 4 + Self::MAX_NAME_LEN // name (String)
-        );
+    pub const SPACE: usize =
+        8  // discriminator
+        + 32 // user pubkey
+        + 1  // count
+        + 4 + (Self::MAX_SUBACCOUNTS * (4 + Self::MAX_NAME_LEN)); // Vec<String>
+}
+
+#[derive(AnchorSerialize, AnchorDeserialize, Clone, Default)]
+pub struct Currencys {
+    pub from: Pubkey,
+    pub to: Pubkey,
 }
 
 #[event]
 pub struct CreateSubAccountEvent {
-    pub signer: Pubkey,
     pub user: Pubkey,
     pub id: Pubkey,
     pub name: String,
@@ -108,6 +86,21 @@ pub struct ChangePausedEvent {
     pub paused: bool,
 }
 
+#[event]
+pub struct OpenPositionEvent {
+    pub contract_address: Pubkey,
+    pub user: Pubkey,
+    pub id: Pubkey,
+    pub details: PositionDetails,
+}
+
+#[event]
+pub struct TraderEvent {
+    pub contract_address: Pubkey,
+    pub from: Pubkey,
+    pub to: Pubkey,
+}
+
 #[derive(Accounts)]
 #[instruction(name: String)]
 pub struct CreateSubAccount<'info> {
@@ -118,35 +111,25 @@ pub struct CreateSubAccount<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        space = SubAccountList::SPACE,
-        seeds = [b"sub_account_list", bot.key().as_ref()],
+        space = SubAccount::SPACE,
+        seeds = [b"sub_account", bot.key().as_ref(), user.key().as_ref(), name.as_bytes()],
         bump
     )]
-    pub sub_account_list: Account<'info, SubAccountList>,
+    pub sub_account: Account<'info, SubAccount>,
 
     #[account(
         init_if_needed,
         payer = signer,
-        space = SubAccount::SPACE,
-        seeds = [b"sub_account", user.key().as_ref(), name.as_bytes()],
+        space = UserSubAccountTracker::SPACE,
+        seeds = [b"tracker", bot.key().as_ref(), user.key().as_ref()],
         bump
     )]
-    pub sub_account: Account<'info, SubAccount>,
+    pub tracker: Account<'info, UserSubAccountTracker>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
 
     pub system_program: Program<'info, System>,
-}
-
-#[derive(Accounts)]
-pub struct GetSubAccounts<'info> {
-    pub sub_account_list: Account<'info, SubAccountList>,
-}
-
-#[derive(Accounts)]
-pub struct FindSubAccountIndex<'info> {
-    pub sub_account_list: Account<'info, SubAccountList>,
 }
 
 #[derive(Accounts)]
@@ -227,14 +210,30 @@ pub struct PositionLiquidity<'info> {
     #[account(mut)]
     pub bot: Account<'info, Bot>,
 
-    #[account(mut)]
-    pub user: Account<'info, User>,
+    pub payments: Account<'info, Payments>,
 
+    pub strategy_list: Account<'info, StrategyList>, 
+
+    #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(mut)]
-    pub strategy_balance: Account<'info, StrategyBalanceList>,
+    pub strategy_balance: Account<'info, StrategyBalanceList>, 
+
+    #[account(mut)]
+    pub user: Account<'info, User>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        space = TemporaryRebalance::LEN,
+        seeds = [b"temporary_rebalance", bot.key().as_ref(), user.key().as_ref(), sub_account.key().as_ref(), strategy_balance.key().as_ref(), payments.key().as_ref()],
+        bump
+    )]
+    pub temporary_rebalance: Account<'info, TemporaryRebalance>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
 }

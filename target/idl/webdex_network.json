@@ -51,9 +51,6 @@
           "name": "user"
         },
         {
-          "name": "sub_account"
-        },
-        {
           "name": "balance_info",
           "writable": true,
           "pda": {
@@ -76,7 +73,7 @@
                 ]
               },
               {
-                "kind": "account",
+                "kind": "arg",
                 "path": "contract_address"
               },
               {
@@ -84,17 +81,11 @@
                 "path": "user"
               },
               {
-                "kind": "account",
-                "path": "token_mint"
+                "kind": "arg",
+                "path": "token"
               }
             ]
           }
-        },
-        {
-          "name": "token_mint"
-        },
-        {
-          "name": "contract_address"
         },
         {
           "name": "signer",
@@ -109,6 +100,10 @@
       "args": [
         {
           "name": "contract_address",
+          "type": "pubkey"
+        },
+        {
+          "name": "token",
           "type": "pubkey"
         },
         {
@@ -1095,10 +1090,6 @@
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
-            "type": "pubkey"
-          },
-          {
             "name": "payments_address",
             "type": "pubkey"
           },
@@ -1122,6 +1113,14 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "bot",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
           {
             "name": "id",
             "type": "pubkey"

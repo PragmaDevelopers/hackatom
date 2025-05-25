@@ -132,8 +132,7 @@
           }
         },
         {
-          "name": "vault_sol",
-          "writable": true,
+          "name": "vault_wsol_authority",
           "pda": {
             "seeds": [
               {
@@ -158,13 +157,13 @@
           }
         },
         {
-          "name": "wsol_vault",
+          "name": "vault_wsol_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vault_sol"
+                "path": "vault_wsol_authority"
               },
               {
                 "kind": "const",
@@ -1111,10 +1110,6 @@
           "signer": true
         },
         {
-          "name": "sub_account_program",
-          "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
-        },
-        {
           "name": "token_program",
           "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
         },
@@ -1700,7 +1695,7 @@
           "writable": true
         },
         {
-          "name": "temporary_fee_account",
+          "name": "temporary_rebalance",
           "writable": true
         },
         {
@@ -1857,6 +1852,96 @@
           }
         },
         {
+          "name": "owner_wsol_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "bot_owner"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "wsol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
           "name": "bot_owner",
           "address": "5jYrTguQ1qh2KXpbEowMYuXg58paHt1F7CaH9E7mjdqu"
         },
@@ -1891,8 +1976,7 @@
           }
         },
         {
-          "name": "vault_sol_account",
-          "writable": true,
+          "name": "vault_wsol_authority",
           "pda": {
             "seeds": [
               {
@@ -1915,6 +1999,100 @@
               }
             ]
           }
+        },
+        {
+          "name": "vault_wsol_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "vault_wsol_authority"
+              },
+              {
+                "kind": "const",
+                "value": [
+                  6,
+                  221,
+                  246,
+                  225,
+                  215,
+                  101,
+                  161,
+                  147,
+                  217,
+                  203,
+                  225,
+                  70,
+                  206,
+                  235,
+                  121,
+                  172,
+                  28,
+                  180,
+                  133,
+                  237,
+                  95,
+                  91,
+                  55,
+                  145,
+                  58,
+                  140,
+                  245,
+                  133,
+                  126,
+                  255,
+                  0,
+                  169
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "wsol_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "wsol_mint",
+          "address": "So11111111111111111111111111111111111111112"
         },
         {
           "name": "signer",
@@ -2128,8 +2306,7 @@
           }
         },
         {
-          "name": "vault_sol",
-          "writable": true,
+          "name": "vault_wsol_authority",
           "pda": {
             "seeds": [
               {
@@ -2154,13 +2331,13 @@
           }
         },
         {
-          "name": "wsol_vault",
+          "name": "vault_wsol_account",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "account",
-                "path": "vault_sol"
+                "path": "vault_wsol_authority"
               },
               {
                 "kind": "const",
@@ -2288,19 +2465,6 @@
       ]
     },
     {
-      "name": "FeeAccount",
-      "discriminator": [
-        137,
-        191,
-        201,
-        34,
-        168,
-        222,
-        43,
-        138
-      ]
-    },
-    {
       "name": "StrategyList",
       "discriminator": [
         128,
@@ -2324,6 +2488,19 @@
         171,
         32,
         114
+      ]
+    },
+    {
+      "name": "TemporaryRebalance",
+      "discriminator": [
+        62,
+        159,
+        173,
+        85,
+        87,
+        147,
+        54,
+        113
       ]
     },
     {
@@ -2651,10 +2828,6 @@
             "type": "pubkey"
           },
           {
-            "name": "sub_account_address",
-            "type": "pubkey"
-          },
-          {
             "name": "payments_address",
             "type": "pubkey"
           },
@@ -2669,18 +2842,6 @@
           {
             "name": "fee_collector_network_address",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "FeeAccount",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "fee",
-            "type": "u64"
           }
         ]
       }
@@ -2749,6 +2910,14 @@
         "kind": "struct",
         "fields": [
           {
+            "name": "bot",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
             "name": "id",
             "type": "pubkey"
           },
@@ -2767,6 +2936,18 @@
             "type": {
               "vec": "pubkey"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "TemporaryRebalance",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "fee",
+            "type": "u64"
           }
         ]
       }

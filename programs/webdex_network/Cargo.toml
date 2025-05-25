@@ -22,4 +22,4 @@ anchor-lang = { version = "0.31.0", features = ["init-if-needed"] }
 anchor-spl = { version = "0.31.0" }
 shared_factory = { path = "../../shared/factory" }
 shared_manager = { path = "../../shared/manager" }
-webdex_sub_accounts = { path = "../webdex_sub_accounts", features = ["no-entrypoint"] }
+shared_sub_accounts = { path = "../../shared/sub_accounts" }

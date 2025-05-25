@@ -1,30 +1,39 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexFactory } from "../../target/types/webdex_factory";
 import { WebdexPayments } from "../../target/types/webdex_payments";
-import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { WebdexManager } from "../../target/types/webdex_manager";
+import { BN } from "bn.js";
+import { WebdexFactory } from "../../target/types/webdex_factory";
+import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
-import { BN } from "bn.js";
 
-describe("webdex_close", () => {
+describe("webdex_payments/manager", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
-    const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
+    const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
-    it("Liquidity Remove - Burn And Transfer", async () => {
+    const amount = new BN(10_000_000_000);
+    const gas = new BN(1_000_000_000)
+
+    it("Position Liquidity", async () => {
         const payments = await paymentsProgram.account.payments.all();
+        const solMint = payments[0].account.coins.find(token => token.coin.symbol == "SOL");
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
 
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
+
+        const [paymentsPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("payments"), botPda.toBuffer()],
+            paymentsProgram.programId
+        );
 
         const [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_list"), botPda.toBuffer()],
@@ -44,11 +53,6 @@ describe("webdex_close", () => {
             managerProgram.programId
         );
 
-        const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
-        );
-
         // Chamada da função get_sub_accounts
         const subAccounts = await subAccountsProgram.account.subAccount.all([
             {
@@ -61,47 +65,62 @@ describe("webdex_close", () => {
 
         const subAccountPda = subAccounts[0].publicKey;
 
-        const amount = new BN(50_000_000_000);
-
-        // FAZ O BURN
-        const tx = await managerProgram.methods
-            .liquidityRemove(
-                strategies[0].tokenAddress,
-                usdtMint.coin.decimals,
-                amount,
-            )
-            .accounts({
-                subAccount: subAccountPda,
-                strategyList: strategyListPda,
-                signer: user.publicKey,
-                tokenMint: usdtMint.pubkey,
-            })
-            .rpc();
-
-        console.log("✅ liquidityRemove tx:", tx);
-
-        console.log("Add Liquidity - Atualiza o saldo")
-
         const [strategyBalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
             subAccountsProgram.programId
         );
 
-        // ATUALIZA O SALDO
-        const txa = await subAccountsProgram.methods
-            .removeLiquidity(
+        const currencys = [
+            {
+                from: solMint.pubkey,
+                to: usdtMint.pubkey,
+            }
+        ];
+
+        const tx = await subAccountsProgram.methods
+            .positionLiquidity(
                 subAccounts[0].account.id,
                 strategies[0].tokenAddress,
-                usdtMint.pubkey,
                 amount,
+                usdtMint.pubkey,
+                gas,
+                currencys,
+            )
+            .accounts({
+                bot: botPda,
+                payments: paymentsPda,
+                strategyList: strategyListPda,
+                strategyBalance: strategyBalancePda,
+                subAccount: subAccountPda,
+                user: userPda,
+                signer: user.publicKey,
+            })
+            .rpc();
+
+        console.log("✅ Transação:", tx);
+
+        const [temporaryRebalancePda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("temporary_rebalance"), botPda.toBuffer(), userPda.toBuffer(), subAccountPda.toBuffer(), strategyBalancePda.toBuffer(), paymentsPda.toBuffer()],
+            subAccountsProgram.programId
+        );
+
+        const txa = await managerProgram.methods
+            .rebalancePosition(
+                strategies[0].tokenAddress,
+                usdtMint.coin.decimals,
+                amount,
+                gas,
             )
             .accounts({
                 bot: botPda,
                 subAccount: subAccountPda,
-                strategyBalance: strategyBalancePda,
+                user: userPda,
+                temporaryRebalance: temporaryRebalancePda,
+                signer: user.publicKey,
+                tokenMint: usdtMint.pubkey,
             })
             .rpc();
 
-        console.log("✅ TX Hash:", txa);
+        console.log("✅ Transação:", txa);
     });
 });

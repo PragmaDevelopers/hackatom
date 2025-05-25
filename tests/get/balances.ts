@@ -18,7 +18,7 @@ describe("webdex_sub_accounts", () => {
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
-    it("Get Balances", async () => {
+    it("Get Balances - Liquidity", async () => {
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
 
@@ -40,19 +40,17 @@ describe("webdex_sub_accounts", () => {
             managerProgram.programId
         );
 
-        const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
-        );
+        // Chamada da função get_sub_accounts
+        const subAccounts = await subAccountsProgram.account.subAccount.all([
+            {
+                memcmp: {
+                    offset: 8 + 32, // pula discriminator + bot
+                    bytes: userPda.toBase58(),
+                },
+            },
+        ]);
 
-        const subAccounts = await subAccountsProgram.methods
-            .getSubAccounts(userPda)
-            .accounts({
-                subAccountList: subAccountListPda,
-            })
-            .view();
-
-        const subAccountPda = subAccounts[0].subAccountAddress;
+        const subAccountPda = subAccounts[0].publicKey;
 
         const [strategyBalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
@@ -60,7 +58,7 @@ describe("webdex_sub_accounts", () => {
         );
 
         const result = await subAccountsProgram.methods
-            .getBalances(subAccounts[0].id, strategies[0].tokenAddress)
+            .getBalances(subAccounts[0].account.id, strategies[0].tokenAddress)
             .accounts({
                 subAccount: subAccountPda,
                 strategyBalance: strategyBalancePda,

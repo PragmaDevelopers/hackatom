@@ -6,6 +6,7 @@ use anchor_spl::token::{transfer, Transfer};
 pub fn _pay_fee(
     ctx: Context<PayFee>,
     contract_address: Pubkey,
+    token: Pubkey,
     amount: u64,
 ) -> Result<()> {
     let signer = &mut ctx.accounts.signer;
@@ -18,7 +19,7 @@ pub fn _pay_fee(
 
     // Se ainda não estava inicializado
     if balance_info.token == Pubkey::default() {
-        balance_info.token = ctx.accounts.token_mint.key();
+        balance_info.token = token;
         balance_info.user = ctx.accounts.user.key();
         balance_info.contract_address = contract_address;
     }
@@ -31,15 +32,28 @@ pub fn _pay_fee(
     emit!(BalanceNetworkAdd {
         contract_address: contract_address,
         user: ctx.accounts.user.key(),
-        token: ctx.accounts.token_mint.key(),
+        token: token,
         new_balance: balance_info.balance,
-        amount
+        amount,
     });
 
     Ok(())
 }
 
-pub fn _withdrawal(ctx: Context<Withdrawal>, amount: u64) -> Result<()> {
+pub fn _get_balance(
+    ctx: Context<GetBalance>,
+) -> Result<BalanceData> {
+    let balance_info = &mut ctx.accounts.balance_info;
+    Ok(BalanceData {
+        balance: balance_info.balance,
+    })
+}
+
+pub fn _withdrawal(
+    ctx: Context<Withdrawal>, 
+    amount: u64,
+    token: Pubkey
+) -> Result<()> {
     let balance_info = &mut ctx.accounts.balance_info;
     let bot = &ctx.accounts.bot;
 
@@ -67,9 +81,9 @@ pub fn _withdrawal(ctx: Context<Withdrawal>, amount: u64) -> Result<()> {
     let cpi_ctx_user = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from: ctx.accounts.vault_token_account.to_account_info(),
-            to: ctx.accounts.user_token_account.to_account_info(),
-            authority: ctx.accounts.sub_account_authority.to_account_info(),
+            from: ctx.accounts.signer.to_account_info(),
+            to: ctx.accounts.vault_token_account.to_account_info(),
+            authority: ctx.accounts.signer.to_account_info(),
         },
     );
     transfer(cpi_ctx_user, user_share)?;
@@ -78,9 +92,9 @@ pub fn _withdrawal(ctx: Context<Withdrawal>, amount: u64) -> Result<()> {
     let cpi_ctx_fee = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from: ctx.accounts.vault_token_account.to_account_info(),
+            from: ctx.accounts.signer.to_account_info(),
             to: ctx.accounts.fee_collector_network_account.to_account_info(),
-            authority: ctx.accounts.sub_account_authority.to_account_info(),
+            authority: ctx.accounts.signer.to_account_info(),
         },
     );
     transfer(cpi_ctx_fee, network_fee)?;
@@ -97,9 +111,9 @@ pub fn _withdrawal(ctx: Context<Withdrawal>, amount: u64) -> Result<()> {
         let cpi_ctx_collector = CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
             Transfer {
-                from: ctx.accounts.vault_token_account.to_account_info(),
+                from: ctx.accounts.signer.to_account_info(),
                 to: collector_account.to_account_info(),
-                authority: ctx.accounts.sub_account_authority.to_account_info(),
+                authority: ctx.accounts.signer.to_account_info(),
             },
         );
         transfer(cpi_ctx_collector, collector_amount)?;
@@ -116,13 +130,4 @@ pub fn _withdrawal(ctx: Context<Withdrawal>, amount: u64) -> Result<()> {
     });
 
     Ok(())
-}
-
-pub fn _get_balance(
-    ctx: Context<GetBalance>,
-) -> Result<BalanceData> {
-    let balance_info = &mut ctx.accounts.balance_info;
-    Ok(BalanceData {
-        balance: balance_info.balance,
-    })
 }

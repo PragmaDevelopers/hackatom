@@ -3,7 +3,6 @@ use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
 
-use webdex_sub_accounts::{state::PositionLiquidity, processor::_position_liquidity};
 use shared_factory::state::{Bot};
 
 pub fn assert_only_owner(signer: &Pubkey, bot: &Account<Bot>) -> Result<()> {
@@ -38,20 +37,6 @@ pub fn _add_fee_tiers<'info>(
     payments.fee_tiers.extend(new_fee_tiers);
 
     Ok(())
-}
-
-pub fn _calculate_fee(payments: &Payments, value: u64) -> u64 {
-    for tier in &payments.fee_tiers {
-        if value <= tier.limit {
-            return tier.fee;
-        }
-    }
-
-    // Se nenhum limite bateu, retorna o último tier
-    return payments.fee_tiers
-        .last()
-        .map(|tier| tier.fee)
-        .unwrap_or(0) // retorna 0 se não houver tiers
 }
 
 pub fn _get_fee_tiers(ctx: Context<GetFeeTiers>) -> Result<Vec<FeeTier>> {
@@ -127,103 +112,6 @@ pub fn _remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
 
     if payments.coins.len() == initial_len {
         return Err(ErrorCode::CoinNotFound.into());
-    }
-
-    Ok(())
-}
-
-pub fn _open_position(
-    ctx: Context<OpenPosition>,
-    _decimals: u8,
-    account_id: Pubkey,
-    strategy_token: Pubkey,
-    amount: i64,
-    coin: Pubkey,
-    gas: u64,
-    currrencys: Vec<Currencys>,
-) -> Result<()> {
-    assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
-
-    let payments = &ctx.accounts.payments;
-    let strategy_list = &ctx.accounts.strategy_list;
-    let temp_fee_account = &mut ctx.accounts.temporary_fee_account;
-
-    let strategy = strategy_list
-        .strategies
-        .iter()
-        .find(|s| s.token_address == strategy_token)
-        .ok_or(ErrorCode::StrategyNotFound)?;
-
-    // ✅ Verifica se está ativa
-    require!(strategy.is_active, ErrorCode::StrategyNotFound);
-
-    // 2. Verifica moedas ativadas
-    for pair in currrencys.iter() {
-        let from_valid = payments
-            .coins
-            .iter()
-            .any(|c| c.pubkey == pair.from && c.coin.status);
-        let to_valid = payments
-            .coins
-            .iter()
-            .any(|c| c.pubkey == pair.to && c.coin.status);
-
-        if !from_valid || !to_valid {
-            return Err(ErrorCode::InvalidCoin.into());
-        }
-    }
-
-    // 3. Chamada CPI → sub_account.position()
-    let cpi_ctx_sub_accounts = CpiContext::new(
-        ctx.accounts.sub_account_program.to_account_info(),
-        PositionLiquidity {
-            bot: ctx.accounts.bot.clone(),
-            user: ctx.accounts.user.clone(),
-            sub_account: ctx.accounts.sub_account.clone(),
-            strategy_balance: ctx.accounts.strategy_balance.clone(),
-            signer: ctx.accounts.signer.clone(),
-        },
-    );
-
-    let old_balance = _position_liquidity(
-        cpi_ctx_sub_accounts,
-        account_id,
-        strategy_token,
-        coin,
-        amount,
-    )?;
-
-    // 4. Calcula a fee
-    let fee = _calculate_fee(&payments, old_balance);
-
-    // Armazena a fee no PDA temporário
-    temp_fee_account.fee = fee;
-
-    let details = PositionDetails {
-        strategy: strategy_token,
-        coin,
-        old_balance,
-        fee,
-        gas,
-        profit: amount,
-    };
-
-    // CHAMAR A FUNÇÂO REBALANCE POSITION DO CONTRATO MANAGER LOGO DEPOIS PARA FAZER USO DO "temp_fee_account"
-
-    // 5. Emite eventos (Anchor Events ou logs)
-    emit!(OpenPositionEvent {
-        contract_address: ctx.accounts.bot.manager_address.key(),
-        user: ctx.accounts.user.key(),
-        id: account_id.clone(),
-        details,
-    });
-
-    for pair in currrencys.iter() {
-        emit!(TraderEvent {
-            contract_address: ctx.accounts.bot.manager_address.key(),
-            from: pair.from,
-            to: pair.to,
-        });
     }
 
     Ok(())

@@ -3058,7 +3058,6 @@ dependencies = [
  "shared_factory",
  "shared_manager",
  "shared_sub_accounts",
- "webdex_payments",
  "webdex_strategy",
  "webdex_sub_accounts",
 ]
@@ -3071,7 +3070,7 @@ dependencies = [
  "anchor-spl",
  "shared_factory",
  "shared_manager",
- "webdex_sub_accounts",
+ "shared_sub_accounts",
 ]
 
 [[package]]
@@ -3083,8 +3082,7 @@ dependencies = [
  "serde",
  "shared_factory",
  "shared_manager",
- "webdex_strategy",
- "webdex_sub_accounts",
+ "shared_sub_accounts",
 ]
 
 [[package]]
@@ -3111,6 +3109,8 @@ dependencies = [
  "shared_factory",
  "shared_manager",
  "shared_sub_accounts",
+ "webdex_payments",
+ "webdex_strategy",
 ]
 
 [[package]]
