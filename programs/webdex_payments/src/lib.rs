@@ -19,10 +19,9 @@ pub mod webdex_payments {
 
     pub fn add_fee_tiers(
         ctx: Context<AddFeeTiers>,
-        contract_address: Pubkey,
         new_fee_tiers: Vec<FeeTier>,
     ) -> Result<()> {
-        _add_fee_tiers(ctx,contract_address,new_fee_tiers)
+        _add_fee_tiers(ctx,new_fee_tiers)
     }
 
     pub fn get_fee_tiers(ctx: Context<GetFeeTiers>) -> Result<Vec<FeeTier>> {
@@ -31,25 +30,25 @@ pub mod webdex_payments {
 
     pub fn currency_allow(
         ctx: Context<RevokeOrAllowCurrency>,
-        coin_pubkey: Pubkey,
+        coin_address: Pubkey,
         name: String,
         symbol: String,
         decimals: u8,
     ) -> Result<()> {
-        _revoke_or_allow_currency(ctx,coin_pubkey,true,name,symbol,decimals)
+        _revoke_or_allow_currency(ctx,coin_address,true,name,symbol,decimals)
     }
 
     pub fn currency_revoke(
         ctx: Context<RevokeOrAllowCurrency>,
-        coin_pubkey: Pubkey,
+        coin_address: Pubkey,
         name: String,
         symbol: String,
         decimals: u8,
     ) -> Result<()> {
-        _revoke_or_allow_currency(ctx,coin_pubkey,false,name,symbol,decimals)
+        _revoke_or_allow_currency(ctx,coin_address,false,name,symbol,decimals)
     }
 
-    pub fn remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
-        _remove_coin(ctx,coin)
+    pub fn remove_coin(ctx: Context<RemoveCoin>, coin_address: Pubkey) -> Result<()> {
+        _remove_coin(ctx,coin_address)
     }
 }

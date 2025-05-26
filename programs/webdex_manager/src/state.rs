@@ -39,7 +39,8 @@ pub struct Register<'info> {
         payer = signer, 
         space = User::SPACE, 
         seeds = [b"user", signer.key().as_ref()], 
-        bump
+        bump,
+        constraint = !user.status @ ErrorCode::RegisteredUser
     )]
     pub user: Account<'info, User>,
 
@@ -70,7 +71,14 @@ pub struct AddLiquidityEvent {
 
 #[derive(Accounts)]
 pub struct GetInfoUser<'info> {
+    #[account(
+        seeds = [b"user", signer.key().as_ref()], 
+        bump,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
     pub user: Account<'info, User>,
+
+    pub signer: Signer<'info>,
 }
 
 #[derive(Accounts)]
@@ -79,7 +87,7 @@ pub struct AddGas<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::RegisteredUser
+        constraint = user.status @ ErrorCode::DisabledUser
     )]
     pub user: Account<'info, User>,
 
@@ -123,7 +131,7 @@ pub struct RemoveGas<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::RegisteredUser
+        constraint = user.status @ ErrorCode::DisabledUser
     )]
     pub user: Account<'info, User>,
 
@@ -165,7 +173,7 @@ pub struct PassAdd<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::RegisteredUser
+        constraint = user.status @ ErrorCode::DisabledUser
     )]
     pub user: Account<'info, User>,
 
@@ -209,7 +217,7 @@ pub struct PassRemove<'info> {
         mut,
         seeds = [b"user", signer.key().as_ref()],
         bump,
-        constraint = user.status @ ErrorCode::RegisteredUser
+        constraint = user.status @ ErrorCode::DisabledUser
     )]
     pub user: Account<'info, User>, // Guarda pass_balance
 
@@ -265,11 +273,18 @@ pub struct BalancePassEvent {
 #[derive(Accounts)]
 #[instruction(strategy_token: Pubkey, decimals: u8)]
 pub struct LiquidityAdd<'info> {
+    #[account(mut)]
     pub bot: Account<'info, Bot>,
 
+    #[account(
+        seeds = [b"user", signer.key().as_ref()],
+        bump,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
     pub user: Account<'info, User>,
 
-    pub strategy_list: Account<'info,StrategyList>,
+    #[account(mut)]
+    pub strategy_list: Account<'info, StrategyList>,
 
     #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
@@ -335,11 +350,22 @@ pub struct LiquidityAdd<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(strategy_token: Pubkey, decimals: u8)]
+#[instruction(strategy_token: Pubkey, decimals: u8,)]
 pub struct LiquidityRemove<'info> {
+    #[account(mut)]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        seeds = [b"user", signer.key().as_ref()],
+        bump,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
+    pub user: Account<'info, User>,
+
     #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
     
+    #[account(mut)]
     pub strategy_list: Account<'info,StrategyList>,
 
     /// CHECK: Apenas para seeds
@@ -400,7 +426,7 @@ pub struct LiquidityRemove<'info> {
 #[derive(Accounts)]
 #[instruction(strategy_token: Pubkey,decimals: u8)]
 pub struct RebalancePosition<'info> {
-    #[account(mut)]
+    #[account(mut,constraint = user.status @ ErrorCode::DisabledUser)]
     pub user: Account<'info, User>,
 
     #[account(mut)]
@@ -408,6 +434,9 @@ pub struct RebalancePosition<'info> {
 
     #[account(mut)]
     pub sub_account: Account<'info, SubAccount>,
+
+    #[account(mut)]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
 
     #[account(mut)]
     pub temporary_rebalance: Account<'info, TemporaryRebalance>,

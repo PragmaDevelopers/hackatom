@@ -25,11 +25,6 @@ describe("webdex_factoty", () => {
             strategyProgram.programId
         );
 
-        const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
-        );
-
         const [paymentsPda] = PublicKey.findProgramAddressSync(
             [Buffer.from("payments"), botPda.toBuffer()],
             paymentsProgram.programId
@@ -37,12 +32,11 @@ describe("webdex_factoty", () => {
 
         const tx = await factoryProgram.methods
             .updateBot(
+                bots[0].account.managerAddress,
                 strategyListPda,
-                subAccountListPda,
                 paymentsPda,
             )
             .accounts({
-                bot: botPda,
                 signer: user.publicKey,
             })
             .rpc();

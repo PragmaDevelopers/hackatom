@@ -1,10 +1,10 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexFactory } from "../target/types/webdex_factory";
-import { WebdexPayments } from "../target/types/webdex_payments";
-import { WebdexStrategy } from "../target/types/webdex_strategy";
-import { WebdexManager } from "../target/types/webdex_manager";
-import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
+import { WebdexFactory } from "../../target/types/webdex_factory";
+import { WebdexPayments } from "../../target/types/webdex_payments";
+import { WebdexStrategy } from "../../target/types/webdex_strategy";
+import { WebdexManager } from "../../target/types/webdex_manager";
+import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { sharedState } from "./setup";
 import { BN } from "bn.js";
 

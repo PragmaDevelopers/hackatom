@@ -11,7 +11,7 @@ import {
 } from "@metaplex-foundation/mpl-token-metadata";
 import { fetchMint } from "@metaplex-foundation/mpl-toolbox";
 import { publicKey } from "@metaplex-foundation/umi";
-import { createMint, getOrCreateAssociatedTokenAccount, mintTo } from "@solana/spl-token";
+import { createMint } from "@solana/spl-token";
 
 export async function fetchTokenInfoFromChain(mint: String): Promise<{ name: string; symbol: string; decimals: number }> {
     const umi = createUmi('http://127.0.0.1:8899').use(mplTokenMetadata())
@@ -63,7 +63,12 @@ describe("webdex_payments", () => {
         )
 
         const tx = await paymentsProgram.methods
-            .currencyAllow(usdtMint, usdtName, usdtSymbol, usdtDecimals)
+            .currencyAllow(
+                usdtMint,
+                usdtName,
+                usdtSymbol,
+                usdtDecimals
+            )
             .accounts({
                 bot: botPda,
                 signer: user.publicKey,
@@ -74,8 +79,6 @@ describe("webdex_payments", () => {
     });
 
     it("Currency Allow (WEBDEX)", async () => {
-        // const { name, symbol, decimals } = await fetchTokenInfoFromChain(usdcMint);
-
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE;
 
@@ -88,14 +91,19 @@ describe("webdex_payments", () => {
             user.payer,              // Payer
             user.publicKey,    // mintAuthoritys
             null,              // freezeAuthority
-            webdexDecimals
+            webdexDecimals,
         )
 
         const tx = await paymentsProgram.methods
-            .currencyAllow(webdexMint, webdexName, webdexSymbol, webdexDecimals)
+            .currencyAllow(
+                webdexMint, webdexName,
+                webdexSymbol,
+                webdexDecimals
+            )
             .accounts({
                 bot: botPda,
                 signer: user.publicKey,
+
             })
             .rpc();
 
@@ -114,7 +122,12 @@ describe("webdex_payments", () => {
         const solMint = new PublicKey("So11111111111111111111111111111111111111112");
 
         const tx = await paymentsProgram.methods
-            .currencyAllow(solMint, solName, solSymbol, solDecimals)
+            .currencyAllow(
+                solMint,
+                solName,
+                solSymbol,
+                solDecimals
+            )
             .accounts({
                 bot: botPda,
                 signer: user.publicKey,

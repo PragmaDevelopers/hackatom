@@ -38,6 +38,7 @@ describe("webdex_factoty", () => {
 
         const tx = await factoryProgram.methods
             .addBot(
+                contractAddress,
                 "Bot 1", // name
                 "ONE",         // prefix
                 user.publicKey, // owner é quem paga
@@ -46,7 +47,6 @@ describe("webdex_factoty", () => {
                 void_collector_3, // 
                 void_collector_4, // 
                 fee_withdraw_void,
-                contractAddress,
                 strategyAddress,
                 paymentsAddress,
                 tokenPassAddress,
@@ -55,7 +55,6 @@ describe("webdex_factoty", () => {
             )
             .accounts({
                 signer: user.publicKey, // owner é quem paga
-                managerAddress: contractAddress,
             })
             .rpc();
 
@@ -65,9 +64,6 @@ describe("webdex_factoty", () => {
     it("Get Bot Info", async () => {
         const botInfo = await factoryProgram.methods
             .getBotInfo(contractAddress)
-            .accounts({
-                bot: botPda,
-            })
             .view(); // view() instead of rpc() for read-only instructions
 
         console.log("📦 Bot Info:", botInfo);

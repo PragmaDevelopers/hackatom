@@ -15,7 +15,6 @@ pub fn assert_only_owner(signer: &Pubkey, bot: &Account<Bot>) -> Result<()> {
 
 pub fn _add_fee_tiers<'info>(
     ctx: Context<AddFeeTiers<'info>>,
-    contract_address: Pubkey,
     new_fee_tiers: Vec<FeeTier>,
 ) -> Result<()> {
     assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
@@ -23,10 +22,10 @@ pub fn _add_fee_tiers<'info>(
     let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
 
-    // ✅ Se a conta payments já tinha contract_address, não sobrescreve
-    if payments.contract_address == Pubkey::default() {
-        payments.contract_address = bot.manager_address;
-    } else if payments.contract_address != bot.manager_address {
+    // ✅ Se a conta payments já tinha bot, não sobrescreve
+    if payments.bot == Pubkey::default() {
+        payments.bot = bot.key();
+    } else if payments.bot != bot.key() {
         return Err(ErrorCode::InvalidContractAddress.into());
     }
 
@@ -46,7 +45,7 @@ pub fn _get_fee_tiers(ctx: Context<GetFeeTiers>) -> Result<Vec<FeeTier>> {
 
 pub fn _revoke_or_allow_currency(
     ctx: Context<RevokeOrAllowCurrency>,
-    coin_pubkey: Pubkey,
+    coin_address: Pubkey,
     status: bool,
     name: String,
     symbol: String,
@@ -57,15 +56,15 @@ pub fn _revoke_or_allow_currency(
     let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
 
-    // ✅ Se a conta payments já tinha contract_address, não sobrescreve
-    if payments.contract_address == Pubkey::default() {
-        payments.contract_address = bot.manager_address;
-    } else if payments.contract_address != bot.manager_address {
+    // ✅ Se a conta payments já tinha bot, não sobrescreve
+    if payments.bot == Pubkey::default() {
+        payments.bot = bot.key();
+    } else if payments.bot != bot.key() {
         return Err(ErrorCode::InvalidContractAddress.into());
     }
 
     // Busca índice da moeda na lista
-    let index = payments.coins.iter().position(|c| c.pubkey == coin_pubkey);
+    let index = payments.coins.iter().position(|c| c.pubkey == coin_address);
 
     match index {
         Some(idx) => {
@@ -80,7 +79,7 @@ pub fn _revoke_or_allow_currency(
         None => {
             // Se não existe ainda e status = true, registra com info básica
             let coin_data = CoinData {
-                pubkey: coin_pubkey,
+                pubkey: coin_address,
                 coin: Coins {
                     name,
                     symbol,
@@ -96,19 +95,19 @@ pub fn _revoke_or_allow_currency(
     Ok(())
 }
 
-pub fn _remove_coin(ctx: Context<RemoveCoin>, coin: Pubkey) -> Result<()> {
+pub fn _remove_coin(ctx: Context<RemoveCoin>, coin_address: Pubkey) -> Result<()> {
     assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
 
     let bot = &ctx.accounts.bot;
     let payments = &mut ctx.accounts.payments;
 
     // Verifica se o bot está registrado
-    if bot.manager_address != payments.contract_address {
+    if bot.key() != payments.bot {
         return Err(ErrorCode::BotNotFound.into());
     }
 
     let initial_len = payments.coins.len();
-    payments.coins.retain(|c| c.pubkey != coin);
+    payments.coins.retain(|c| c.pubkey != coin_address);
 
     if payments.coins.len() == initial_len {
         return Err(ErrorCode::CoinNotFound.into());

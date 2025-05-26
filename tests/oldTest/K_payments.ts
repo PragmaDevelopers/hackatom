@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexPayments } from "../target/types/webdex_payments";
+import { WebdexPayments } from "../../target/types/webdex_payments";
 import BN from "bn.js";
 import { sharedState } from "./setup";
 

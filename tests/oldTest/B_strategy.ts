@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexStrategy } from "../target/types/webdex_strategy";
+import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 import { sharedState } from "./setup";

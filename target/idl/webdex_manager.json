@@ -289,7 +289,28 @@
       ],
       "accounts": [
         {
-          "name": "user"
+          "name": "user",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
         }
       ],
       "args": [],
@@ -313,13 +334,32 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
-          "name": "user"
+          "name": "user",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
         },
         {
-          "name": "strategy_list"
+          "name": "strategy_list",
+          "writable": true
         },
         {
           "name": "sub_account",
@@ -735,11 +775,36 @@
       ],
       "accounts": [
         {
+          "name": "bot",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
           "name": "sub_account",
           "writable": true
         },
         {
-          "name": "strategy_list"
+          "name": "strategy_list",
+          "writable": true
         },
         {
           "name": "token_mint"
@@ -1695,6 +1760,10 @@
           "writable": true
         },
         {
+          "name": "strategy_balance",
+          "writable": true
+        },
+        {
           "name": "temporary_rebalance",
           "writable": true
         },
@@ -2465,6 +2534,19 @@
       ]
     },
     {
+      "name": "StrategyBalanceList",
+      "discriminator": [
+        101,
+        190,
+        24,
+        107,
+        186,
+        122,
+        101,
+        70
+      ]
+    },
+    {
       "name": "StrategyList",
       "discriminator": [
         128,
@@ -2659,36 +2741,41 @@
     },
     {
       "code": 6017,
+      "name": "DisabledUser",
+      "msg": "Disabled User"
+    },
+    {
+      "code": 6018,
       "name": "InsufficientGasBalance",
       "msg": "Insufficient Gas Balance"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "InvalidAmount",
       "msg": "Invalid Amount"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "InsufficientPassBalance",
       "msg": "Insufficient Pass Balance"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "YouMustTheWebDexPayments",
       "msg": "You must the WebDexPayments"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "StrategyNotFound",
       "msg": "Strategy Not Found"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "InvalidAuthority",
       "msg": "Invalid Authority"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "InvalidTemporaryFee",
       "msg": "Invalid Temporary Fee"
     }
@@ -2777,6 +2864,42 @@
           },
           {
             "name": "is_operation",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BalanceStrategy",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "ico",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          },
+          {
+            "name": "paused",
             "type": "bool"
           }
         ]
@@ -2883,12 +3006,44 @@
       }
     },
     {
+      "name": "StrategyBalanceList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strategy_token",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          },
+          {
+            "name": "list_coins",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "balance",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "BalanceStrategy"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "StrategyList",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "bot",
             "type": "pubkey"
           },
           {

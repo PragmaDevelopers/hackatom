@@ -34,17 +34,11 @@
                 ]
               },
               {
-                "kind": "account",
+                "kind": "arg",
                 "path": "manager_address"
               }
             ]
           }
-        },
-        {
-          "name": "manager_address",
-          "docs": [
-            "CHECK"
-          ]
         },
         {
           "name": "signer",
@@ -57,6 +51,10 @@
         }
       ],
       "args": [
+        {
+          "name": "manager_address",
+          "type": "pubkey"
+        },
         {
           "name": "name",
           "type": "string"
@@ -88,10 +86,6 @@
         {
           "name": "fee_withdraw_void",
           "type": "u64"
-        },
-        {
-          "name": "contract_address",
-          "type": "pubkey"
         },
         {
           "name": "strategy_address",
@@ -129,12 +123,28 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "manager_address"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "contract_address",
+          "name": "manager_address",
           "type": "pubkey"
         }
       ],
@@ -159,14 +169,35 @@
       "accounts": [
         {
           "name": "bot",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "manager_address"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
           "signer": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "manager_address",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "update_bot",
@@ -183,7 +214,23 @@
       "accounts": [
         {
           "name": "bot",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "manager_address"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -191,6 +238,10 @@
         }
       ],
       "args": [
+        {
+          "name": "manager_address",
+          "type": "pubkey"
+        },
         {
           "name": "strategy_address",
           "type": {
@@ -420,7 +471,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "manager_address",
             "type": "pubkey"
           },
           {

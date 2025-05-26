@@ -12,7 +12,7 @@ describe("webdex_manager", () => {
     const user = provider.wallet;
 
     it("Remove Gas", async () => {
-        const solAmout = new BN(5_000_000_000);
+        const solAmout = new BN(1_000_000_000);
 
         const tx = await managerProgram.methods
             .removeGas(solAmout)

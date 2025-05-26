@@ -14,7 +14,6 @@ pub fn _add_strategy(
     name: String,
     symbol: String,
     uri: String,
-    contract_address: Pubkey,
 ) -> Result<()> {
     let bot = &mut ctx.accounts.bot;
     let strategy_list = &mut ctx.accounts.strategy_list;
@@ -22,10 +21,6 @@ pub fn _add_strategy(
     // ✅ Verifica que quem está chamando é o dono do bot
     if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
-    }
-
-    if bot.manager_address != contract_address {
-        return Err(ErrorCode::BotNotFound.into());
     }
 
     if strategy_list.strategies.len() >= StrategyList::MAX_STRATEGIES {
@@ -70,10 +65,10 @@ pub fn _add_strategy(
     //     None,
     // )?;
 
-    // ✅ Se a conta strategy_list já tinha contract_address, não sobrescreve
-    if strategy_list.contract_address == Pubkey::default() {
-        strategy_list.contract_address = bot.manager_address;
-    } else if strategy_list.contract_address != contract_address {
+    // ✅ Se a conta strategy_list já tinha bot, não sobrescreve
+    if strategy_list.bot == Pubkey::default() {
+        strategy_list.bot = bot.key();
+    } else if strategy_list.bot != bot.key() {
         return Err(ErrorCode::InvalidContractAddress.into());
     }
 
@@ -88,7 +83,7 @@ pub fn _add_strategy(
     strategy_list.strategies.push(strategy);
 
     emit!(StrategyAddedEvent {
-        contract_address,
+        bot: bot.key(),
         name: name_clone,
         symbol,
         uri,
@@ -98,7 +93,7 @@ pub fn _add_strategy(
     Ok(())
 }
 
-pub fn _update_strategy_status(ctx: Context<UpdateStrategyStatus>, contract_address: Pubkey, token_address: Pubkey, is_active: bool) -> Result<()> {
+pub fn _update_strategy_status(ctx: Context<UpdateStrategyStatus>, token_address: Pubkey, is_active: bool) -> Result<()> {
     let bot = &ctx.accounts.bot;
     let strategy_list = &mut ctx.accounts.strategy_list;
 
@@ -107,44 +102,30 @@ pub fn _update_strategy_status(ctx: Context<UpdateStrategyStatus>, contract_addr
         return Err(ErrorCode::Unauthorized.into());
     }
     
-    if bot.manager_address != contract_address {
-        return Err(ErrorCode::BotNotFound.into());
-    }
-    
     if let Some(strategy) = strategy_list.strategies.iter_mut().find(|s| s.token_address == token_address) {
         strategy.is_active = is_active;
         emit!(StrategyStatusUpdatedEvent {
-            contract_address: contract_address,
+            bot: bot.key(),
             token_address: token_address,
             is_active: true,
         });
     } else {
         return Err(ErrorCode::StrategyNotFound.into());
     }
+
     Ok(())
 }
 
-pub fn _get_strategies(ctx: Context<GetStrategies>, contract_address: Pubkey) -> Result<Vec<Strategy>> {
+pub fn _get_strategies(ctx: Context<GetStrategies>) -> Result<Vec<Strategy>> {
     let strategy_list = &ctx.accounts.strategy_list;
-
-    if strategy_list.contract_address != contract_address {
-        return Err(ErrorCode::InvalidContractAddress.into());
-    }
-
     Ok(strategy_list.strategies.clone())
 }
 
 pub fn _find_strategy(
     ctx: Context<FindStrategy>,
-    contract_address: Pubkey,
     token_address: Pubkey,
 ) -> Result<Strategy> {
     let strategy_list = &ctx.accounts.strategy_list;
-
-    // Garante que a strategy list pertence ao contrato informado
-    if strategy_list.contract_address != contract_address {
-        return Err(ErrorCode::InvalidContractAddress.into());
-    }
 
     // Procura a strategy pelo token_address
     if let Some(strategy) = strategy_list
@@ -160,7 +141,6 @@ pub fn _find_strategy(
 
 pub fn _delete_strategy(
     ctx: Context<DeleteStrategy>,
-    contract_address: Pubkey,
     token_address: Pubkey,
 ) -> Result<()> {
     let bot = &ctx.accounts.bot;
@@ -169,10 +149,6 @@ pub fn _delete_strategy(
     // ✅ Verifica que quem está chamando é o dono do bot
     if bot.owner != ctx.accounts.signer.key() {
         return Err(ErrorCode::Unauthorized.into());
-    }
-
-    if bot.manager_address != contract_address {
-        return Err(ErrorCode::BotNotFound.into());
     }
 
     let initial_len = strategy_list.strategies.len();
@@ -185,7 +161,7 @@ pub fn _delete_strategy(
     }
 
     emit!(StrategyStatusUpdatedEvent {
-        contract_address,
+        bot: bot.key(),
         token_address,
         is_active: false,
     });

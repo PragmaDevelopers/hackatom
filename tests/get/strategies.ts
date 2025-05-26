@@ -16,18 +16,12 @@ describe("webdex_strategy", () => {
     it("Get Strategies", async () => {
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
-        const contractAddress = bots[0].account.managerAddress;
-
-        const [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("strategy_list"), botPda.toBuffer()],
-            strategyProgram.programId
-        );
 
         // Chamada da função de leitura
         const strategies = await strategyProgram.methods
-            .getStrategies(contractAddress)
+            .getStrategies()
             .accounts({
-                strategyList: strategyListPda,
+                bot: botPda,
             })
             .view(); // <- importante: view() para funções que retornam valores
 

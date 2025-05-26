@@ -2,7 +2,6 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
-import { expect } from "chai";
 import { WebdexFactory } from "../../target/types/webdex_factory";
 import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { WebdexPayments } from "../../target/types/webdex_payments";
@@ -26,16 +25,11 @@ describe("webdex_sub_accounts", () => {
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
 
-        const [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("strategy_list"), botPda.toBuffer()],
-            strategyProgram.programId
-        );
-
         // Chamada da função de leitura
         const strategies = await strategyProgram.methods
-            .getStrategies(bots[0].account.managerAddress)
+            .getStrategies()
             .accounts({
-                strategyList: strategyListPda,
+                bot: botPda,
             })
             .view(); // <- importante: view() para funções que retornam valores
 
@@ -54,18 +48,10 @@ describe("webdex_sub_accounts", () => {
             },
         ]);
 
-        const subAccountPda = subAccounts[0].publicKey;
-
-        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
-            subAccountsProgram.programId
-        );
-
         const result = await subAccountsProgram.methods
-            .getBalance(subAccounts[0].account.id, strategies[0].tokenAddress, usdtMint.pubkey)
+            .getBalance(subAccounts[0].account.name, strategies[0].tokenAddress, usdtMint.pubkey)
             .accounts({
-                subAccount: subAccountPda,
-                strategyBalance: strategyBalancePda,
+                user: userPda,
             })
             .view();
 

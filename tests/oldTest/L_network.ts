@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexNetwork } from "../target/types/webdex_network";
+import { WebdexNetwork } from "../../target/types/webdex_network";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import BN from "bn.js";
 import { sharedState } from "./setup";

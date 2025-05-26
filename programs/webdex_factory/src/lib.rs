@@ -17,6 +17,7 @@ pub mod webdex_factory {
 
     pub fn add_bot(
         ctx: Context<AddBot>,
+        manager_address: Pubkey,
         name: String,
         prefix: String,
         owner: Pubkey,
@@ -25,29 +26,29 @@ pub mod webdex_factory {
         void_collector_3: Pubkey,
         void_collector_4: Pubkey,
         fee_withdraw_void: u64,
-        contract_address: Pubkey,
         strategy_address: Pubkey,
         payments_address: Pubkey,
         token_pass_address: Pubkey,
         fee_withdraw_network: u64,
         fee_collector_network_address: Pubkey,
     ) -> Result<()> {
-        _add_bot(ctx,name,prefix,owner,void_collector_1,void_collector_2,void_collector_3,void_collector_4,fee_withdraw_void,contract_address,strategy_address,payments_address,token_pass_address,fee_withdraw_network,fee_collector_network_address)
+        _add_bot(ctx,manager_address,name,prefix,owner,void_collector_1,void_collector_2,void_collector_3,void_collector_4,fee_withdraw_void,strategy_address,payments_address,token_pass_address,fee_withdraw_network,fee_collector_network_address)
     }
 
-    pub fn get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Result<BotInfo> {
-        _get_bot_info(ctx,contract_address)
+    pub fn get_bot_info(ctx: Context<GetBotInfo>, manager_address: Pubkey) -> Result<BotInfo> {
+        _get_bot_info(ctx,manager_address)
     }
 
     pub fn update_bot(
         ctx: Context<UpdateBot>,
+        manager_address: Pubkey,
         strategy_address: Option<Pubkey>,
         payments_address: Option<Pubkey>,
     ) -> Result<()> {
-        _update_bot(ctx,strategy_address,payments_address)
+        _update_bot(ctx,manager_address,strategy_address,payments_address)
     }
 
-    pub fn remove_bot(ctx: Context<RemoveBot>) -> Result<()> {
-       _remove_bot(ctx)
+    pub fn remove_bot(ctx: Context<RemoveBot>, manager_address: Pubkey) -> Result<()> {
+       _remove_bot(ctx,manager_address)
     }
 }

@@ -5,13 +5,12 @@ use anchor_spl::token::{transfer, Transfer};
 
 pub fn _pay_fee(
     ctx: Context<PayFee>,
-    contract_address: Pubkey,
     token: Pubkey,
     amount: u64,
 ) -> Result<()> {
     let signer = &mut ctx.accounts.signer;
 
-    if ctx.accounts.bot.owner != signer.key() {
+    if ctx.accounts.sub_account.bot != ctx.accounts.bot.key() || ctx.accounts.bot.owner != signer.key() {
         return Err(ErrorCode::Unauthorized.into());
     }
 
@@ -21,7 +20,7 @@ pub fn _pay_fee(
     if balance_info.token == Pubkey::default() {
         balance_info.token = token;
         balance_info.user = ctx.accounts.user.key();
-        balance_info.contract_address = contract_address;
+        balance_info.bot = ctx.accounts.bot.key();
     }
 
     balance_info.balance = balance_info
@@ -30,9 +29,9 @@ pub fn _pay_fee(
         .ok_or(ErrorCode::Overflow)?;
 
     emit!(BalanceNetworkAdd {
-        contract_address: contract_address,
-        user: ctx.accounts.user.key(),
-        token: token,
+        bot: balance_info.bot,
+        user: balance_info.user,
+        token: balance_info.token,
         new_balance: balance_info.balance,
         amount,
     });
@@ -42,6 +41,7 @@ pub fn _pay_fee(
 
 pub fn _get_balance(
     ctx: Context<GetBalance>,
+    _token: Pubkey,
 ) -> Result<BalanceData> {
     let balance_info = &mut ctx.accounts.balance_info;
     Ok(BalanceData {
@@ -52,7 +52,6 @@ pub fn _get_balance(
 pub fn _withdrawal(
     ctx: Context<Withdrawal>, 
     amount: u64,
-    token: Pubkey
 ) -> Result<()> {
     let balance_info = &mut ctx.accounts.balance_info;
     let bot = &ctx.accounts.bot;
@@ -81,7 +80,7 @@ pub fn _withdrawal(
     let cpi_ctx_user = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from: ctx.accounts.signer.to_account_info(),
+            from: ctx.accounts.deposit_token_account.to_account_info(),
             to: ctx.accounts.vault_token_account.to_account_info(),
             authority: ctx.accounts.signer.to_account_info(),
         },
@@ -92,7 +91,7 @@ pub fn _withdrawal(
     let cpi_ctx_fee = CpiContext::new(
         ctx.accounts.token_program.to_account_info(),
         Transfer {
-            from: ctx.accounts.signer.to_account_info(),
+            from: ctx.accounts.deposit_token_account.to_account_info(),
             to: ctx.accounts.fee_collector_network_account.to_account_info(),
             authority: ctx.accounts.signer.to_account_info(),
         },
@@ -111,7 +110,7 @@ pub fn _withdrawal(
         let cpi_ctx_collector = CpiContext::new(
             ctx.accounts.token_program.to_account_info(),
             Transfer {
-                from: ctx.accounts.signer.to_account_info(),
+                from: ctx.accounts.deposit_token_account.to_account_info(),
                 to: collector_account.to_account_info(),
                 authority: ctx.accounts.signer.to_account_info(),
             },
@@ -121,7 +120,7 @@ pub fn _withdrawal(
 
     // --- Evento
     emit!(BalanceNetworkRemove {
-        contract_address: balance_info.contract_address,
+        bot: balance_info.bot,
         user: balance_info.user,
         token: balance_info.token,
         new_balance: balance_info.balance,

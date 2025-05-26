@@ -1,6 +1,6 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexPayments } from "../target/types/webdex_payments";
+import { WebdexPayments } from "../../target/types/webdex_payments";
 import { PublicKey } from "@solana/web3.js";
 import { sharedState } from "./setup";
 import { createUmi } from '@metaplex-foundation/umi-bundle-defaults'

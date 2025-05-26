@@ -35,9 +35,9 @@ describe("webdex_manager", () => {
 
         // Chamada da função de leitura
         const strategies = await strategyProgram.methods
-            .getStrategies(bots[0].account.managerAddress)
+            .getStrategies()
             .accounts({
-                strategyList: strategyListPda,
+                bot: botPda,
             })
             .view(); // <- importante: view() para funções que retornam valores
 
@@ -67,7 +67,6 @@ describe("webdex_manager", () => {
             )
             .accounts({
                 bot: botPda,
-                user: userPda,
                 subAccount: subAccountPda,
                 strategyList: strategyListPda,
                 tokenMint: usdtMint.pubkey,
@@ -82,8 +81,8 @@ describe("webdex_manager", () => {
         // ATUALIZA O SALDO
         const txa = await subAccountsProgram.methods
             .addLiquidity(
+                subAccounts[0].account.name,
                 strategies[0].tokenAddress,
-                subAccounts[0].account.id,
                 usdtMint.pubkey,
                 amount,
                 usdtMint.coin.name,
@@ -92,8 +91,6 @@ describe("webdex_manager", () => {
             )
             .accounts({
                 user: userPda,
-                bot: botPda,
-                subAccount: subAccountPda,
                 signer: user.publicKey,
             })
             .rpc();

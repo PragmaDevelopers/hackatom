@@ -2,7 +2,6 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
 import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { PublicKey } from "@solana/web3.js";
-import { expect } from "chai";
 import { WebdexFactory } from "../../target/types/webdex_factory";
 
 describe("webdex_strategy", () => {
@@ -17,22 +16,14 @@ describe("webdex_strategy", () => {
     const user = provider.wallet;
 
     // 👉 Variáveis compartilhadas entre os testes
-    let strategyListPda: PublicKey;
-    let strategyTokenAddress: PublicKey;
 
     it("Add Strategy", async () => {
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
-        const contractAddress = bots[0].account.managerAddress;
-
-        [strategyListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("strategy_list"), botPda.toBuffer()],
-            strategyProgram.programId
-        );
 
         // 🎨 Criar uma nova conta mint (NFT)
         const mint = anchor.web3.Keypair.generate();
-        strategyTokenAddress = mint.publicKey;
+        const strategyTokenAddress = mint.publicKey;
 
         // 📜 Endereço de metadados PDA conforme padrão do Metaplex
         const [metadataPda] = anchor.web3.PublicKey.findProgramAddressSync(
@@ -50,7 +41,6 @@ describe("webdex_strategy", () => {
                 "Moderate",
                 "MODERATE",
                 "https://example.com/nft.json",
-                contractAddress
             )
             .accounts({
                 bot: botPda,

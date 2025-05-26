@@ -1,29 +1,21 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexNetwork } from "../../../target/types/webdex_network";
-import { PublicKey } from "@solana/web3.js";
-import { WebdexFactory } from "../../../target/types/webdex_factory";
-import { WebdexStrategy } from "../../../target/types/webdex_strategy";
-import { WebdexPayments } from "../../../target/types/webdex_payments";
-import { WebdexManager } from "../../../target/types/webdex_manager";
 import { WebdexSubAccounts } from "../../../target/types/webdex_sub_accounts";
+import { PublicKey } from "@solana/web3.js";
+import { expect } from "chai";
+import { WebdexFactory } from "../../../target/types/webdex_factory";
+import { WebdexManager } from "../../../target/types/webdex_manager";
 
-describe("webdex_network", () => {
+describe("webdex_sub_accounts", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
-    const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
-    const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
-    const networkProgram = anchor.workspace.WebdexNetwork as Program<WebdexNetwork>;
     const user = provider.wallet;
 
-    it("Get Balance - Network", async () => {
-        const payments = await paymentsProgram.account.payments.all();
-        const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
-
+    it("Get Sub Account Strategies", async () => {
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
 
@@ -32,16 +24,23 @@ describe("webdex_network", () => {
             managerProgram.programId
         );
 
-        const balanceData = await networkProgram.methods
-            .getBalance(
-                usdtMint.pubkey,
-            )
+        // Chamada da função get_sub_accounts
+        const subAccounts = await subAccountsProgram.account.subAccount.all([
+            {
+                memcmp: {
+                    offset: 8 + 32, // pula discriminator + bot
+                    bytes: userPda.toBase58(),
+                },
+            },
+        ]);
+
+        const result = await subAccountsProgram.methods
+            .getSubAccountStrategies(subAccounts[0].account.name)
             .accounts({
-                bot: botPda,
                 user: userPda,
             })
             .view();
 
-        console.log("💵 balance:", balanceData.balance.toNumber());
+        console.log("🔗 Estratégias vinculadas à subconta:", result);
     });
 });

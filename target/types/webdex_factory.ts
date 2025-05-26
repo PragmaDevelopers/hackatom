@@ -40,17 +40,11 @@ export type WebdexFactory = {
                 ]
               },
               {
-                "kind": "account",
+                "kind": "arg",
                 "path": "managerAddress"
               }
             ]
           }
-        },
-        {
-          "name": "managerAddress",
-          "docs": [
-            "CHECK"
-          ]
         },
         {
           "name": "signer",
@@ -63,6 +57,10 @@ export type WebdexFactory = {
         }
       ],
       "args": [
+        {
+          "name": "managerAddress",
+          "type": "pubkey"
+        },
         {
           "name": "name",
           "type": "string"
@@ -94,10 +92,6 @@ export type WebdexFactory = {
         {
           "name": "feeWithdrawVoid",
           "type": "u64"
-        },
-        {
-          "name": "contractAddress",
-          "type": "pubkey"
         },
         {
           "name": "strategyAddress",
@@ -135,12 +129,28 @@ export type WebdexFactory = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "managerAddress"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "contractAddress",
+          "name": "managerAddress",
           "type": "pubkey"
         }
       ],
@@ -165,14 +175,35 @@ export type WebdexFactory = {
       "accounts": [
         {
           "name": "bot",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "managerAddress"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
           "signer": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "managerAddress",
+          "type": "pubkey"
+        }
+      ]
     },
     {
       "name": "updateBot",
@@ -189,7 +220,23 @@ export type WebdexFactory = {
       "accounts": [
         {
           "name": "bot",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  111,
+                  116
+                ]
+              },
+              {
+                "kind": "arg",
+                "path": "managerAddress"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -197,6 +244,10 @@ export type WebdexFactory = {
         }
       ],
       "args": [
+        {
+          "name": "managerAddress",
+          "type": "pubkey"
+        },
         {
           "name": "strategyAddress",
           "type": {
@@ -426,7 +477,7 @@ export type WebdexFactory = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "managerAddress",
             "type": "pubkey"
           },
           {

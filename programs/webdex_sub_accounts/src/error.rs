@@ -24,8 +24,8 @@ pub enum ErrorCode {
     AccountNotLinkedToCurrency,
     #[msg("Max Sub Accounts Reached")]
     MaxSubAccountsReached,
-    #[msg("Invalid Sub Account Id")]
-    InvalidSubAccountId,
+    #[msg("Invalid Sub Account Name")]
+    InvalidSubAccountName,
     #[msg("Strategy Not Linked")]
     StrategyNotLinked,
     #[msg("Strategy Balance Not Found")]
@@ -48,4 +48,6 @@ pub enum ErrorCode {
     DuplicateSubAccountName,
     #[msg("Invalid Coin")]
     InvalidCoin,
+    #[msg("Disabled User")]
+    DisabledUser,
 }

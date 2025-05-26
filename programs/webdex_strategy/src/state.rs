@@ -16,7 +16,7 @@ impl Strategy {
 
 #[account]
 pub struct StrategyList {
-    pub contract_address: Pubkey,  
+    pub bot: Pubkey,  
     pub strategies: Vec<Strategy>,
 }
 
@@ -27,7 +27,7 @@ impl StrategyList {
 
 #[event]
 pub struct StrategyAddedEvent {
-    pub contract_address: Pubkey,
+    pub bot: Pubkey,
     pub name: String,
     pub symbol: String,
     pub uri: String,
@@ -36,13 +36,14 @@ pub struct StrategyAddedEvent {
 
 #[event]
 pub struct StrategyStatusUpdatedEvent {
-    pub contract_address: Pubkey,
+    pub bot: Pubkey,
     pub token_address: Pubkey,
     pub is_active: bool,
 }
 
 #[derive(Accounts)]
 pub struct AddStrategy<'info> {
+    #[account(mut)]
     pub bot: Account<'info, Bot>,
 
     #[account(
@@ -73,26 +74,55 @@ pub struct AddStrategy<'info> {
 
 #[derive(Accounts)]
 pub struct UpdateStrategyStatus<'info> {
-    pub bot: Account<'info, Bot>,
     #[account(mut)]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        mut,
+        seeds = [b"strategy_list", bot.key().as_ref()],
+        bump
+    )]
     pub strategy_list: Account<'info, StrategyList>,
+
     pub signer: Signer<'info>,
 }
 
 #[derive(Accounts)]
 pub struct GetStrategies<'info> {
+    #[account()]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        seeds = [b"strategy_list", bot.key().as_ref()],
+        bump
+    )]
     pub strategy_list: Account<'info, StrategyList>,
 }
 
 #[derive(Accounts)]
 pub struct FindStrategy<'info> {
+    #[account()]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        mut,
+        seeds = [b"strategy_list", bot.key().as_ref()],
+        bump
+    )]
     pub strategy_list: Account<'info, StrategyList>,
 }
 
 #[derive(Accounts)]
 pub struct DeleteStrategy<'info> {
-    pub bot: Account<'info, Bot>,
     #[account(mut)]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        mut,
+        seeds = [b"strategy_list", bot.key().as_ref()],
+        bump
+    )]
     pub strategy_list: Account<'info, StrategyList>,
+
     pub signer: Signer<'info>,
 }

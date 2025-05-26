@@ -27,10 +27,54 @@ export type WebdexNetwork = {
       ],
       "accounts": [
         {
-          "name": "balanceInfo"
+          "name": "bot"
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "balanceInfo",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "token"
+              }
+            ]
+          }
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "token",
+          "type": "pubkey"
+        }
+      ],
       "returns": {
         "defined": {
           "name": "balanceData"
@@ -57,6 +101,9 @@ export type WebdexNetwork = {
           "name": "user"
         },
         {
+          "name": "subAccount"
+        },
+        {
           "name": "balanceInfo",
           "writable": true,
           "pda": {
@@ -79,8 +126,8 @@ export type WebdexNetwork = {
                 ]
               },
               {
-                "kind": "arg",
-                "path": "contractAddress"
+                "kind": "account",
+                "path": "bot"
               },
               {
                 "kind": "account",
@@ -105,10 +152,6 @@ export type WebdexNetwork = {
       ],
       "args": [
         {
-          "name": "contractAddress",
-          "type": "pubkey"
-        },
-        {
           "name": "token",
           "type": "pubkey"
         },
@@ -132,22 +175,56 @@ export type WebdexNetwork = {
       ],
       "accounts": [
         {
-          "name": "bot",
-          "writable": true
+          "name": "bot"
         },
         {
-          "name": "subAccount",
-          "writable": true
+          "name": "user"
+        },
+        {
+          "name": "subAccount"
         },
         {
           "name": "balanceInfo",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "tokenMint"
+              }
+            ]
+          }
         },
         {
           "name": "tokenMint"
         },
         {
-          "name": "userTokenAccount",
+          "name": "depositTokenAccount",
           "writable": true,
           "pda": {
             "seeds": [
@@ -238,120 +315,7 @@ export type WebdexNetwork = {
         },
         {
           "name": "vaultTokenAccount",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "subAccountAuthority"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "tokenMint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "subAccountAuthority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "subAccount"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "feeCollectorNetworkAddress",
@@ -984,7 +948,7 @@ export type WebdexNetwork = {
             "type": "pubkey"
           },
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           }
         ]
@@ -996,7 +960,7 @@ export type WebdexNetwork = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {
@@ -1024,7 +988,7 @@ export type WebdexNetwork = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {

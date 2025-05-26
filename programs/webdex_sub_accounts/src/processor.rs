@@ -37,7 +37,7 @@ pub fn _create_sub_account(
 
     // Inicializa subconta
     sub_account.user = user_key;
-    sub_account.bot = bot.manager_address;
+    sub_account.bot = bot.key();
     sub_account.id = sub_account_id;
     sub_account.name = name.clone();
 
@@ -57,8 +57,8 @@ pub fn _create_sub_account(
 
 pub fn _add_liquidity<'info>(
     ctx: Context<AddLiquidity>,
+    account_name: String,
     strategy_token: Pubkey,
-    account_id: Pubkey,
     coin: Pubkey,
     amount: u64,
     name: String,
@@ -68,14 +68,9 @@ pub fn _add_liquidity<'info>(
     let sub_account = &mut ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
-    // Verificação de permissão
-    if ctx.accounts.bot.manager_address == Pubkey::default() {
-       return Err(ErrorCode::Unauthorized.into());
-    }
-
     // Confirma subconta correta
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
+    if sub_account.name != account_name {
+        return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
     // Vincula strategy_token se ainda não existe
@@ -111,7 +106,7 @@ pub fn _add_liquidity<'info>(
 
     // Emite evento
     emit!(AddAndRemoveLiquidityEvent {
-        id: account_id,
+        account_name,
         strategy_token,
         coin,
         amount,
@@ -124,7 +119,7 @@ pub fn _add_liquidity<'info>(
 
 pub fn _get_balance(
     ctx: Context<GetBalance>,
-    account_id: Pubkey,
+    account_name: String,
     strategy_token: Pubkey,
     coin: Pubkey,
 ) -> Result<BalanceStrategy> {
@@ -132,8 +127,8 @@ pub fn _get_balance(
     let strat_balance = &ctx.accounts.strategy_balance;
     
     // ✅ Verifica se o SubAccount pertence ao contrato
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
+    if sub_account.name != account_name {
+        return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
     // ✅ Verifica se a strategy está registrada
@@ -160,15 +155,15 @@ pub fn _get_balance(
 
 pub fn _get_balances(
     ctx: Context<GetBalances>,
-    account_id: Pubkey,
+    account_name: String,
     strategy_token: Pubkey,
 ) -> Result<Vec<BalanceStrategy>> {
     let sub_account = &ctx.accounts.sub_account;
     let strategy_balance = &ctx.accounts.strategy_balance;
 
     // Verifica ID da subconta
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
+    if sub_account.name != account_name {
+        return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
     // Verifica se a subconta está vinculada à estratégia
@@ -182,13 +177,13 @@ pub fn _get_balances(
 
 pub fn _get_sub_account_strategies(
     ctx: Context<GetSubAccountStrategies>,
-    account_id: Pubkey,
+    account_name: String,
 ) -> Result<Vec<Pubkey>> {
     let sub_account = &ctx.accounts.sub_account;
 
     // ✅ Verifica se o ID da subconta bate com o informado
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
+    if sub_account.name != account_name {
+        return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
     // ✅ Retorna a lista de estratégias vinculadas
@@ -197,7 +192,7 @@ pub fn _get_sub_account_strategies(
 
 pub fn _toggle_pause(
     ctx: Context<TogglePause>,
-    account_id: Pubkey,
+    account_name: String,
     strategy_token: Pubkey,
     coin: Pubkey,
     paused: bool,
@@ -205,12 +200,8 @@ pub fn _toggle_pause(
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
-    if ctx.accounts.bot.manager_address == Pubkey::default() {
-       return Err(ErrorCode::Unauthorized.into());
-    }
-
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
+    if sub_account.name != account_name {
+        return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
     let coin_index = strat_balance
@@ -235,7 +226,7 @@ pub fn _toggle_pause(
     emit!(ChangePausedEvent {
         signer: ctx.accounts.signer.key(),
         user: ctx.accounts.user.key(),
-        id: account_id,
+        account_name,
         strategy_token,
         coin,
         paused,
@@ -246,7 +237,7 @@ pub fn _toggle_pause(
 
 pub fn _remove_liquidity(
     ctx: Context<RemoveLiquidity>,
-    account_id: Pubkey,
+    account_name: String,
     strategy_token: Pubkey,
     coin: Pubkey,
     amount: u64,
@@ -254,13 +245,9 @@ pub fn _remove_liquidity(
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
-    if ctx.accounts.bot.manager_address == Pubkey::default() {
-       return Err(ErrorCode::Unauthorized.into());
-    }
-
     // ✅ Confirma subconta correta
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
+    if sub_account.name != account_name {
+        return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
     // ✅ Confirma que a moeda existe na lista
@@ -287,7 +274,7 @@ pub fn _remove_liquidity(
 
     // ✅ Emite evento de saída
     emit!(AddAndRemoveLiquidityEvent {
-        id: account_id,
+        account_name,
         strategy_token,
         coin,
         amount,
@@ -300,7 +287,7 @@ pub fn _remove_liquidity(
 
 pub fn _position_liquidity(
     ctx: Context<PositionLiquidity>,
-    account_id: Pubkey,
+    account_name: String,
     strategy_token: Pubkey,
     amount: i64,
     coin: Pubkey,
@@ -322,8 +309,8 @@ pub fn _position_liquidity(
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 
-    if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountId.into());
+    if sub_account.name != account_name {
+        return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
     let strategy = strategy_list
@@ -389,7 +376,7 @@ pub fn _position_liquidity(
     // CHAMAR A FUNÇÂO REBALANCE POSITION DO CONTRATO MANAGER LOGO DEPOIS PARA FAZER USO DO "temp_fee_account"
 
     emit!(BalanceLiquidityEvent {
-        id: account_id,
+        account_name: account_name.clone(),
         strategy_token,
         coin,
         amount: amount,
@@ -410,7 +397,7 @@ pub fn _position_liquidity(
     emit!(OpenPositionEvent {
         contract_address: ctx.accounts.bot.manager_address.key(),
         user: ctx.accounts.user.key(),
-        id: account_id.clone(),
+        account_name: account_name.clone(),
         details,
     });
 

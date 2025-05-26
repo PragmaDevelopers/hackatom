@@ -21,10 +21,54 @@
       ],
       "accounts": [
         {
-          "name": "balance_info"
+          "name": "bot"
+        },
+        {
+          "name": "user"
+        },
+        {
+          "name": "balance_info",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "token"
+              }
+            ]
+          }
         }
       ],
-      "args": [],
+      "args": [
+        {
+          "name": "_token",
+          "type": "pubkey"
+        }
+      ],
       "returns": {
         "defined": {
           "name": "BalanceData"
@@ -51,6 +95,9 @@
           "name": "user"
         },
         {
+          "name": "sub_account"
+        },
+        {
           "name": "balance_info",
           "writable": true,
           "pda": {
@@ -73,8 +120,8 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "contract_address"
+                "kind": "account",
+                "path": "bot"
               },
               {
                 "kind": "account",
@@ -99,10 +146,6 @@
       ],
       "args": [
         {
-          "name": "contract_address",
-          "type": "pubkey"
-        },
-        {
           "name": "token",
           "type": "pubkey"
         },
@@ -126,22 +169,56 @@
       ],
       "accounts": [
         {
-          "name": "bot",
-          "writable": true
+          "name": "bot"
         },
         {
-          "name": "sub_account",
-          "writable": true
+          "name": "user"
+        },
+        {
+          "name": "sub_account"
         },
         {
           "name": "balance_info",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101,
+                  95,
+                  105,
+                  110,
+                  102,
+                  111
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "token_mint"
+              }
+            ]
+          }
         },
         {
           "name": "token_mint"
         },
         {
-          "name": "user_token_account",
+          "name": "deposit_token_account",
           "writable": true,
           "pda": {
             "seeds": [
@@ -232,120 +309,7 @@
         },
         {
           "name": "vault_token_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "sub_account_authority"
-              },
-              {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "token_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "sub_account_authority",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "sub_account"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "fee_collector_network_address",
@@ -978,7 +942,7 @@
             "type": "pubkey"
           },
           {
-            "name": "contract_address",
+            "name": "bot",
             "type": "pubkey"
           }
         ]
@@ -990,7 +954,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "bot",
             "type": "pubkey"
           },
           {
@@ -1018,7 +982,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "bot",
             "type": "pubkey"
           },
           {

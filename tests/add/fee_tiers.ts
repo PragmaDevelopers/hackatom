@@ -36,7 +36,6 @@ describe("webdex_payments", () => {
 
         const tx = await paymentsProgram.methods
             .addFeeTiers(
-                bots[0].account.managerAddress,
                 feeTiers,
             )
             .accounts({

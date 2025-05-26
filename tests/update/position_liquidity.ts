@@ -42,9 +42,9 @@ describe("webdex_payments/manager", () => {
 
         // Chamada da função de leitura
         const strategies = await strategyProgram.methods
-            .getStrategies(bots[0].account.managerAddress)
+            .getStrategies()
             .accounts({
-                strategyList: strategyListPda,
+                bot: botPda,
             })
             .view(); // <- importante: view() para funções que retornam valores
 
@@ -65,11 +65,6 @@ describe("webdex_payments/manager", () => {
 
         const subAccountPda = subAccounts[0].publicKey;
 
-        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
-            subAccountsProgram.programId
-        );
-
         const currencys = [
             {
                 from: solMint.pubkey,
@@ -79,7 +74,7 @@ describe("webdex_payments/manager", () => {
 
         const tx = await subAccountsProgram.methods
             .positionLiquidity(
-                subAccounts[0].account.id,
+                subAccounts[0].account.name,
                 strategies[0].tokenAddress,
                 amount,
                 usdtMint.pubkey,
@@ -87,17 +82,20 @@ describe("webdex_payments/manager", () => {
                 currencys,
             )
             .accounts({
+                user: userPda,
                 bot: botPda,
                 payments: paymentsPda,
                 strategyList: strategyListPda,
-                strategyBalance: strategyBalancePda,
-                subAccount: subAccountPda,
-                user: userPda,
                 signer: user.publicKey,
             })
             .rpc();
 
         console.log("✅ Transação:", tx);
+
+        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
+            subAccountsProgram.programId
+        );
 
         const [temporaryRebalancePda] = PublicKey.findProgramAddressSync(
             [Buffer.from("temporary_rebalance"), botPda.toBuffer(), userPda.toBuffer(), subAccountPda.toBuffer(), strategyBalancePda.toBuffer(), paymentsPda.toBuffer()],
@@ -113,8 +111,9 @@ describe("webdex_payments/manager", () => {
             )
             .accounts({
                 bot: botPda,
-                subAccount: subAccountPda,
                 user: userPda,
+                strategyBalance: strategyBalancePda,
+                subAccount: subAccounts[0].publicKey,
                 temporaryRebalance: temporaryRebalancePda,
                 signer: user.publicKey,
                 tokenMint: usdtMint.pubkey,

@@ -21,32 +21,29 @@ pub mod webdex_strategy {
         name: String,
         symbol: String,
         uri: String,
-        contract_address: Pubkey,
     ) -> Result<()> {
-        _add_strategy(ctx,name,symbol,uri,contract_address)
+        _add_strategy(ctx,name,symbol,uri)
     }
 
-    pub fn update_strategy_status(ctx: Context<UpdateStrategyStatus>, contract_address: Pubkey, token_address: Pubkey, is_active: bool) -> Result<()> {
-        _update_strategy_status(ctx,contract_address,token_address,is_active)
+    pub fn update_strategy_status(ctx: Context<UpdateStrategyStatus>, token_address: Pubkey, is_active: bool) -> Result<()> {
+        _update_strategy_status(ctx,token_address,is_active)
     }
 
-    pub fn get_strategies(ctx: Context<GetStrategies>, contract_address: Pubkey) -> Result<Vec<Strategy>> {
-        _get_strategies(ctx,contract_address)
+    pub fn get_strategies(ctx: Context<GetStrategies>) -> Result<Vec<Strategy>> {
+        _get_strategies(ctx)
     }
 
     pub fn find_strategy(
         ctx: Context<FindStrategy>,
-        contract_address: Pubkey,
         token_address: Pubkey,
     ) -> Result<Strategy> {
-        _find_strategy(ctx,contract_address,token_address)
+        _find_strategy(ctx,token_address)
     }
 
     pub fn delete_strategy(
         ctx: Context<DeleteStrategy>,
-        contract_address: Pubkey,
         token_address: Pubkey,
     ) -> Result<()> {
-        _delete_strategy(ctx,contract_address,token_address)
+        _delete_strategy(ctx,token_address)
     }
 }

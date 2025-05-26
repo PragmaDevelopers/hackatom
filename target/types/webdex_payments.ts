@@ -27,7 +27,8 @@ export type WebdexPayments = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
@@ -65,10 +66,6 @@ export type WebdexPayments = {
         }
       ],
       "args": [
-        {
-          "name": "contractAddress",
-          "type": "pubkey"
-        },
         {
           "name": "newFeeTiers",
           "type": {
@@ -95,7 +92,8 @@ export type WebdexPayments = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
@@ -134,7 +132,7 @@ export type WebdexPayments = {
       ],
       "args": [
         {
-          "name": "coinPubkey",
+          "name": "coinAddress",
           "type": "pubkey"
         },
         {
@@ -165,7 +163,8 @@ export type WebdexPayments = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
@@ -204,7 +203,7 @@ export type WebdexPayments = {
       ],
       "args": [
         {
-          "name": "coinPubkey",
+          "name": "coinAddress",
           "type": "pubkey"
         },
         {
@@ -235,7 +234,31 @@ export type WebdexPayments = {
       ],
       "accounts": [
         {
-          "name": "payments"
+          "name": "bot"
+        },
+        {
+          "name": "payments",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         }
       ],
       "args": [],
@@ -261,11 +284,33 @@ export type WebdexPayments = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -274,7 +319,7 @@ export type WebdexPayments = {
       ],
       "args": [
         {
-          "name": "coin",
+          "name": "coinAddress",
           "type": "pubkey"
         }
       ]
@@ -521,7 +566,7 @@ export type WebdexPayments = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {

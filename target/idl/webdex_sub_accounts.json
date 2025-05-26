@@ -21,14 +21,40 @@
       ],
       "accounts": [
         {
-          "name": "bot"
-        },
-        {
-          "name": "user"
+          "name": "user",
+          "writable": true
         },
         {
           "name": "sub_account",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "account_name"
+              }
+            ]
+          }
         },
         {
           "name": "strategy_balance",
@@ -83,11 +109,11 @@
       ],
       "args": [
         {
-          "name": "strategy_token",
-          "type": "pubkey"
+          "name": "account_name",
+          "type": "string"
         },
         {
-          "name": "account_id",
+          "name": "strategy_token",
           "type": "pubkey"
         },
         {
@@ -126,10 +152,12 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
-          "name": "user"
+          "name": "user",
+          "writable": true
         },
         {
           "name": "sub_account",
@@ -151,10 +179,6 @@
                   110,
                   116
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
               },
               {
                 "kind": "account",
@@ -183,10 +207,6 @@
                   101,
                   114
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
               },
               {
                 "kind": "account",
@@ -226,16 +246,84 @@
       ],
       "accounts": [
         {
-          "name": "sub_account"
+          "name": "user"
         },
         {
-          "name": "strategy_balance"
+          "name": "sub_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "account_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "strategy_balance",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              },
+              {
+                "kind": "arg",
+                "path": "strategy_token"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "account_id",
-          "type": "pubkey"
+          "name": "account_name",
+          "type": "string"
         },
         {
           "name": "strategy_token",
@@ -266,16 +354,84 @@
       ],
       "accounts": [
         {
-          "name": "sub_account"
+          "name": "user"
         },
         {
-          "name": "strategy_balance"
+          "name": "sub_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "account_name"
+              }
+            ]
+          }
+        },
+        {
+          "name": "strategy_balance",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              },
+              {
+                "kind": "arg",
+                "path": "strategy_token"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "account_id",
-          "type": "pubkey"
+          "name": "account_name",
+          "type": "string"
         },
         {
           "name": "strategy_token",
@@ -304,13 +460,44 @@
       ],
       "accounts": [
         {
-          "name": "sub_account"
+          "name": "user"
+        },
+        {
+          "name": "sub_account",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "account_name"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "account_id",
-          "type": "pubkey"
+          "name": "account_name",
+          "type": "string"
         }
       ],
       "returns": {
@@ -335,22 +522,89 @@
           "writable": true
         },
         {
-          "name": "payments"
+          "name": "user",
+          "writable": true
         },
         {
-          "name": "strategy_list"
+          "name": "payments",
+          "writable": true
+        },
+        {
+          "name": "strategy_list",
+          "writable": true
         },
         {
           "name": "sub_account",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "account_name"
+              }
+            ]
+          }
         },
         {
           "name": "strategy_balance",
-          "writable": true
-        },
-        {
-          "name": "user",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              },
+              {
+                "kind": "arg",
+                "path": "strategy_token"
+              }
+            ]
+          }
         },
         {
           "name": "temporary_rebalance",
@@ -416,8 +670,8 @@
       ],
       "args": [
         {
-          "name": "account_id",
-          "type": "pubkey"
+          "name": "account_name",
+          "type": "string"
         },
         {
           "name": "strategy_token",
@@ -461,21 +715,91 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "user",
+          "writable": true
         },
         {
           "name": "sub_account",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "account_name"
+              }
+            ]
+          }
         },
         {
           "name": "strategy_balance",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              },
+              {
+                "kind": "arg",
+                "path": "strategy_token"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
         }
       ],
       "args": [
         {
-          "name": "account_id",
-          "type": "pubkey"
+          "name": "account_name",
+          "type": "string"
         },
         {
           "name": "strategy_token",
@@ -505,17 +829,81 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "user",
+          "writable": true
         },
         {
-          "name": "user"
-        },
-        {
-          "name": "sub_account"
+          "name": "sub_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "account_name"
+              }
+            ]
+          }
         },
         {
           "name": "strategy_balance",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "sub_account"
+              },
+              {
+                "kind": "arg",
+                "path": "strategy_token"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -525,8 +913,8 @@
       ],
       "args": [
         {
-          "name": "account_id",
-          "type": "pubkey"
+          "name": "account_name",
+          "type": "string"
         },
         {
           "name": "strategy_token",
@@ -787,8 +1175,8 @@
     },
     {
       "code": 6011,
-      "name": "InvalidSubAccountId",
-      "msg": "Invalid Sub Account Id"
+      "name": "InvalidSubAccountName",
+      "msg": "Invalid Sub Account Name"
     },
     {
       "code": 6012,
@@ -844,6 +1232,11 @@
       "code": 6022,
       "name": "InvalidCoin",
       "msg": "Invalid Coin"
+    },
+    {
+      "code": 6023,
+      "name": "DisabledUser",
+      "msg": "Disabled User"
     }
   ],
   "types": [
@@ -853,8 +1246,8 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "account_name",
+            "type": "string"
           },
           {
             "name": "strategy_token",
@@ -885,8 +1278,8 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "account_name",
+            "type": "string"
           },
           {
             "name": "strategy_token",
@@ -1025,8 +1418,8 @@
             "type": "pubkey"
           },
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "account_name",
+            "type": "string"
           },
           {
             "name": "strategy_token",
@@ -1153,8 +1546,8 @@
             "type": "pubkey"
           },
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "account_name",
+            "type": "string"
           },
           {
             "name": "details",
@@ -1173,7 +1566,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "bot",
             "type": "pubkey"
           },
           {
@@ -1289,7 +1682,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "bot",
             "type": "pubkey"
           },
           {

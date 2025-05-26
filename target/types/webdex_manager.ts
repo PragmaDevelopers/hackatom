@@ -295,7 +295,28 @@ export type WebdexManager = {
       ],
       "accounts": [
         {
-          "name": "user"
+          "name": "user",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
         }
       ],
       "args": [],
@@ -319,13 +340,32 @@ export type WebdexManager = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
-          "name": "user"
+          "name": "user",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
         },
         {
-          "name": "strategyList"
+          "name": "strategyList",
+          "writable": true
         },
         {
           "name": "subAccount",
@@ -741,11 +781,36 @@ export type WebdexManager = {
       ],
       "accounts": [
         {
+          "name": "bot",
+          "writable": true
+        },
+        {
+          "name": "user",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  117,
+                  115,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "signer"
+              }
+            ]
+          }
+        },
+        {
           "name": "subAccount",
           "writable": true
         },
         {
-          "name": "strategyList"
+          "name": "strategyList",
+          "writable": true
         },
         {
           "name": "tokenMint"
@@ -1701,6 +1766,10 @@ export type WebdexManager = {
           "writable": true
         },
         {
+          "name": "strategyBalance",
+          "writable": true
+        },
+        {
           "name": "temporaryRebalance",
           "writable": true
         },
@@ -2471,6 +2540,19 @@ export type WebdexManager = {
       ]
     },
     {
+      "name": "strategyBalanceList",
+      "discriminator": [
+        101,
+        190,
+        24,
+        107,
+        186,
+        122,
+        101,
+        70
+      ]
+    },
+    {
       "name": "strategyList",
       "discriminator": [
         128,
@@ -2665,36 +2747,41 @@ export type WebdexManager = {
     },
     {
       "code": 6017,
+      "name": "disabledUser",
+      "msg": "Disabled User"
+    },
+    {
+      "code": 6018,
       "name": "insufficientGasBalance",
       "msg": "Insufficient Gas Balance"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "invalidAmount",
       "msg": "Invalid Amount"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "insufficientPassBalance",
       "msg": "Insufficient Pass Balance"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "youMustTheWebDexPayments",
       "msg": "You must the WebDexPayments"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "strategyNotFound",
       "msg": "Strategy Not Found"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "invalidAuthority",
       "msg": "Invalid Authority"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "invalidTemporaryFee",
       "msg": "Invalid Temporary Fee"
     }
@@ -2783,6 +2870,42 @@ export type WebdexManager = {
           },
           {
             "name": "isOperation",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "balanceStrategy",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "token",
+            "type": "pubkey"
+          },
+          {
+            "name": "decimals",
+            "type": "u8"
+          },
+          {
+            "name": "ico",
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          },
+          {
+            "name": "paused",
             "type": "bool"
           }
         ]
@@ -2889,12 +3012,44 @@ export type WebdexManager = {
       }
     },
     {
+      "name": "strategyBalanceList",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "strategyToken",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": "bool"
+          },
+          {
+            "name": "listCoins",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "balance",
+            "type": {
+              "vec": {
+                "defined": {
+                  "name": "balanceStrategy"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "strategyList",
       "type": {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {

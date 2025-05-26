@@ -27,7 +27,8 @@ export type WebdexStrategy = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "strategyList",
@@ -101,10 +102,6 @@ export type WebdexStrategy = {
         {
           "name": "uri",
           "type": "string"
-        },
-        {
-          "name": "contractAddress",
-          "type": "pubkey"
         }
       ]
     },
@@ -122,11 +119,38 @@ export type WebdexStrategy = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "strategyList",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -134,10 +158,6 @@ export type WebdexStrategy = {
         }
       ],
       "args": [
-        {
-          "name": "contractAddress",
-          "type": "pubkey"
-        },
         {
           "name": "tokenAddress",
           "type": "pubkey"
@@ -158,14 +178,40 @@ export type WebdexStrategy = {
       ],
       "accounts": [
         {
-          "name": "strategyList"
+          "name": "bot"
+        },
+        {
+          "name": "strategyList",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         }
       ],
       "args": [
-        {
-          "name": "contractAddress",
-          "type": "pubkey"
-        },
         {
           "name": "tokenAddress",
           "type": "pubkey"
@@ -191,15 +237,39 @@ export type WebdexStrategy = {
       ],
       "accounts": [
         {
-          "name": "strategyList"
-        }
-      ],
-      "args": [
+          "name": "bot"
+        },
         {
-          "name": "contractAddress",
-          "type": "pubkey"
+          "name": "strategyList",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         }
       ],
+      "args": [],
       "returns": {
         "vec": {
           "defined": {
@@ -222,11 +292,38 @@ export type WebdexStrategy = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "strategyList",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  108,
+                  105,
+                  115,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -234,10 +331,6 @@ export type WebdexStrategy = {
         }
       ],
       "args": [
-        {
-          "name": "contractAddress",
-          "type": "pubkey"
-        },
         {
           "name": "tokenAddress",
           "type": "pubkey"
@@ -478,7 +571,7 @@ export type WebdexStrategy = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {
@@ -506,7 +599,7 @@ export type WebdexStrategy = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {
@@ -528,7 +621,7 @@ export type WebdexStrategy = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {

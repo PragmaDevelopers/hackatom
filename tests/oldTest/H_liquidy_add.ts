@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexManager } from "../target/types/webdex_manager";
-import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
+import { WebdexManager } from "../../target/types/webdex_manager";
+import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
 import {
     getAccount, getOrCreateAssociatedTokenAccount, mintTo,

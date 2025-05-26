@@ -1,8 +1,8 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexFactory } from "../target/types/webdex_factory";
+import { WebdexFactory } from "../../target/types/webdex_factory";
 import { PublicKey } from "@solana/web3.js";
-import { sharedState } from "./setup";
+import { sharedState } from "../setup";
 import { BN } from "bn.js";
 
 describe("webdex_factoty", () => {

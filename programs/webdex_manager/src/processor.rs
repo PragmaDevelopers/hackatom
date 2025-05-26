@@ -10,11 +10,6 @@ use anchor_spl::token::{MintTo, Burn, mint_to, burn, transfer, Transfer};
 pub fn _register(ctx: Context<Register>) -> Result<()> {
     let user = &mut ctx.accounts.user;
 
-    // Proteção: evitar sobrescrever dados se o user já estiver registrado
-    if user.status {
-        return Err(ErrorCode::RegisteredUser.into());
-    }
-
     // Lógica de manager opcional
     match &ctx.accounts.manager {
         Some(manager) => {

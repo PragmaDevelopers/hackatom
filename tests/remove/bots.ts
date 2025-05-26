@@ -11,13 +11,11 @@ describe("webdex_factoty", () => {
 
     it("Remove Bot All", async () => {
         const bots = await factoryProgram.account.bot.all();
-        const botsPda = bots.map((bot) => bot.publicKey);
-        for (const bot of botsPda) {
+        for (const bot of bots) {
             try {
                 const tx = await factoryProgram.methods
-                    .removeBot()
+                    .removeBot(bot.account.managerAddress)
                     .accounts({
-                        bot: bot,
                         signer: user.publicKey,
                     })
                     .rpc();
@@ -26,13 +24,13 @@ describe("webdex_factoty", () => {
 
                 // Verifica que foi fechado (ou o fetch falha)
                 try {
-                    const result = await factoryProgram.account.bot.fetch(bot);
+                    const result = await factoryProgram.account.bot.fetch(bot.publicKey);
                     console.log("⚠️ Ainda existe:", result);
                 } catch (err) {
                     console.log("✅ Conta do bot foi fechada com sucesso");
                 }
             } catch (err) {
-                console.error("❌ Falha ao remover bot:", bot.toBase58(), err);
+                console.error("❌ Falha ao remover bot:", bot.publicKey.toBase58(), err);
             }
         }
     });

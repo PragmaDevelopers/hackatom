@@ -1,11 +1,9 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { PublicKey } from "@solana/web3.js";
-import { expect } from "chai";
-import { getAccount } from "@solana/spl-token";
-import { WebdexManager } from "../../target/types/webdex_manager";
+import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
 import { WebdexFactory } from "../../target/types/webdex_factory";
+import { WebdexManager } from "../../target/types/webdex_manager";
 
 describe("webdex_sub_accounts", () => {
     const provider = anchor.AnchorProvider.env();
@@ -20,7 +18,7 @@ describe("webdex_sub_accounts", () => {
         const name = "Main Account";
 
         const bots = await factoryProgram.account.bot.all();
-        const botPda = bots.map((bot) => bot.publicKey)[0]; // BOT 1 - ONE
+        const botPda = bots[0].publicKey; // BOT 1 - ONE
 
         // Deriva o PDA do user
         const [userPda] = PublicKey.findProgramAddressSync(
@@ -29,11 +27,13 @@ describe("webdex_sub_accounts", () => {
         );
 
         const tx = await subAccountsProgram.methods
-            .createSubAccount(name)
+            .createSubAccount(
+                name,
+            )
             .accounts({
-                bot: botPda, // FAZ PARTE DA LISTA DE BOT
-                signer: user.publicKey, // É QUEM PAGA E CRIADOR DO BOT
-                user: userPda, // É O DONO DA SUBCONTA
+                bot: botPda,
+                user: userPda,
+                signer: user.publicKey,
             })
             .rpc();
 

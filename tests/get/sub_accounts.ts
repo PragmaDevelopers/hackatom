@@ -17,9 +17,6 @@ describe("webdex_sub_accounts", () => {
     const user = provider.wallet;
 
     it("Get Sub Accounts - User", async () => {
-        const bots = await factoryProgram.account.bot.all();
-        const botPda = bots.map((bot) => bot.publicKey)[0]; // BOT 1 - ONE
-
         // Deriva o PDA do user
         const [userPda] = PublicKey.findProgramAddressSync(
             [Buffer.from("user"), user.publicKey.toBuffer()],

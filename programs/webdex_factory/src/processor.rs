@@ -21,6 +21,7 @@ pub fn assert_only_owner(signer: &Pubkey, bot: &Account<Bot>) -> Result<()> {
 
 pub fn _add_bot(
     ctx: Context<AddBot>,
+    manager_address: Pubkey,
     name: String,
     prefix: String,
     owner: Pubkey,
@@ -29,7 +30,6 @@ pub fn _add_bot(
     void_collector_3: Pubkey,
     void_collector_4: Pubkey,
     fee_withdraw_void: u64,
-    contract_address: Pubkey,
     strategy_address: Pubkey,
     payments_address: Pubkey,
     token_pass_address: Pubkey,
@@ -59,7 +59,7 @@ pub fn _add_bot(
     bot.void_collector_3 = void_collector_3;
     bot.void_collector_4 = void_collector_4;
     bot.fee_withdraw_void = fee_withdraw_void;
-    bot.manager_address = contract_address;
+    bot.manager_address = manager_address;
     bot.strategy_address = strategy_address;
     bot.payments_address = payments_address;
     bot.token_pass_address = token_pass_address;
@@ -67,7 +67,7 @@ pub fn _add_bot(
     bot.fee_collector_network_address = fee_collector_network_address;
 
     emit!(BotCreated {
-        contract_address,
+        manager_address,
         bot: bot.key(),
         owner,
     });
@@ -75,10 +75,10 @@ pub fn _add_bot(
     Ok(())
 }
 
-pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Result<BotInfo> {
+pub fn _get_bot_info(ctx: Context<GetBotInfo>, manager_address: Pubkey) -> Result<BotInfo> {
     let bot = &ctx.accounts.bot;
 
-    if bot.manager_address != contract_address {
+    if bot.manager_address != manager_address {
         return Err(ErrorCode::InvalidContractAddress.into());
     }
 
@@ -102,12 +102,17 @@ pub fn _get_bot_info(ctx: Context<GetBotInfo>, contract_address: Pubkey) -> Resu
 
 pub fn _update_bot(
     ctx: Context<UpdateBot>,
+    manager_address: Pubkey,
     strategy_address: Option<Pubkey>,
     payments_address: Option<Pubkey>,
 ) -> Result<()> {
     assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
 
     let bot = &mut ctx.accounts.bot;
+
+    if bot.manager_address != manager_address {
+        return Err(ErrorCode::InvalidContractAddress.into());
+    }
     
     if let Some(addr) = strategy_address {
         bot.strategy_address = addr;
@@ -125,14 +130,14 @@ pub fn _update_bot(
     Ok(())
 }
 
-pub fn _remove_bot(ctx: Context<RemoveBot>) -> Result<()> {
+pub fn _remove_bot(ctx: Context<RemoveBot>, manager_address: Pubkey) -> Result<()> {
     assert_only_owner(&ctx.accounts.signer.key(), &ctx.accounts.bot)?;
 
     let bot_pubkey = ctx.accounts.bot.key();
     let bot = &mut ctx.accounts.bot;
 
-    if bot.manager_address == Pubkey::default() {
-        return Err(ErrorCode::BotNotFound.into());
+    if bot.manager_address != manager_address {
+        return Err(ErrorCode::InvalidContractAddress.into());
     }
 
     emit!(BotRemoved {

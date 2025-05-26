@@ -21,7 +21,8 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
@@ -59,10 +60,6 @@
         }
       ],
       "args": [
-        {
-          "name": "contract_address",
-          "type": "pubkey"
-        },
         {
           "name": "new_fee_tiers",
           "type": {
@@ -89,7 +86,8 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
@@ -128,7 +126,7 @@
       ],
       "args": [
         {
-          "name": "coin_pubkey",
+          "name": "coin_address",
           "type": "pubkey"
         },
         {
@@ -159,7 +157,8 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
@@ -198,7 +197,7 @@
       ],
       "args": [
         {
-          "name": "coin_pubkey",
+          "name": "coin_address",
           "type": "pubkey"
         },
         {
@@ -229,7 +228,31 @@
       ],
       "accounts": [
         {
-          "name": "payments"
+          "name": "bot"
+        },
+        {
+          "name": "payments",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         }
       ],
       "args": [],
@@ -255,11 +278,33 @@
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
           "name": "payments",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  97,
+                  121,
+                  109,
+                  101,
+                  110,
+                  116,
+                  115
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bot"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -268,7 +313,7 @@
       ],
       "args": [
         {
-          "name": "coin",
+          "name": "coin_address",
           "type": "pubkey"
         }
       ]
@@ -515,7 +560,7 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "contract_address",
+            "name": "bot",
             "type": "pubkey"
           },
           {

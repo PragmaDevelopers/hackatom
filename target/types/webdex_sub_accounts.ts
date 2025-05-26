@@ -27,14 +27,40 @@ export type WebdexSubAccounts = {
       ],
       "accounts": [
         {
-          "name": "bot"
-        },
-        {
-          "name": "user"
+          "name": "user",
+          "writable": true
         },
         {
           "name": "subAccount",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "accountName"
+              }
+            ]
+          }
         },
         {
           "name": "strategyBalance",
@@ -89,11 +115,11 @@ export type WebdexSubAccounts = {
       ],
       "args": [
         {
-          "name": "strategyToken",
-          "type": "pubkey"
+          "name": "accountName",
+          "type": "string"
         },
         {
-          "name": "accountId",
+          "name": "strategyToken",
           "type": "pubkey"
         },
         {
@@ -132,10 +158,12 @@ export type WebdexSubAccounts = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "bot",
+          "writable": true
         },
         {
-          "name": "user"
+          "name": "user",
+          "writable": true
         },
         {
           "name": "subAccount",
@@ -157,10 +185,6 @@ export type WebdexSubAccounts = {
                   110,
                   116
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
               },
               {
                 "kind": "account",
@@ -189,10 +213,6 @@ export type WebdexSubAccounts = {
                   101,
                   114
                 ]
-              },
-              {
-                "kind": "account",
-                "path": "bot"
               },
               {
                 "kind": "account",
@@ -232,16 +252,84 @@ export type WebdexSubAccounts = {
       ],
       "accounts": [
         {
-          "name": "subAccount"
+          "name": "user"
         },
         {
-          "name": "strategyBalance"
+          "name": "subAccount",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "accountName"
+              }
+            ]
+          }
+        },
+        {
+          "name": "strategyBalance",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "subAccount"
+              },
+              {
+                "kind": "arg",
+                "path": "strategyToken"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "accountId",
-          "type": "pubkey"
+          "name": "accountName",
+          "type": "string"
         },
         {
           "name": "strategyToken",
@@ -272,16 +360,84 @@ export type WebdexSubAccounts = {
       ],
       "accounts": [
         {
-          "name": "subAccount"
+          "name": "user"
         },
         {
-          "name": "strategyBalance"
+          "name": "subAccount",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "accountName"
+              }
+            ]
+          }
+        },
+        {
+          "name": "strategyBalance",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "subAccount"
+              },
+              {
+                "kind": "arg",
+                "path": "strategyToken"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "accountId",
-          "type": "pubkey"
+          "name": "accountName",
+          "type": "string"
         },
         {
           "name": "strategyToken",
@@ -310,13 +466,44 @@ export type WebdexSubAccounts = {
       ],
       "accounts": [
         {
-          "name": "subAccount"
+          "name": "user"
+        },
+        {
+          "name": "subAccount",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "accountName"
+              }
+            ]
+          }
         }
       ],
       "args": [
         {
-          "name": "accountId",
-          "type": "pubkey"
+          "name": "accountName",
+          "type": "string"
         }
       ],
       "returns": {
@@ -341,22 +528,89 @@ export type WebdexSubAccounts = {
           "writable": true
         },
         {
-          "name": "payments"
+          "name": "user",
+          "writable": true
         },
         {
-          "name": "strategyList"
+          "name": "payments",
+          "writable": true
+        },
+        {
+          "name": "strategyList",
+          "writable": true
         },
         {
           "name": "subAccount",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "accountName"
+              }
+            ]
+          }
         },
         {
           "name": "strategyBalance",
-          "writable": true
-        },
-        {
-          "name": "user",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "subAccount"
+              },
+              {
+                "kind": "arg",
+                "path": "strategyToken"
+              }
+            ]
+          }
         },
         {
           "name": "temporaryRebalance",
@@ -422,8 +676,8 @@ export type WebdexSubAccounts = {
       ],
       "args": [
         {
-          "name": "accountId",
-          "type": "pubkey"
+          "name": "accountName",
+          "type": "string"
         },
         {
           "name": "strategyToken",
@@ -467,21 +721,91 @@ export type WebdexSubAccounts = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "user",
+          "writable": true
         },
         {
           "name": "subAccount",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "accountName"
+              }
+            ]
+          }
         },
         {
           "name": "strategyBalance",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "subAccount"
+              },
+              {
+                "kind": "arg",
+                "path": "strategyToken"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "signer": true
         }
       ],
       "args": [
         {
-          "name": "accountId",
-          "type": "pubkey"
+          "name": "accountName",
+          "type": "string"
         },
         {
           "name": "strategyToken",
@@ -511,17 +835,81 @@ export type WebdexSubAccounts = {
       ],
       "accounts": [
         {
-          "name": "bot"
+          "name": "user",
+          "writable": true
         },
         {
-          "name": "user"
-        },
-        {
-          "name": "subAccount"
+          "name": "subAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "accountName"
+              }
+            ]
+          }
         },
         {
           "name": "strategyBalance",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  116,
+                  114,
+                  97,
+                  116,
+                  101,
+                  103,
+                  121,
+                  95,
+                  98,
+                  97,
+                  108,
+                  97,
+                  110,
+                  99,
+                  101
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "subAccount"
+              },
+              {
+                "kind": "arg",
+                "path": "strategyToken"
+              }
+            ]
+          }
         },
         {
           "name": "signer",
@@ -531,8 +919,8 @@ export type WebdexSubAccounts = {
       ],
       "args": [
         {
-          "name": "accountId",
-          "type": "pubkey"
+          "name": "accountName",
+          "type": "string"
         },
         {
           "name": "strategyToken",
@@ -793,8 +1181,8 @@ export type WebdexSubAccounts = {
     },
     {
       "code": 6011,
-      "name": "invalidSubAccountId",
-      "msg": "Invalid Sub Account Id"
+      "name": "invalidSubAccountName",
+      "msg": "Invalid Sub Account Name"
     },
     {
       "code": 6012,
@@ -850,6 +1238,11 @@ export type WebdexSubAccounts = {
       "code": 6022,
       "name": "invalidCoin",
       "msg": "Invalid Coin"
+    },
+    {
+      "code": 6023,
+      "name": "disabledUser",
+      "msg": "Disabled User"
     }
   ],
   "types": [
@@ -859,8 +1252,8 @@ export type WebdexSubAccounts = {
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "accountName",
+            "type": "string"
           },
           {
             "name": "strategyToken",
@@ -891,8 +1284,8 @@ export type WebdexSubAccounts = {
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "accountName",
+            "type": "string"
           },
           {
             "name": "strategyToken",
@@ -1031,8 +1424,8 @@ export type WebdexSubAccounts = {
             "type": "pubkey"
           },
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "accountName",
+            "type": "string"
           },
           {
             "name": "strategyToken",
@@ -1159,8 +1552,8 @@ export type WebdexSubAccounts = {
             "type": "pubkey"
           },
           {
-            "name": "id",
-            "type": "pubkey"
+            "name": "accountName",
+            "type": "string"
           },
           {
             "name": "details",
@@ -1179,7 +1572,7 @@ export type WebdexSubAccounts = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {
@@ -1295,7 +1688,7 @@ export type WebdexSubAccounts = {
         "kind": "struct",
         "fields": [
           {
-            "name": "contractAddress",
+            "name": "bot",
             "type": "pubkey"
           },
           {

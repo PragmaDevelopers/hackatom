@@ -16,15 +16,10 @@ describe("webdex_payments", () => {
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE
 
-        const [paymentsPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("payments"), botPda.toBuffer()],
-            paymentsProgram.programId
-        );
-
         const feeTiers = await paymentsProgram.methods
             .getFeeTiers()
             .accounts({
-                payments: paymentsPda,
+                bot: botPda,
             })
             .view(); // 👈 importante: view() quando retorno != void
 

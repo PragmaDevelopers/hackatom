@@ -4,6 +4,7 @@ use shared_manager::state::{User};
 use shared_sub_accounts::state::{BalanceStrategy,StrategyBalanceList,SubAccount};
 use webdex_strategy::state::{StrategyList};
 use webdex_payments::state::{Payments};
+use crate::error::ErrorCode;
 
 #[account]
 pub struct TemporaryRebalance {
@@ -58,7 +59,7 @@ pub struct CreateSubAccountEvent {
 
 #[event]
 pub struct AddAndRemoveLiquidityEvent {
-    pub id: Pubkey,
+    pub account_name: String,
     pub strategy_token: Pubkey,
     pub coin: Pubkey,
     pub amount: u64,
@@ -68,7 +69,7 @@ pub struct AddAndRemoveLiquidityEvent {
 
 #[event]
 pub struct BalanceLiquidityEvent {
-    pub id: Pubkey,
+    pub account_name: String,
     pub strategy_token: Pubkey,
     pub coin: Pubkey,
     pub amount: i64,
@@ -80,7 +81,7 @@ pub struct BalanceLiquidityEvent {
 pub struct ChangePausedEvent {
     pub signer: Pubkey,
     pub user: Pubkey,
-    pub id: Pubkey,
+    pub account_name: String,
     pub strategy_token: Pubkey,
     pub coin: Pubkey,
     pub paused: bool,
@@ -90,7 +91,7 @@ pub struct ChangePausedEvent {
 pub struct OpenPositionEvent {
     pub contract_address: Pubkey,
     pub user: Pubkey,
-    pub id: Pubkey,
+    pub account_name: String,
     pub details: PositionDetails,
 }
 
@@ -104,15 +105,20 @@ pub struct TraderEvent {
 #[derive(Accounts)]
 #[instruction(name: String)]
 pub struct CreateSubAccount<'info> {
+    #[account(mut)]
     pub bot: Account<'info, Bot>,
 
+    #[account(
+        mut,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
     pub user: Account<'info, User>,
 
     #[account(
         init_if_needed,
         payer = signer,
         space = SubAccount::SPACE,
-        seeds = [b"sub_account", bot.key().as_ref(), user.key().as_ref(), name.as_bytes()],
+        seeds = [b"sub_account", user.key().as_ref(), name.as_bytes()],
         bump
     )]
     pub sub_account: Account<'info, SubAccount>,
@@ -121,7 +127,7 @@ pub struct CreateSubAccount<'info> {
         init_if_needed,
         payer = signer,
         space = UserSubAccountTracker::SPACE,
-        seeds = [b"tracker", bot.key().as_ref(), user.key().as_ref()],
+        seeds = [b"tracker", user.key().as_ref()],
         bump
     )]
     pub tracker: Account<'info, UserSubAccountTracker>,
@@ -133,13 +139,19 @@ pub struct CreateSubAccount<'info> {
 }
 
 #[derive(Accounts)]
-#[instruction(strategy_token: Pubkey)]
+#[instruction(account_name: String, strategy_token: Pubkey)]
 pub struct AddLiquidity<'info> {
-    pub bot: Account<'info, Bot>,
-
+    #[account(
+        mut,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
     pub user: Account<'info, User>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [b"sub_account", user.key().as_ref(), account_name.as_bytes()],
+        bump
+    )]
     pub sub_account: Account<'info, SubAccount>,
 
     #[account(
@@ -163,42 +175,129 @@ pub struct AddLiquidity<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(account_name: String, strategy_token: Pubkey)]
 pub struct GetBalance<'info> {
-    pub sub_account: Account<'info, SubAccount>,
-    pub strategy_balance: Account<'info, StrategyBalanceList>,
-}
-
-#[derive(Accounts)]
-pub struct GetBalances<'info> {
-    pub sub_account: Account<'info, SubAccount>,
-    pub strategy_balance: Account<'info, StrategyBalanceList>,
-}
-
-#[derive(Accounts)]
-pub struct GetSubAccountStrategies<'info> {
-    pub sub_account: Account<'info, SubAccount>,
-}
-
-#[derive(Accounts)]
-pub struct RemoveLiquidity<'info> {
-    pub bot: Account<'info, Bot>,
-
-    #[account(mut)]
-    pub sub_account: Account<'info, SubAccount>,
-
-    #[account(mut)]
-    pub strategy_balance: Account<'info, StrategyBalanceList>,
-}
-
-#[derive(Accounts)]
-pub struct TogglePause<'info> {
-    pub bot: Account<'info, Bot>,
-
+    #[account(
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
     pub user: Account<'info, User>,
 
+    #[account(
+        seeds = [b"sub_account", user.key().as_ref(), account_name.as_bytes()],
+        bump
+    )]
     pub sub_account: Account<'info, SubAccount>,
 
-    #[account(mut)]
+    #[account(
+        seeds = [
+            b"strategy_balance",
+            user.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+}
+
+#[derive(Accounts)]
+#[instruction(account_name: String, strategy_token: Pubkey)]
+pub struct GetBalances<'info> {
+    #[account(
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
+    pub user: Account<'info, User>,
+
+    #[account(
+        seeds = [b"sub_account", user.key().as_ref(), account_name.as_bytes()],
+        bump
+    )]
+    pub sub_account: Account<'info, SubAccount>,
+
+    #[account(
+        seeds = [
+            b"strategy_balance",
+            user.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+}
+
+#[derive(Accounts)]
+#[instruction(account_name: String)]
+pub struct GetSubAccountStrategies<'info> {
+    #[account(
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
+    pub user: Account<'info, User>,
+
+    #[account(
+        seeds = [b"sub_account", user.key().as_ref(), account_name.as_bytes()],
+        bump
+    )]
+    pub sub_account: Account<'info, SubAccount>,
+}
+
+#[derive(Accounts)]
+#[instruction(account_name: String, strategy_token: Pubkey)]
+pub struct RemoveLiquidity<'info> {
+    #[account(
+        mut,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
+    pub user: Account<'info, User>,
+
+    #[account(
+        mut,
+        seeds = [b"sub_account", user.key().as_ref(), account_name.as_bytes()],
+        bump
+    )]
+    pub sub_account: Account<'info, SubAccount>,
+
+    #[account(
+        mut,
+        seeds = [
+            b"strategy_balance",
+            user.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
+    pub strategy_balance: Account<'info, StrategyBalanceList>,
+
+    pub signer: Signer<'info>,
+}
+
+#[derive(Accounts)]
+#[instruction(account_name: String, strategy_token: Pubkey)]
+pub struct TogglePause<'info> {
+    #[account(
+        mut,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
+    pub user: Account<'info, User>,
+
+    #[account(
+        mut,
+        seeds = [b"sub_account", user.key().as_ref(), account_name.as_bytes()],
+        bump
+    )]
+    pub sub_account: Account<'info, SubAccount>,
+
+    #[account(
+        mut,
+        seeds = [
+            b"strategy_balance",
+            user.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
     pub strategy_balance: Account<'info, StrategyBalanceList>,
 
     #[account(mut)]
@@ -206,28 +305,44 @@ pub struct TogglePause<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(account_name: String, strategy_token: Pubkey)]
 pub struct PositionLiquidity<'info> {
     #[account(mut)]
     pub bot: Account<'info, Bot>,
 
+    #[account(mut,constraint = user.status @ ErrorCode::DisabledUser)]
+    pub user: Account<'info, User>,
+
+    #[account(mut)]
     pub payments: Account<'info, Payments>,
 
+    #[account(mut)]
     pub strategy_list: Account<'info, StrategyList>, 
 
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [b"sub_account", user.key().as_ref(), account_name.as_bytes()],
+        bump
+    )]
     pub sub_account: Account<'info, SubAccount>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [
+            b"strategy_balance",
+            user.key().as_ref(),
+            sub_account.key().as_ref(),
+            strategy_token.as_ref()
+        ],
+        bump
+    )]
     pub strategy_balance: Account<'info, StrategyBalanceList>, 
-
-    #[account(mut)]
-    pub user: Account<'info, User>,
 
     #[account(
         init_if_needed,
         payer = signer,
         space = TemporaryRebalance::LEN,
-        seeds = [b"temporary_rebalance", bot.key().as_ref(), user.key().as_ref(), sub_account.key().as_ref(), strategy_balance.key().as_ref(), payments.key().as_ref()],
+        seeds = [b"temporary_rebalance", bot.key().as_ref(), user.key().as_ref(), sub_account.key().as_ref(), strategy_balance.key().as_ref(),payments.key().as_ref()],
         bump
     )]
     pub temporary_rebalance: Account<'info, TemporaryRebalance>,

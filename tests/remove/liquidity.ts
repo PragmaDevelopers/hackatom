@@ -33,20 +33,15 @@ describe("webdex_close", () => {
 
         // Chamada da função de leitura
         const strategies = await strategyProgram.methods
-            .getStrategies(bots[0].account.managerAddress)
+            .getStrategies()
             .accounts({
-                strategyList: strategyListPda,
+                bot: botPda,
             })
             .view(); // <- importante: view() para funções que retornam valores
 
         const [userPda] = PublicKey.findProgramAddressSync(
             [Buffer.from("user"), user.publicKey.toBuffer()],
             managerProgram.programId
-        );
-
-        const [subAccountListPda] = anchor.web3.PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account_list"), botPda.toBuffer()],
-            subAccountsProgram.programId
         );
 
         // Chamada da função get_sub_accounts
@@ -59,9 +54,7 @@ describe("webdex_close", () => {
             },
         ]);
 
-        const subAccountPda = subAccounts[0].publicKey;
-
-        const amount = new BN(50_000_000_000);
+        const amount = new BN(100_000_000_000);
 
         // FAZ O BURN
         const tx = await managerProgram.methods
@@ -71,8 +64,9 @@ describe("webdex_close", () => {
                 amount,
             )
             .accounts({
-                subAccount: subAccountPda,
+                bot: botPda,
                 strategyList: strategyListPda,
+                subAccount: subAccounts[0].publicKey,
                 signer: user.publicKey,
                 tokenMint: usdtMint.pubkey,
             })
@@ -82,23 +76,17 @@ describe("webdex_close", () => {
 
         console.log("Add Liquidity - Atualiza o saldo")
 
-        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
-            subAccountsProgram.programId
-        );
-
         // ATUALIZA O SALDO
         const txa = await subAccountsProgram.methods
             .removeLiquidity(
-                subAccounts[0].account.id,
+                subAccounts[0].account.name,
                 strategies[0].tokenAddress,
                 usdtMint.pubkey,
                 amount,
             )
             .accounts({
-                bot: botPda,
-                subAccount: subAccountPda,
-                strategyBalance: strategyBalancePda,
+                user: userPda,
+                signer: user.publicKey,
             })
             .rpc();
 

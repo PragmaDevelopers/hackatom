@@ -21,7 +21,7 @@ pub struct BotInfo {
 
 #[event]
 pub struct BotCreated {
-    pub contract_address: Pubkey,
+    pub manager_address: Pubkey,
     pub bot: Pubkey,
     pub owner: Pubkey,
 }
@@ -40,6 +40,7 @@ pub struct BotRemoved {
 }
 
 #[derive(Accounts)]
+#[instruction(manager_address: Pubkey)]
 pub struct AddBot<'info> {
     #[account(
         init_if_needed,
@@ -50,9 +51,6 @@ pub struct AddBot<'info> {
     )]
     pub bot: Account<'info, Bot>,
 
-    /// CHECK
-    pub manager_address: AccountInfo<'info>,
-
     #[account(mut)]
     pub signer: Signer<'info>,
 
@@ -60,22 +58,38 @@ pub struct AddBot<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(manager_address: Pubkey)]
 pub struct GetBotInfo<'info> {
     // Essa conta já deve ter sido inicializada e conter os dados do bot
-    #[account()]
+    #[account(
+        seeds = [b"bot", manager_address.key().as_ref()],
+        bump
+    )]
     pub bot: Account<'info, Bot>,
 }
 
 #[derive(Accounts)]
+#[instruction(manager_address: Pubkey)]
 pub struct UpdateBot<'info> {
-    #[account(mut)]
+    #[account(
+        mut,
+        seeds = [b"bot", manager_address.key().as_ref()],
+        bump
+    )]
     pub bot: Account<'info, Bot>,
+
     pub signer: Signer<'info>,
 }
 
 #[derive(Accounts)]
+#[instruction(manager_address: Pubkey)]
 pub struct RemoveBot<'info> {
-    #[account(mut, close = signer)]
+    #[account(
+        mut, 
+        seeds = [b"bot", manager_address.key().as_ref()],
+        bump, 
+        close = signer
+    )]
     pub bot: Account<'info, Bot>,
     pub signer: Signer<'info>,
 }

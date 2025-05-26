@@ -1,27 +1,30 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexNetwork } from "../../target/types/webdex_network";
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { WebdexFactory } from "../../target/types/webdex_factory";
-import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { WebdexPayments } from "../../target/types/webdex_payments";
+import { WebdexNetwork } from "../../target/types/webdex_network";
 import { WebdexManager } from "../../target/types/webdex_manager";
 import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
+import {
+    getAssociatedTokenAddress,
+} from "@solana/spl-token";
 
 describe("webdex_network", () => {
     const provider = anchor.AnchorProvider.env();
     anchor.setProvider(provider);
 
     const factoryProgram = anchor.workspace.WebdexFactory as Program<WebdexFactory>;
-    const strategyProgram = anchor.workspace.WebdexStrategy as Program<WebdexStrategy>;
     const paymentsProgram = anchor.workspace.WebdexPayments as Program<WebdexPayments>;
     const managerProgram = anchor.workspace.WebdexManager as Program<WebdexManager>;
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const networkProgram = anchor.workspace.WebdexNetwork as Program<WebdexNetwork>;
     const user = provider.wallet;
 
-    it("Pay Fee", async () => {
+    // 👉 Variáveis compartilhadas entre os testes
+
+    it("Withdrawal", async () => {
         const payments = await paymentsProgram.account.payments.all();
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
 
@@ -33,14 +36,6 @@ describe("webdex_network", () => {
             managerProgram.programId
         );
 
-        // Chamada da função de leitura
-        const strategies = await strategyProgram.methods
-            .getStrategies()
-            .accounts({
-                bot: botPda,
-            })
-            .view(); // <- importante: view() para funções que retornam valores
-
         // Chamada da função get_sub_accounts
         const subAccounts = await subAccountsProgram.account.subAccount.all([
             {
@@ -51,23 +46,32 @@ describe("webdex_network", () => {
             },
         ]);
 
-        const balance = await subAccountsProgram.methods
-            .getBalance(subAccounts[0].account.name, strategies[0].tokenAddress, usdtMint.pubkey)
-            .accounts({
-                user: userPda,
-            })
-            .view();
+        const subAccountPda = subAccounts[0].publicKey;
+
+        // Authority — o sub_account_authority é uma PDA derivada
+        const [subAccountAuthority] = PublicKey.findProgramAddressSync(
+            [Buffer.from("sub_account"), subAccountPda.toBuffer()],
+            managerProgram.programId
+        );
+
+        // Agora derive o vault_token_account
+        const vaultTokenAccount = await getAssociatedTokenAddress(
+            usdtMint.pubkey,
+            subAccountAuthority,
+            true, // allowOwnerOffCurve (porque sub_account_authority é PDA)
+        );
+
+        const amount = new BN(10_000_000_000); // 10 USDT
 
         const tx = await networkProgram.methods
-            .payFee(
-                usdtMint.pubkey,
-                new BN(balance.amount),
-            )
+            .withdrawal(amount)
             .accounts({
                 bot: botPda,
-                subAccount: subAccounts[0].publicKey,
-                user: userPda,
                 signer: user.publicKey,
+                subAccount: subAccountPda,
+                tokenMint: usdtMint.pubkey,
+                user: userPda,
+                vaultTokenAccount: vaultTokenAccount,
             })
             .rpc();
 

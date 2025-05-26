@@ -17,7 +17,7 @@ pub struct BalanceInfo {
     pub balance: u64,
     pub token: Pubkey,
     pub user: Pubkey,
-    pub contract_address: Pubkey,
+    pub bot: Pubkey,
 }
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
@@ -27,7 +27,7 @@ pub struct BalanceData {
 
 #[event]
 pub struct BalanceNetworkAdd {
-    pub contract_address: Pubkey,
+    pub bot: Pubkey,
     pub user: Pubkey,
     pub token: Pubkey,
     pub new_balance: u64,
@@ -36,7 +36,7 @@ pub struct BalanceNetworkAdd {
 
 #[event]
 pub struct BalanceNetworkRemove {
-    pub contract_address: Pubkey,
+    pub bot: Pubkey,
     pub user: Pubkey,
     pub token: Pubkey,
     pub new_balance: u64,
@@ -45,17 +45,22 @@ pub struct BalanceNetworkRemove {
 }
 
 #[derive(Accounts)]
-#[instruction(contract_address: Pubkey, token: Pubkey)]
+#[instruction(token: Pubkey)]
 pub struct PayFee<'info> {
+    #[account()]
     pub bot: Account<'info, Bot>,
-    
+
+    #[account()]
     pub user: Account<'info, User>,
+
+    #[account()]
+    pub sub_account: Account<'info, SubAccount>,
 
     #[account(
         init_if_needed,
         payer = signer,
         space = 8 + std::mem::size_of::<BalanceInfo>(),
-        seeds = [b"balance_info", contract_address.key().as_ref(), user.key().as_ref(), token.key().as_ref()],
+        seeds = [b"balance_info", bot.key().as_ref(), user.key().as_ref(), token.key().as_ref()],
         bump
     )]
     pub balance_info: Account<'info, BalanceInfo>,
@@ -67,36 +72,50 @@ pub struct PayFee<'info> {
 }
 
 #[derive(Accounts)]
+#[instruction(token: Pubkey)]
 pub struct GetBalance<'info> {
     #[account()]
+    pub bot: Account<'info, Bot>,
+
+    pub user: Account<'info, User>,
+
+    #[account(
+        seeds = [b"balance_info", bot.key().as_ref(), user.key().as_ref(), token.key().as_ref()],
+        bump
+    )]
     pub balance_info: Account<'info, BalanceInfo>,
 }
 
 #[derive(Accounts)]
-#[instruction(token: Pubkey)]
 pub struct Withdrawal<'info> {
-    #[account(mut)]
+    #[account()]
     pub bot: Account<'info, Bot>,
 
-    #[account(mut)]
-    pub sub_account: Account<'info, SubAccount>,
+    pub user: Account<'info, User>,
 
-    #[account(mut)]
-    pub balance_info: Account<'info, BalanceInfo>,
+    #[account()]
+    pub sub_account: Account<'info, SubAccount>,
 
     #[account(
         mut,
-        associated_token::mint = token,
-        associated_token::authority = sub_account_authority,
-    )]
-    pub vault_token_account: Account<'info, TokenAccount>, // onde o token vai
-
-    #[account(
-        seeds = [b"sub_account",sub_account.key().as_ref()],
+        seeds = [b"balance_info", bot.key().as_ref(), user.key().as_ref(), token_mint.key().as_ref()],
         bump
     )]
-    /// CHECK: É usado como signer programático
-    pub sub_account_authority: AccountInfo<'info>,
+    pub balance_info: Account<'info, BalanceInfo>,
+
+    /// CHECK: Apenas para seeds
+    pub token_mint: AccountInfo<'info>,
+
+    #[account(
+        init_if_needed,
+        payer = signer,
+        associated_token::mint = token_mint,
+        associated_token::authority = signer,
+    )]
+    pub deposit_token_account: Account<'info, TokenAccount>, // do SPL depositado
+
+    #[account(mut)]
+    pub vault_token_account: Account<'info, TokenAccount>, // onde o token vai
 
     /// CHECK: Autoridade fixa do collector network
     #[account(address = _fixed_fee_collector_network())]
@@ -105,7 +124,7 @@ pub struct Withdrawal<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = token,
+        associated_token::mint = token_mint,
         associated_token::authority = fee_collector_network_address,
     )]
     pub fee_collector_network_account: Account<'info, TokenAccount>,
@@ -126,7 +145,7 @@ pub struct Withdrawal<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = token,
+        associated_token::mint = token_mint,
         associated_token::authority = void_collector_1
     )]
     pub void_collector_1_lp_account: Box<Account<'info, TokenAccount>>,
@@ -134,7 +153,7 @@ pub struct Withdrawal<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = token,
+        associated_token::mint = token_mint,
         associated_token::authority = void_collector_2
     )]
     pub void_collector_2_lp_account: Box<Account<'info, TokenAccount>>,
@@ -142,7 +161,7 @@ pub struct Withdrawal<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = token,
+        associated_token::mint = token_mint,
         associated_token::authority = void_collector_3
     )]
     pub void_collector_3_lp_account: Box<Account<'info, TokenAccount>>,
@@ -150,7 +169,7 @@ pub struct Withdrawal<'info> {
     #[account(
         init_if_needed,
         payer = signer,
-        associated_token::mint = token,
+        associated_token::mint = token_mint,
         associated_token::authority = void_collector_4
     )]
     pub void_collector_4_lp_account: Box<Account<'info, TokenAccount>>,

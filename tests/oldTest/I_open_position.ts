@@ -1,8 +1,8 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program } from "@coral-xyz/anchor";
-import { WebdexSubAccounts } from "../target/types/webdex_sub_accounts";
-import { WebdexPayments } from "../target/types/webdex_payments";
-import { WebdexManager } from "../target/types/webdex_manager";
+import { WebdexSubAccounts } from "../../target/types/webdex_sub_accounts";
+import { WebdexPayments } from "../../target/types/webdex_payments";
+import { WebdexManager } from "../../target/types/webdex_manager";
 import { Keypair, PublicKey } from "@solana/web3.js";
 import { expect } from "chai";
 import { sharedState } from "./setup";

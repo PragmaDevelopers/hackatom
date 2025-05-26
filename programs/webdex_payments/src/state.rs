@@ -10,7 +10,7 @@ use anchor_spl::associated_token::AssociatedToken;
 
 #[account]
 pub struct Payments {
-    pub contract_address: Pubkey,     
+    pub bot: Pubkey,     
     pub fee_tiers: Vec<FeeTier>,          
     pub coins: Vec<CoinData>,        
 }
@@ -20,7 +20,7 @@ pub const MAX_COINS: usize = 10;
 
 impl Payments {
     pub const INIT_SPACE: usize = 8  // discriminator
-        + 32                         // contract_address
+        + 32                         // bot
         + 4 + MAX_FEE_TIERS * 64     // Vec<FeeTier>: 4 + n * 64
         + 4 + MAX_COINS * (32 + 52); // coins (Pubkey + Coins)
 }
@@ -47,6 +47,7 @@ pub struct CoinData {
 
 #[derive(Accounts)]
 pub struct AddFeeTiers<'info> {
+    #[account(mut)]
     pub bot: Account<'info, Bot>,
     
     #[account(
@@ -66,12 +67,21 @@ pub struct AddFeeTiers<'info> {
 
 #[derive(Accounts)]
 pub struct GetFeeTiers<'info> {
+    #[account()]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        seeds = [b"payments", bot.key().as_ref()],
+        bump
+    )]
     pub payments: Account<'info, Payments>,
 }
 
 #[derive(Accounts)]
 pub struct RevokeOrAllowCurrency<'info> {
+    #[account(mut)]
     pub bot: Account<'info, Bot>,
+
     #[account(
         init_if_needed,
         payer = signer,
@@ -89,8 +99,15 @@ pub struct RevokeOrAllowCurrency<'info> {
 
 #[derive(Accounts)]
 pub struct RemoveCoin<'info> {
-    pub bot: Account<'info, Bot>,
     #[account(mut)]
+    pub bot: Account<'info, Bot>,
+
+    #[account(
+        mut,
+        seeds = [b"payments", bot.key().as_ref()], // exemplo de seeds
+        bump
+    )]
     pub payments: Account<'info, Payments>,
+
     pub signer: Signer<'info>,
 }
