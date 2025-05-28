@@ -2,8 +2,23 @@ use anchor_lang::prelude::*;
 use crate::state::*;
 use crate::error::ErrorCode;
 
-use shared_sub_accounts::state::{BalanceStrategy};
+use shared_sub_accounts::state::{BalanceStrategy,SubAccount};
 use webdex_payments::state::{Payments};
+
+pub fn _init_sub_accounts_tracker(ctx: Context<InitSubAccountsTracker>) -> Result<()> {
+    let tracker = &mut ctx.accounts.sub_accounts_tracker;
+    tracker.user = ctx.accounts.user.key();
+    tracker.count = 0;
+    Ok(())
+}
+
+pub fn _get_sub_accounts_tracker(ctx: Context<GetSubAccountsTracker>) -> Result<SubAccountsTracker> {
+    let tracker = &ctx.accounts.sub_accounts_tracker;
+    Ok(SubAccountsTracker {
+        user: tracker.user,
+        count: tracker.count,
+    })
+}
 
 pub fn _create_sub_account(
     ctx: Context<CreateSubAccount>,
@@ -12,52 +27,40 @@ pub fn _create_sub_account(
     let user_key = ctx.accounts.user.key();
     let bot = &ctx.accounts.bot;
     let sub_account = &mut ctx.accounts.sub_account;
-    let tracker = &mut ctx.accounts.tracker;
-
-    // Valida limite de subcontas
-    if tracker.count >= UserSubAccountTracker::MAX_SUBACCOUNTS as u8 {
-        return Err(ErrorCode::MaxSubAccountsReached.into());
-    }
-
-    // Valida nome duplicado
-    if tracker.names.iter().any(|n| n == &name) {
-        return Err(ErrorCode::DuplicateSubAccountName.into());
-    }
-
-    // Gera id determinístico (opcional, pode usar o próprio address)
-    let (sub_account_id, _bump) = Pubkey::find_program_address(
-        &[
-            b"sub_account_id",
-            user_key.as_ref(),
-            name.as_bytes(),
-            bot.prefix.as_ref(),
-        ],
-        ctx.program_id,
-    );
+    let tracker = &mut ctx.accounts.sub_accounts_tracker;
 
     // Inicializa subconta
     sub_account.user = user_key;
     sub_account.bot = bot.key();
-    sub_account.id = sub_account_id;
+    sub_account.id = tracker.count;
     sub_account.name = name.clone();
 
-    // Atualiza o tracker
+    tracker.user = ctx.accounts.user.key();
+
+    // Incrementa contador para próxima subconta
     tracker.count += 1;
-    tracker.names.push(name.clone());
 
     // Evento
     emit!(CreateSubAccountEvent {
         user: user_key,
-        id: sub_account_id,
+        id: sub_account.id,
         name,
     });
 
     Ok(())
 }
 
+pub fn _get_sub_account(ctx: Context<GetSubAccount>) -> Result<SubAccountInfo> {
+    Ok(SubAccountInfo {
+        name: ctx.accounts.sub_account.name.clone(),
+        list_strategies: ctx.accounts.sub_account.list_strategies.clone(),
+        strategies: ctx.accounts.sub_account.strategies.clone(),
+    })
+}
+
 pub fn _add_liquidity<'info>(
     ctx: Context<AddLiquidity>,
-    account_name: String,
+    account_id: u64,
     strategy_token: Pubkey,
     coin: Pubkey,
     amount: u64,
@@ -69,8 +72,8 @@ pub fn _add_liquidity<'info>(
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
     // Confirma subconta correta
-    if sub_account.name != account_name {
-        return Err(ErrorCode::InvalidSubAccountName.into());
+    if sub_account.id != account_id {
+        return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
     // Vincula strategy_token se ainda não existe
@@ -106,7 +109,7 @@ pub fn _add_liquidity<'info>(
 
     // Emite evento
     emit!(AddAndRemoveLiquidityEvent {
-        account_name,
+        account_id,
         strategy_token,
         coin,
         amount,
@@ -119,7 +122,7 @@ pub fn _add_liquidity<'info>(
 
 pub fn _get_balance(
     ctx: Context<GetBalance>,
-    account_name: String,
+    account_id: u64,
     strategy_token: Pubkey,
     coin: Pubkey,
 ) -> Result<BalanceStrategy> {
@@ -127,7 +130,7 @@ pub fn _get_balance(
     let strat_balance = &ctx.accounts.strategy_balance;
     
     // ✅ Verifica se o SubAccount pertence ao contrato
-    if sub_account.name != account_name {
+    if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
@@ -155,14 +158,14 @@ pub fn _get_balance(
 
 pub fn _get_balances(
     ctx: Context<GetBalances>,
-    account_name: String,
+    account_id: u64,
     strategy_token: Pubkey,
 ) -> Result<Vec<BalanceStrategy>> {
     let sub_account = &ctx.accounts.sub_account;
     let strategy_balance = &ctx.accounts.strategy_balance;
 
     // Verifica ID da subconta
-    if sub_account.name != account_name {
+    if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
@@ -177,12 +180,12 @@ pub fn _get_balances(
 
 pub fn _get_sub_account_strategies(
     ctx: Context<GetSubAccountStrategies>,
-    account_name: String,
+    account_id: u64,
 ) -> Result<Vec<Pubkey>> {
     let sub_account = &ctx.accounts.sub_account;
 
     // ✅ Verifica se o ID da subconta bate com o informado
-    if sub_account.name != account_name {
+    if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
@@ -192,7 +195,7 @@ pub fn _get_sub_account_strategies(
 
 pub fn _toggle_pause(
     ctx: Context<TogglePause>,
-    account_name: String,
+    account_id: u64,
     strategy_token: Pubkey,
     coin: Pubkey,
     paused: bool,
@@ -200,7 +203,7 @@ pub fn _toggle_pause(
     let sub_account = &ctx.accounts.sub_account;
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
-    if sub_account.name != account_name {
+    if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
@@ -226,7 +229,7 @@ pub fn _toggle_pause(
     emit!(ChangePausedEvent {
         signer: ctx.accounts.signer.key(),
         user: ctx.accounts.user.key(),
-        account_name,
+        account_id,
         strategy_token,
         coin,
         paused,
@@ -237,7 +240,7 @@ pub fn _toggle_pause(
 
 pub fn _remove_liquidity(
     ctx: Context<RemoveLiquidity>,
-    account_name: String,
+    account_id: u64,
     strategy_token: Pubkey,
     coin: Pubkey,
     amount: u64,
@@ -246,7 +249,7 @@ pub fn _remove_liquidity(
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
     // ✅ Confirma subconta correta
-    if sub_account.name != account_name {
+    if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
@@ -274,7 +277,7 @@ pub fn _remove_liquidity(
 
     // ✅ Emite evento de saída
     emit!(AddAndRemoveLiquidityEvent {
-        account_name,
+        account_id,
         strategy_token,
         coin,
         amount,
@@ -287,7 +290,7 @@ pub fn _remove_liquidity(
 
 pub fn _position_liquidity(
     ctx: Context<PositionLiquidity>,
-    account_name: String,
+    account_id: u64,
     strategy_token: Pubkey,
     amount: i64,
     coin: Pubkey,
@@ -309,7 +312,7 @@ pub fn _position_liquidity(
        return Err(ErrorCode::YouMustTheWebDexPayments.into());
     }
 
-    if sub_account.name != account_name {
+    if sub_account.id != account_id {
         return Err(ErrorCode::InvalidSubAccountName.into());
     }
 
@@ -376,7 +379,7 @@ pub fn _position_liquidity(
     // CHAMAR A FUNÇÂO REBALANCE POSITION DO CONTRATO MANAGER LOGO DEPOIS PARA FAZER USO DO "temp_fee_account"
 
     emit!(BalanceLiquidityEvent {
-        account_name: account_name.clone(),
+        account_id: account_id.clone(),
         strategy_token,
         coin,
         amount: amount,
@@ -397,7 +400,7 @@ pub fn _position_liquidity(
     emit!(OpenPositionEvent {
         contract_address: ctx.accounts.bot.manager_address.key(),
         user: ctx.accounts.user.key(),
-        account_name: account_name.clone(),
+        account_id: account_id.clone(),
         details,
     });
 

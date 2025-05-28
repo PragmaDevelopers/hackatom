@@ -19,10 +19,7 @@ describe("webdex_payments/manager", () => {
     const subAccountsProgram = anchor.workspace.WebdexSubAccounts as Program<WebdexSubAccounts>;
     const user = provider.wallet;
 
-    const amount = new BN(10_000_000_000);
-    const gas = new BN(1_000_000_000)
-
-    it("Position Liquidity", async () => {
+    it("Stress Test - Position Liquidity + Rebalance", async () => {
         const payments = await paymentsProgram.account.payments.all();
         const solMint = payments[0].account.coins.find(token => token.coin.symbol == "SOL");
         const usdtMint = payments[0].account.coins.find(token => token.coin.symbol == "USDT");
@@ -72,55 +69,65 @@ describe("webdex_payments/manager", () => {
             }
         ];
 
-        const tx = await subAccountsProgram.methods
-            .positionLiquidity(
-                subAccount.id,
-                strategies[0].tokenAddress,
-                amount,
-                usdtMint.pubkey,
-                gas,
-                currencys,
-            )
-            .accounts({
-                user: userPda,
-                bot: botPda,
-                payments: paymentsPda,
-                strategyList: strategyListPda,
-                signer: user.publicKey,
-                subAccount: subAccountPda,
-            })
-            .rpc();
+        const totalRuns = 10; // 🔁 Número de execuções para o teste
+        const amount = new BN(10_000_000);
+        const gas = new BN(1_000_000)
 
-        console.log("✅ Transação:", tx);
+        for (let i = 0; i < totalRuns; i++) {
+            console.log(`🚀 Execução #${i + 1}...`);
 
-        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
-            subAccountsProgram.programId
-        );
+            try {
+                const tx1 = await subAccountsProgram.methods
+                    .positionLiquidity(
+                        subAccount.id,
+                        strategies[0].tokenAddress,
+                        amount,
+                        usdtMint.pubkey,
+                        gas,
+                        currencys,
+                    )
+                    .accounts({
+                        user: userPda,
+                        bot: botPda,
+                        payments: paymentsPda,
+                        strategyList: strategyListPda,
+                        signer: user.publicKey,
+                        subAccount: subAccountPda,
+                    })
+                    .rpc();
+                console.log(`✅ positionLiquidity: ${tx1}`);
 
-        const [temporaryRebalancePda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("temporary_rebalance"), botPda.toBuffer(), userPda.toBuffer(), subAccountPda.toBuffer(), strategyBalancePda.toBuffer(), paymentsPda.toBuffer()],
-            subAccountsProgram.programId
-        );
+                const [strategyBalancePda] = PublicKey.findProgramAddressSync(
+                    [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
+                    subAccountsProgram.programId
+                );
 
-        const txa = await managerProgram.methods
-            .rebalancePosition(
-                strategies[0].tokenAddress,
-                usdtMint.coin.decimals,
-                amount,
-                gas,
-            )
-            .accounts({
-                bot: botPda,
-                user: userPda,
-                strategyBalance: strategyBalancePda,
-                subAccount: subAccountPda,
-                temporaryRebalance: temporaryRebalancePda,
-                signer: user.publicKey,
-                tokenMint: usdtMint.pubkey,
-            })
-            .rpc();
+                const [temporaryRebalancePda] = PublicKey.findProgramAddressSync(
+                    [Buffer.from("temporary_rebalance"), botPda.toBuffer(), userPda.toBuffer(), subAccountPda.toBuffer(), strategyBalancePda.toBuffer(), paymentsPda.toBuffer()],
+                    subAccountsProgram.programId
+                );
 
-        console.log("✅ Transação:", txa);
+                const tx2 = await managerProgram.methods
+                    .rebalancePosition(
+                        strategies[0].tokenAddress,
+                        usdtMint.coin.decimals,
+                        amount,
+                        gas,
+                    )
+                    .accounts({
+                        bot: botPda,
+                        user: userPda,
+                        strategyBalance: strategyBalancePda,
+                        subAccount: subAccountPda,
+                        temporaryRebalance: temporaryRebalancePda,
+                        signer: user.publicKey,
+                        tokenMint: usdtMint.pubkey,
+                    })
+                    .rpc();
+                console.log(`✅ rebalancePosition: ${tx2}`);
+            } catch (err) {
+                console.error(`❌ Erro na execução #${i + 1}:`, err.logs || err.message);
+            }
+        }
     });
 });

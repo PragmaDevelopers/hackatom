@@ -44,17 +44,19 @@ describe("webdex_close", () => {
             managerProgram.programId
         );
 
-        // Chamada da função get_sub_accounts
-        const subAccounts = await subAccountsProgram.account.subAccount.all([
-            {
-                memcmp: {
-                    offset: 8 + 32, // pula discriminator + bot
-                    bytes: userPda.toBase58(),
-                },
-            },
-        ]);
+        const [subAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("sub_account"), userPda.toBuffer(), new BN(0).toArrayLike(Buffer, "le", 8)],
+            subAccountsProgram.programId
+        );
 
-        const amount = new BN(100_000_000_000);
+        const subAccount = await subAccountsProgram.methods
+            .getSubAccount()
+            .accounts({
+                subAccount: subAccountPda,
+            })
+            .view();
+
+        const amount = new BN(10_000_000_000);
 
         // FAZ O BURN
         const tx = await managerProgram.methods
@@ -66,7 +68,7 @@ describe("webdex_close", () => {
             .accounts({
                 bot: botPda,
                 strategyList: strategyListPda,
-                subAccount: subAccounts[0].publicKey,
+                subAccount: subAccountPda,
                 signer: user.publicKey,
                 tokenMint: usdtMint.pubkey,
             })
@@ -79,7 +81,7 @@ describe("webdex_close", () => {
         // ATUALIZA O SALDO
         const txa = await subAccountsProgram.methods
             .removeLiquidity(
-                subAccounts[0].account.name,
+                subAccount.id,
                 strategies[0].tokenAddress,
                 usdtMint.pubkey,
                 amount,
@@ -87,6 +89,7 @@ describe("webdex_close", () => {
             .accounts({
                 user: userPda,
                 signer: user.publicKey,
+                subAccount: subAccountPda,
             })
             .rpc();
 

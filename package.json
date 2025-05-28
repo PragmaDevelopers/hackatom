@@ -34,6 +34,7 @@
     "remove:liquidity:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/remove/liquidity.ts",
     "remove:withdrawal:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/remove/withdrawal.ts",
     "pause:strategy_balance:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/pause/strategy_balance.ts",
+    "stress:order:devnet": "ANCHOR_PROVIDER_URL=https://api.devnet.solana.com ANCHOR_WALLET=~/.config/solana/id.json ts-mocha -p ./tsconfig.json -t 1000000 tests/stress/order.ts",
     "parse:keypair:base58_to_64bytes": "ts-mocha -p ./tsconfig.json -t 1000000 tests/parse/keypair.ts"
   },
   "devDependencies": {

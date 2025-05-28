@@ -26,35 +26,7 @@
         },
         {
           "name": "sub_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "arg",
-                "path": "account_name"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "strategy_balance",
@@ -109,8 +81,8 @@
       ],
       "args": [
         {
-          "name": "account_name",
-          "type": "string"
+          "name": "account_id",
+          "type": "u64"
         },
         {
           "name": "strategy_token",
@@ -185,20 +157,34 @@
                 "path": "user"
               },
               {
-                "kind": "arg",
-                "path": "name"
+                "kind": "account",
+                "path": "sub_accounts_tracker.count",
+                "account": "SubAccountsTracker"
               }
             ]
           }
         },
         {
-          "name": "tracker",
+          "name": "sub_accounts_tracker",
           "writable": true,
           "pda": {
             "seeds": [
               {
                 "kind": "const",
                 "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  115,
+                  95,
                   116,
                   114,
                   97,
@@ -249,35 +235,7 @@
           "name": "user"
         },
         {
-          "name": "sub_account",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "arg",
-                "path": "account_name"
-              }
-            ]
-          }
+          "name": "sub_account"
         },
         {
           "name": "strategy_balance",
@@ -322,8 +280,8 @@
       ],
       "args": [
         {
-          "name": "account_name",
-          "type": "string"
+          "name": "account_id",
+          "type": "u64"
         },
         {
           "name": "strategy_token",
@@ -357,35 +315,7 @@
           "name": "user"
         },
         {
-          "name": "sub_account",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "arg",
-                "path": "account_name"
-              }
-            ]
-          }
+          "name": "sub_account"
         },
         {
           "name": "strategy_balance",
@@ -430,8 +360,8 @@
       ],
       "args": [
         {
-          "name": "account_name",
-          "type": "string"
+          "name": "account_id",
+          "type": "u64"
         },
         {
           "name": "strategy_token",
@@ -443,6 +373,30 @@
           "defined": {
             "name": "BalanceStrategy"
           }
+        }
+      }
+    },
+    {
+      "name": "get_sub_account",
+      "discriminator": [
+        98,
+        182,
+        29,
+        44,
+        252,
+        200,
+        147,
+        56
+      ],
+      "accounts": [
+        {
+          "name": "sub_account"
+        }
+      ],
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "SubAccountInfo"
         }
       }
     },
@@ -460,10 +414,37 @@
       ],
       "accounts": [
         {
+          "name": "sub_account"
+        }
+      ],
+      "args": [
+        {
+          "name": "account_id",
+          "type": "u64"
+        }
+      ],
+      "returns": {
+        "vec": "pubkey"
+      }
+    },
+    {
+      "name": "get_sub_accounts_tracker",
+      "discriminator": [
+        31,
+        228,
+        159,
+        128,
+        246,
+        113,
+        92,
+        172
+      ],
+      "accounts": [
+        {
           "name": "user"
         },
         {
-          "name": "sub_account",
+          "name": "sub_accounts_tracker",
           "pda": {
             "seeds": [
               {
@@ -479,30 +460,98 @@
                   111,
                   117,
                   110,
-                  116
+                  116,
+                  115,
+                  95,
+                  116,
+                  114,
+                  97,
+                  99,
+                  107,
+                  101,
+                  114
                 ]
               },
               {
                 "kind": "account",
                 "path": "user"
-              },
-              {
-                "kind": "arg",
-                "path": "account_name"
               }
             ]
           }
         }
       ],
-      "args": [
+      "args": [],
+      "returns": {
+        "defined": {
+          "name": "SubAccountsTracker"
+        }
+      }
+    },
+    {
+      "name": "init_sub_accounts_tracker",
+      "discriminator": [
+        244,
+        98,
+        54,
+        169,
+        242,
+        77,
+        234,
+        62
+      ],
+      "accounts": [
         {
-          "name": "account_name",
-          "type": "string"
+          "name": "user",
+          "writable": true
+        },
+        {
+          "name": "sub_accounts_tracker",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  115,
+                  117,
+                  98,
+                  95,
+                  97,
+                  99,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  115,
+                  95,
+                  116,
+                  114,
+                  97,
+                  99,
+                  107,
+                  101,
+                  114
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "signer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
         }
       ],
-      "returns": {
-        "vec": "pubkey"
-      }
+      "args": []
     },
     {
       "name": "position_liquidity",
@@ -535,35 +584,7 @@
         },
         {
           "name": "sub_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "arg",
-                "path": "account_name"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "strategy_balance",
@@ -670,8 +691,8 @@
       ],
       "args": [
         {
-          "name": "account_name",
-          "type": "string"
+          "name": "account_id",
+          "type": "u64"
         },
         {
           "name": "strategy_token",
@@ -720,35 +741,7 @@
         },
         {
           "name": "sub_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "arg",
-                "path": "account_name"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "strategy_balance",
@@ -798,8 +791,8 @@
       ],
       "args": [
         {
-          "name": "account_name",
-          "type": "string"
+          "name": "account_id",
+          "type": "u64"
         },
         {
           "name": "strategy_token",
@@ -834,35 +827,7 @@
         },
         {
           "name": "sub_account",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  115,
-                  117,
-                  98,
-                  95,
-                  97,
-                  99,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "arg",
-                "path": "account_name"
-              }
-            ]
-          }
+          "writable": true
         },
         {
           "name": "strategy_balance",
@@ -913,8 +878,8 @@
       ],
       "args": [
         {
-          "name": "account_name",
-          "type": "string"
+          "name": "account_id",
+          "type": "u64"
         },
         {
           "name": "strategy_token",
@@ -998,6 +963,19 @@
       ]
     },
     {
+      "name": "SubAccountsTracker",
+      "discriminator": [
+        82,
+        136,
+        138,
+        246,
+        112,
+        63,
+        80,
+        72
+      ]
+    },
+    {
       "name": "TemporaryRebalance",
       "discriminator": [
         62,
@@ -1021,19 +999,6 @@
         151,
         58,
         236
-      ]
-    },
-    {
-      "name": "UserSubAccountTracker",
-      "discriminator": [
-        26,
-        66,
-        149,
-        140,
-        159,
-        57,
-        235,
-        41
       ]
     }
   ],
@@ -1180,63 +1145,73 @@
     },
     {
       "code": 6012,
+      "name": "InvalidSubAccountId",
+      "msg": "Invalid Sub Account Id"
+    },
+    {
+      "code": 6013,
       "name": "StrategyNotLinked",
       "msg": "Strategy Not Linked"
     },
     {
-      "code": 6013,
+      "code": 6014,
       "name": "StrategyBalanceNotFound",
       "msg": "Strategy Balance Not Found"
     },
     {
-      "code": 6014,
+      "code": 6015,
       "name": "CoinNotLinked",
       "msg": "Coin Not Linked"
     },
     {
-      "code": 6015,
+      "code": 6016,
       "name": "MustPauseBeforeWithdraw",
       "msg": "Liquidity must be paused before removal"
     },
     {
-      "code": 6016,
+      "code": 6017,
       "name": "CoinNotFound",
       "msg": "Coin not found"
     },
     {
-      "code": 6017,
+      "code": 6018,
       "name": "CoinNotLinkedToStrategy",
       "msg": "Coin not linked to strategy"
     },
     {
-      "code": 6018,
+      "code": 6019,
       "name": "PauseStateUnchanged",
       "msg": "The paused state must be different"
     },
     {
-      "code": 6019,
+      "code": 6020,
       "name": "UnauthorizedPaymentsCaller",
       "msg": "Only the registered Payments program can call this"
     },
     {
-      "code": 6020,
+      "code": 6021,
       "name": "InsufficientFunds",
       "msg": "Insufficient funds to subtract"
     },
     {
-      "code": 6021,
+      "code": 6022,
       "name": "DuplicateSubAccountName",
       "msg": "Insufficient funds to subtract"
     },
     {
-      "code": 6022,
+      "code": 6023,
       "name": "InvalidCoin",
       "msg": "Invalid Coin"
     },
     {
-      "code": 6023,
+      "code": 6024,
       "name": "DisabledUser",
       "msg": "Disabled User"
+    },
+    {
+      "code": 6025,
+      "name": "TrackerAlreadyInitialized",
+      "msg": "Tracker Already Initialized"
     }
   ],
   "types": [
@@ -1246,8 +1221,8 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "account_name",
-            "type": "string"
+            "name": "account_id",
+            "type": "u64"
           },
           {
             "name": "strategy_token",
@@ -1278,8 +1253,8 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "account_name",
-            "type": "string"
+            "name": "account_id",
+            "type": "u64"
           },
           {
             "name": "strategy_token",
@@ -1418,8 +1393,8 @@
             "type": "pubkey"
           },
           {
-            "name": "account_name",
-            "type": "string"
+            "name": "account_id",
+            "type": "u64"
           },
           {
             "name": "strategy_token",
@@ -1491,7 +1466,7 @@
           },
           {
             "name": "id",
-            "type": "pubkey"
+            "type": "u64"
           },
           {
             "name": "name",
@@ -1546,8 +1521,8 @@
             "type": "pubkey"
           },
           {
-            "name": "account_name",
-            "type": "string"
+            "name": "account_id",
+            "type": "u64"
           },
           {
             "name": "details",
@@ -1713,7 +1688,7 @@
           },
           {
             "name": "id",
-            "type": "pubkey"
+            "type": "u64"
           },
           {
             "name": "name",
@@ -1730,6 +1705,46 @@
             "type": {
               "vec": "pubkey"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubAccountInfo",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "list_strategies",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "strategies",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubAccountsTracker",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "count",
+            "type": "u64"
           }
         ]
       }
@@ -1786,28 +1801,6 @@
           {
             "name": "status",
             "type": "bool"
-          }
-        ]
-      }
-    },
-    {
-      "name": "UserSubAccountTracker",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "user",
-            "type": "pubkey"
-          },
-          {
-            "name": "count",
-            "type": "u8"
-          },
-          {
-            "name": "names",
-            "type": {
-              "vec": "string"
-            }
           }
         ]
       }

@@ -322,7 +322,7 @@ pub struct LiquidityAdd<'info> {
         bump,
         mint::decimals = decimals,
         mint::authority = lp_mint_authority,
-        mint::freeze_authority = lp_mint_authority
+        // mint::freeze_authority = lp_mint_authority
     )]
     pub lp_token: Account<'info, Mint>, // mint do LP
 

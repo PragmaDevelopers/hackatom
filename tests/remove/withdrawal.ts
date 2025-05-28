@@ -36,17 +36,10 @@ describe("webdex_network", () => {
             managerProgram.programId
         );
 
-        // Chamada da função get_sub_accounts
-        const subAccounts = await subAccountsProgram.account.subAccount.all([
-            {
-                memcmp: {
-                    offset: 8 + 32, // pula discriminator + bot
-                    bytes: userPda.toBase58(),
-                },
-            },
-        ]);
-
-        const subAccountPda = subAccounts[0].publicKey;
+        const [subAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("sub_account"), userPda.toBuffer(), new BN(0).toArrayLike(Buffer, "le", 8)],
+            subAccountsProgram.programId
+        );
 
         // Authority — o sub_account_authority é uma PDA derivada
         const [subAccountAuthority] = PublicKey.findProgramAddressSync(

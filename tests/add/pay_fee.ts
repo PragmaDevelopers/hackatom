@@ -41,20 +41,23 @@ describe("webdex_network", () => {
             })
             .view(); // <- importante: view() para funções que retornam valores
 
-        // Chamada da função get_sub_accounts
-        const subAccounts = await subAccountsProgram.account.subAccount.all([
-            {
-                memcmp: {
-                    offset: 8 + 32, // pula discriminator + bot
-                    bytes: userPda.toBase58(),
-                },
-            },
-        ]);
+        const [subAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("sub_account"), userPda.toBuffer(), new BN(0).toArrayLike(Buffer, "le", 8)],
+            subAccountsProgram.programId
+        );
+
+        const subAccount = await subAccountsProgram.methods
+            .getSubAccount()
+            .accounts({
+                subAccount: subAccountPda,
+            })
+            .view();
 
         const balance = await subAccountsProgram.methods
-            .getBalance(subAccounts[0].account.name, strategies[0].tokenAddress, usdtMint.pubkey)
+            .getBalance(subAccount.id, strategies[0].tokenAddress, usdtMint.pubkey)
             .accounts({
                 user: userPda,
+                subAccount: subAccountPda,
             })
             .view();
 
@@ -65,7 +68,7 @@ describe("webdex_network", () => {
             )
             .accounts({
                 bot: botPda,
-                subAccount: subAccounts[0].publicKey,
+                subAccount: subAccountPda,
                 user: userPda,
                 signer: user.publicKey,
             })

@@ -26,6 +26,8 @@ pub enum ErrorCode {
     MaxSubAccountsReached,
     #[msg("Invalid Sub Account Name")]
     InvalidSubAccountName,
+    #[msg("Invalid Sub Account Id")]
+    InvalidSubAccountId,
     #[msg("Strategy Not Linked")]
     StrategyNotLinked,
     #[msg("Strategy Balance Not Found")]
@@ -50,4 +52,6 @@ pub enum ErrorCode {
     InvalidCoin,
     #[msg("Disabled User")]
     DisabledUser,
+    #[msg("Tracker Already Initialized")]
+    TrackerAlreadyInitialized
 }

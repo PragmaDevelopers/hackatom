@@ -6,6 +6,7 @@ import { PublicKey } from "@solana/web3.js";
 import { WebdexPayments } from "../../target/types/webdex_payments";
 import { WebdexFactory } from "../../target/types/webdex_factory";
 import { WebdexStrategy } from "../../target/types/webdex_strategy";
+import { BN } from "bn.js";
 
 describe("webdex_manager", () => {
     const provider = anchor.AnchorProvider.env();
@@ -46,17 +47,17 @@ describe("webdex_manager", () => {
             managerProgram.programId
         );
 
-        // Chamada da função get_sub_accounts
-        const subAccounts = await subAccountsProgram.account.subAccount.all([
-            {
-                memcmp: {
-                    offset: 8 + 32, // pula discriminator + bot
-                    bytes: userPda.toBase58(),
-                },
-            },
-        ]);
+        const [subAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("sub_account"), userPda.toBuffer(), new BN(0).toArrayLike(Buffer, "le", 8)],
+            subAccountsProgram.programId
+        );
 
-        const subAccountPda = subAccounts[0].publicKey;
+        const subAccount = await subAccountsProgram.methods
+            .getSubAccount()
+            .accounts({
+                subAccount: subAccountPda,
+            })
+            .view();
 
         // FAZ O MINT
         const tx = await managerProgram.methods
@@ -81,7 +82,7 @@ describe("webdex_manager", () => {
         // ATUALIZA O SALDO
         const txa = await subAccountsProgram.methods
             .addLiquidity(
-                subAccounts[0].account.name,
+                subAccount.id,
                 strategies[0].tokenAddress,
                 usdtMint.pubkey,
                 amount,
@@ -92,6 +93,7 @@ describe("webdex_manager", () => {
             .accounts({
                 user: userPda,
                 signer: user.publicKey,
+                subAccount: subAccountPda,
             })
             .rpc();
 

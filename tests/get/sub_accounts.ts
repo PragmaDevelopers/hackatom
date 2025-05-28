@@ -6,6 +6,7 @@ import { expect } from "chai";
 import { getAccount } from "@solana/spl-token";
 import { WebdexManager } from "../../target/types/webdex_manager";
 import { WebdexFactory } from "../../target/types/webdex_factory";
+import { BN } from "bn.js";
 
 describe("webdex_sub_accounts", () => {
     const provider = anchor.AnchorProvider.env();
@@ -23,16 +24,25 @@ describe("webdex_sub_accounts", () => {
             managerProgram.programId
         );
 
-        // Chamada da função get_sub_accounts
-        const subAccounts = await subAccountsProgram.account.subAccount.all([
-            {
-                memcmp: {
-                    offset: 8 + 32, // pula discriminator + bot
-                    bytes: userPda.toBase58(),
-                },
-            },
-        ]);
+        const subAccountsTracker = await subAccountsProgram.methods
+            .getSubAccountsTracker()
+            .accounts({
+                user: userPda,
+            })
+            .view();
 
-        console.log("📦 SubAccounts:", subAccounts);
+        for (let i = 0; i < subAccountsTracker.count.toNumber(); i++) {
+            const [subAccountPda] = PublicKey.findProgramAddressSync(
+                [Buffer.from("sub_account"), userPda.toBuffer(), new BN(i).toArrayLike(Buffer, "le", 8)],
+                subAccountsProgram.programId
+            );
+            const subAccount = await subAccountsProgram.methods
+                .getSubAccount()
+                .accounts({
+                    subAccount: subAccountPda,
+                })
+                .view(); // 👈 importante: view() quando retorno != void
+            console.log("📦 SubAccount", i, ":", subAccount);
+        }
     });
 });

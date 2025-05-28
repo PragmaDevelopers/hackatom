@@ -8,7 +8,7 @@ pub mod error;
 use crate::processor::*;
 use crate::state::*;
 
-use shared_sub_accounts::state::{BalanceStrategy};
+use shared_sub_accounts::state::{BalanceStrategy,SubAccount};
 
 declare_id!("C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX");
 
@@ -17,13 +17,27 @@ pub mod webdex_sub_accounts {
 
     use super::*;
 
+    pub fn init_sub_accounts_tracker(ctx: Context<InitSubAccountsTracker>) -> Result<()> {
+        _init_sub_accounts_tracker(ctx)
+    }
+
+    pub fn get_sub_accounts_tracker(ctx: Context<GetSubAccountsTracker>) -> Result<SubAccountsTracker> {
+        _get_sub_accounts_tracker(ctx)
+    }
+
     pub fn create_sub_account(ctx: Context<CreateSubAccount>, name: String) -> Result<()> {
         _create_sub_account(ctx,name)
     }
 
+    pub fn get_sub_account(
+        ctx: Context<GetSubAccount>,
+    ) -> Result<SubAccountInfo> {
+        _get_sub_account(ctx)
+    }
+
     pub fn add_liquidity(
         ctx: Context<AddLiquidity>,
-        account_name: String,
+        account_id: u64,
         strategy_token: Pubkey,
         coin: Pubkey,
         amount: u64,
@@ -31,62 +45,62 @@ pub mod webdex_sub_accounts {
         coin_ico: String,
         coin_decimals: u8,
     ) -> Result<()> {
-        _add_liquidity(ctx,account_name,strategy_token,coin,amount,coin_name,coin_ico,coin_decimals)
+        _add_liquidity(ctx,account_id,strategy_token,coin,amount,coin_name,coin_ico,coin_decimals)
     }
 
     pub fn get_balance(
         ctx: Context<GetBalance>,
-        account_name: String,
+        account_id: u64,
         strategy_token: Pubkey,
         coin: Pubkey,
     ) -> Result<BalanceStrategy> {
-        _get_balance(ctx,account_name,strategy_token,coin)
+        _get_balance(ctx,account_id,strategy_token,coin)
     }
 
     pub fn get_balances(
         ctx: Context<GetBalances>,
-        account_name: String,
+        account_id: u64,
         strategy_token: Pubkey,
     ) -> Result<Vec<BalanceStrategy>> {
-        _get_balances(ctx,account_name,strategy_token)
+        _get_balances(ctx,account_id,strategy_token)
     }
 
     pub fn get_sub_account_strategies(
         ctx: Context<GetSubAccountStrategies>,
-        account_name: String,
+        account_id: u64,
     ) -> Result<Vec<Pubkey>> {
-        _get_sub_account_strategies(ctx,account_name)
+        _get_sub_account_strategies(ctx,account_id)
     }
 
     pub fn toggle_pause(
         ctx: Context<TogglePause>,
-        account_name: String,
+        account_id: u64,
         strategy_token: Pubkey,
         coin: Pubkey,
         paused: bool,
     ) -> Result<()> {
-        _toggle_pause(ctx,account_name,strategy_token,coin,paused)
+        _toggle_pause(ctx,account_id,strategy_token,coin,paused)
     }
 
     pub fn remove_liquidity(
         ctx: Context<RemoveLiquidity>,
-        account_name: String,
+        account_id: u64,
         strategy_token: Pubkey,
         coin: Pubkey,
         amount: u64,
     ) -> Result<()> {
-        _remove_liquidity(ctx,account_name,strategy_token,coin,amount)
+        _remove_liquidity(ctx,account_id,strategy_token,coin,amount)
     }
 
     pub fn position_liquidity(
         ctx: Context<PositionLiquidity>,
-        account_name: String,
+        account_id: u64,
         strategy_token: Pubkey,
         amount: i64,
         coin: Pubkey,
         gas: u64,
         currrencys: Vec<Currencys>,
     ) -> Result<()> {
-        _position_liquidity(ctx,account_name,strategy_token,amount,coin,gas,currrencys)
+        _position_liquidity(ctx,account_id,strategy_token,amount,coin,gas,currrencys)
     }
 }

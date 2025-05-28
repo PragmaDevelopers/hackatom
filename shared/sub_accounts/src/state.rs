@@ -44,7 +44,7 @@ impl StrategyBalanceList {
 pub struct SubAccount {
     pub bot: Pubkey,
     pub user: Pubkey,
-    pub id: Pubkey,
+    pub id: u64,
     pub name: String,
     pub list_strategies: Vec<Pubkey>,
     pub strategies: Vec<Pubkey>, // StrategyBalanceList
@@ -58,7 +58,7 @@ impl SubAccount {
         8   // discriminator
         + 32 // bot_address
         + 32 // user_address
-        + 32 // id
+        + 8 // id
         + 4 + Self::MAX_NAME_LEN // name
         + 4 + (32 * Self::MAX_STRATEGIES) // list_strategies
         + 4 + (32 * Self::MAX_STRATEGIES); // strategies

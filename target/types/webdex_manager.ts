@@ -3080,7 +3080,7 @@ export type WebdexManager = {
           },
           {
             "name": "id",
-            "type": "pubkey"
+            "type": "u64"
           },
           {
             "name": "name",

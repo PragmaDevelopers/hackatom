@@ -1093,7 +1093,7 @@ export type WebdexNetwork = {
           },
           {
             "name": "id",
-            "type": "pubkey"
+            "type": "u64"
           },
           {
             "name": "name",

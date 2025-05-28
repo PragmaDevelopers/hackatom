@@ -26,7 +26,23 @@ describe("webdex_sub_accounts", () => {
             managerProgram.programId
         );
 
-        const tx = await subAccountsProgram.methods
+        try {
+            const tx = await subAccountsProgram.methods
+                .initSubAccountsTracker()
+                .accounts({
+                    user: userPda,
+                    signer: user.publicKey,
+                })
+                .rpc();
+
+            console.log("🧾 initUserTracker Created TX:", tx);
+        } catch (error) {
+            if (error.message.includes("TrackerAlreadyInitialized")) {
+                console.log("Tracker já existe - não pode ser reinicializado");
+            }
+        }
+
+        const txa = await subAccountsProgram.methods
             .createSubAccount(
                 name,
             )
@@ -37,6 +53,6 @@ describe("webdex_sub_accounts", () => {
             })
             .rpc();
 
-        console.log("🧾 SubAccount Created TX:", tx);
+        console.log("🧾 SubAccount Created TX:", txa);
     });
 });

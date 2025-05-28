@@ -6,6 +6,7 @@ import { WebdexFactory } from "../../target/types/webdex_factory";
 import { WebdexStrategy } from "../../target/types/webdex_strategy";
 import { WebdexPayments } from "../../target/types/webdex_payments";
 import { WebdexManager } from "../../target/types/webdex_manager";
+import { BN } from "bn.js";
 
 describe("webdex_sub_accounts", () => {
     const provider = anchor.AnchorProvider.env();
@@ -38,26 +39,29 @@ describe("webdex_sub_accounts", () => {
             managerProgram.programId
         );
 
-        // Chamada da função get_sub_accounts
-        const subAccounts = await subAccountsProgram.account.subAccount.all([
-            {
-                memcmp: {
-                    offset: 8 + 32, // pula discriminator + bot
-                    bytes: userPda.toBase58(),
-                },
-            },
-        ]);
+        const [subAccountPda] = PublicKey.findProgramAddressSync(
+            [Buffer.from("sub_account"), userPda.toBuffer(), new BN(0).toArrayLike(Buffer, "le", 8)],
+            subAccountsProgram.programId
+        );
+
+        const subAccount = await subAccountsProgram.methods
+            .getSubAccount()
+            .accounts({
+                subAccount: subAccountPda,
+            })
+            .view();
 
         const balanceStrategy = await subAccountsProgram.methods
-            .getBalance(subAccounts[0].account.name, strategies[0].tokenAddress, usdtMint.pubkey)
+            .getBalance(subAccount.id, strategies[0].tokenAddress, usdtMint.pubkey)
             .accounts({
                 user: userPda,
+                subAccount: subAccountPda,
             })
             .view();
 
         const tx = await subAccountsProgram.methods
             .togglePause(
-                subAccounts[0].account.name,
+                subAccount.id,
                 strategies[0].tokenAddress,
                 usdtMint.pubkey,
                 !balanceStrategy.paused,
@@ -65,6 +69,7 @@ describe("webdex_sub_accounts", () => {
             .accounts({
                 user: userPda,
                 signer: user.publicKey,
+                subAccount: subAccountPda,
             })
             .rpc();
 
