@@ -1,5 +1,5 @@
 {
-  "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX",
+  "address": "AeoFURmySDt2fGayusSKPbYCJYipG4Sq7iPjMMbXDGE4",
   "metadata": {
     "name": "webdex_sub_accounts",
     "version": "0.1.0",
@@ -1714,6 +1714,10 @@
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
           {
             "name": "name",
             "type": "string"

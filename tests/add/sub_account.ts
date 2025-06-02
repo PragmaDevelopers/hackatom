@@ -15,7 +15,7 @@ describe("webdex_sub_accounts", () => {
     const user = provider.wallet;
 
     it("Create SubAccount", async () => {
-        const name = "Main Account";
+        const name = "Fifth Account";
 
         const bots = await factoryProgram.account.bot.all();
         const botPda = bots[0].publicKey; // BOT 1 - ONE

@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/webdex_sub_accounts.json`.
  */
 export type WebdexSubAccounts = {
-  "address": "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX",
+  "address": "AeoFURmySDt2fGayusSKPbYCJYipG4Sq7iPjMMbXDGE4",
   "metadata": {
     "name": "webdexSubAccounts",
     "version": "0.1.0",
@@ -1720,6 +1720,10 @@ export type WebdexSubAccounts = {
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
           {
             "name": "name",
             "type": "string"

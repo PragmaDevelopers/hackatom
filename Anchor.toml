@@ -7,19 +7,19 @@ skip-lint = false
 
 [programs.localnet]
 webdex_factory = "9i1mJt5ioM5RaffYiQxLdv1dQnotfoDXDzENZnGsoqjX"
-webdex_manager = "B3AQgsRyHeJ4rVm9JmAvzrFtTBCvLTSUAYW9HwhVaa92"
+webdex_manager = "rsnfy8DoYNs32o8v7WeCTbDCxZkqYirxgeqwkuEe5Ba"
 webdex_network = "4SqHQNaCovQM1XTfPFFb2sMc4mhnkFL2Khz5JQT4D6M8"
 webdex_payments = "Gp1yoP72LTgD3pQrnkKw9BTCTbEDC2aDWBVkjDadaV3f"
 webdex_strategy = "CVuroprVgA34wFb5kdQbFcfV4vyk6AfMvcpWkvVnNApK"
-webdex_sub_accounts = "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
+webdex_sub_accounts = "AeoFURmySDt2fGayusSKPbYCJYipG4Sq7iPjMMbXDGE4"
 
 [programs.devnet]
 webdex_factory = "9i1mJt5ioM5RaffYiQxLdv1dQnotfoDXDzENZnGsoqjX"
-webdex_manager = "B3AQgsRyHeJ4rVm9JmAvzrFtTBCvLTSUAYW9HwhVaa92"
+webdex_manager = "rsnfy8DoYNs32o8v7WeCTbDCxZkqYirxgeqwkuEe5Ba"
 webdex_network = "4SqHQNaCovQM1XTfPFFb2sMc4mhnkFL2Khz5JQT4D6M8"
 webdex_payments = "Gp1yoP72LTgD3pQrnkKw9BTCTbEDC2aDWBVkjDadaV3f"
 webdex_strategy = "CVuroprVgA34wFb5kdQbFcfV4vyk6AfMvcpWkvVnNApK"
-webdex_sub_accounts = "C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX"
+webdex_sub_accounts = "AeoFURmySDt2fGayusSKPbYCJYipG4Sq7iPjMMbXDGE4"
 
 [registry]
 url = "https://api.apr.dev"

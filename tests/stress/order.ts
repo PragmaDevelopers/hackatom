@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
+import { Program, Wallet } from "@coral-xyz/anchor";
 import { WebdexPayments } from "../../target/types/webdex_payments";
 import { WebdexManager } from "../../target/types/webdex_manager";
 import { BN } from "bn.js";
@@ -37,30 +37,10 @@ describe("webdex_payments/manager", () => {
             strategyProgram.programId
         );
 
-        // Chamada da função de leitura
-        const strategies = await strategyProgram.methods
-            .getStrategies()
-            .accounts({
-                bot: botPda,
-            })
-            .view(); // <- importante: view() para funções que retornam valores
+        const amount = new BN(100_000);
+        const gas = new BN(100)
 
-        const [userPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("user"), user.publicKey.toBuffer()],
-            managerProgram.programId
-        );
-
-        const [subAccountPda] = PublicKey.findProgramAddressSync(
-            [Buffer.from("sub_account"), userPda.toBuffer(), new BN(0).toArrayLike(Buffer, "le", 8)],
-            subAccountsProgram.programId
-        );
-
-        const subAccount = await subAccountsProgram.methods
-            .getSubAccount()
-            .accounts({
-                subAccount: subAccountPda,
-            })
-            .view();
+        const promises: Promise<void>[] = [];
 
         const currencys = [
             {
@@ -69,65 +49,130 @@ describe("webdex_payments/manager", () => {
             }
         ];
 
-        const totalRuns = 10; // 🔁 Número de execuções para o teste
-        const amount = new BN(10_000_000);
-        const gas = new BN(1_000_000)
+        const subAccounts = await subAccountsProgram.account.subAccount.all([
+            {
+                memcmp: {
+                    offset: 8, // pula o discriminator
+                    bytes: botPda.toBase58(), // começa no campo `bot`
+                },
+            },
+        ]);
 
-        for (let i = 0; i < totalRuns; i++) {
-            console.log(`🚀 Execução #${i + 1}...`);
+        for (let i = 0; i < subAccounts.length; i++) {
+            const userPda = subAccounts[i].account.user;
+            const subAccountPda = subAccounts[i].publicKey;
+            const strategiesAddress = subAccounts[i].account.listStrategies;
+            const subAccountId = subAccounts[i].account.id;
 
-            try {
-                const tx1 = await subAccountsProgram.methods
-                    .positionLiquidity(
-                        subAccount.id,
-                        strategies[0].tokenAddress,
+            for (let y = 0; y < strategiesAddress.length; y++) {
+                promises.push(
+                    runStressIteration(
+                        i,
+                        subAccountId,
+                        user.publicKey,
+                        subAccountsProgram,
+                        managerProgram,
+                        botPda,
+                        userPda,
+                        subAccountPda,
+                        paymentsPda, // DERIVA DE BOT
+                        strategyListPda, // DERIVA DE BOT
+                        strategiesAddress[y], // DERIVA DE SUBACCOUNT
                         amount,
-                        usdtMint.pubkey,
                         gas,
                         currencys,
+                        usdtMint
                     )
-                    .accounts({
-                        user: userPda,
-                        bot: botPda,
-                        payments: paymentsPda,
-                        strategyList: strategyListPda,
-                        signer: user.publicKey,
-                        subAccount: subAccountPda,
-                    })
-                    .rpc();
-                console.log(`✅ positionLiquidity: ${tx1}`);
-
-                const [strategyBalancePda] = PublicKey.findProgramAddressSync(
-                    [Buffer.from("strategy_balance"), userPda.toBuffer(), subAccountPda.toBuffer(), strategies[0].tokenAddress.toBuffer()],
-                    subAccountsProgram.programId
                 );
-
-                const [temporaryRebalancePda] = PublicKey.findProgramAddressSync(
-                    [Buffer.from("temporary_rebalance"), botPda.toBuffer(), userPda.toBuffer(), subAccountPda.toBuffer(), strategyBalancePda.toBuffer(), paymentsPda.toBuffer()],
-                    subAccountsProgram.programId
-                );
-
-                const tx2 = await managerProgram.methods
-                    .rebalancePosition(
-                        strategies[0].tokenAddress,
-                        usdtMint.coin.decimals,
-                        amount,
-                        gas,
-                    )
-                    .accounts({
-                        bot: botPda,
-                        user: userPda,
-                        strategyBalance: strategyBalancePda,
-                        subAccount: subAccountPda,
-                        temporaryRebalance: temporaryRebalancePda,
-                        signer: user.publicKey,
-                        tokenMint: usdtMint.pubkey,
-                    })
-                    .rpc();
-                console.log(`✅ rebalancePosition: ${tx2}`);
-            } catch (err) {
-                console.error(`❌ Erro na execução #${i + 1}:`, err.logs || err.message);
             }
+
         }
+        await Promise.all(promises);
+        console.log("✅ Todas as execuções finalizadas em paralelo!");
     });
 });
+
+async function runStressIteration(
+    i: number,
+    accountId: anchor.BN,
+    signer: PublicKey,
+    subAccountsProgram: Program<WebdexSubAccounts>,
+    managerProgram: Program<WebdexManager>,
+    botPda: PublicKey,
+    userPda: PublicKey,
+    subAccountPda: PublicKey,
+    paymentsPda: PublicKey,
+    strategyListPda: PublicKey,
+    strategyAddress: PublicKey,
+    amount: anchor.BN,
+    gas: anchor.BN,
+    currencys: { from: PublicKey; to: PublicKey }[],
+    usdtMint: any
+) {
+    console.log(`🚀 Execução #${i + 1}...`);
+
+    try {
+        const tx1 = await subAccountsProgram.methods
+            .positionLiquidity(
+                accountId,
+                strategyAddress,
+                amount,
+                usdtMint.pubkey,
+                gas,
+                currencys
+            )
+            .accounts({
+                user: userPda,
+                bot: botPda,
+                payments: paymentsPda,
+                strategyList: strategyListPda,
+                signer: signer, // BOT
+                subAccount: subAccountPda,
+            })
+            .rpc();
+        console.log(`✅ positionLiquidity: ${tx1}`);
+
+        const [strategyBalancePda] = PublicKey.findProgramAddressSync(
+            [
+                Buffer.from("strategy_balance"),
+                userPda.toBuffer(),
+                subAccountPda.toBuffer(),
+                strategyAddress.toBuffer(),
+            ],
+            subAccountsProgram.programId
+        );
+
+        const [temporaryRebalancePda] = PublicKey.findProgramAddressSync(
+            [
+                Buffer.from("temporary_rebalance"),
+                botPda.toBuffer(),
+                userPda.toBuffer(),
+                subAccountPda.toBuffer(),
+                strategyBalancePda.toBuffer(),
+                paymentsPda.toBuffer(),
+            ],
+            subAccountsProgram.programId
+        );
+
+        const tx2 = await managerProgram.methods
+            .rebalancePosition(
+                strategyAddress,
+                usdtMint.coin.decimals,
+                amount,
+                gas
+            )
+            .accounts({
+                bot: botPda,
+                user: userPda,
+                strategyBalance: strategyBalancePda,
+                subAccount: subAccountPda,
+                temporaryRebalance: temporaryRebalancePda,
+                signer: signer, // BOT
+                tokenMint: usdtMint.pubkey,
+            })
+            .rpc();
+        console.log(`✅ rebalancePosition: ${tx2}`);
+    } catch (err) {
+        console.error(`❌ Erro na execução #${i + 1}:`, err.logs || err.message);
+    }
+}  

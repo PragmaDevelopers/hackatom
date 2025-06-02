@@ -20,7 +20,7 @@ describe("webdex_manager", () => {
     const user = provider.wallet;
 
     // 👉 Variáveis compartilhadas entre os testes
-    const amount = new anchor.BN(100_000_000_000);
+    const amount = new anchor.BN(100_000);
 
     it("Liquidity Add - Transfer And Mint", async () => {
         const payments = await paymentsProgram.account.payments.all();

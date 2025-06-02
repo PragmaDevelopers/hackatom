@@ -17,6 +17,7 @@ impl TemporaryRebalance {
 
 #[derive(AnchorSerialize, AnchorDeserialize)]
 pub struct SubAccountInfo {
+    pub id: u64,
     pub name: String,
     pub list_strategies: Vec<Pubkey>,
     pub strategies: Vec<Pubkey>, // StrategyBalanceList

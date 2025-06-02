@@ -10,7 +10,7 @@ use crate::state::*;
 
 use shared_sub_accounts::state::{BalanceStrategy,SubAccount};
 
-declare_id!("C4bmi6wrQdtHdoCXdUtFQoHpXhsMiA9uajbE4wFjDssX");
+declare_id!("AeoFURmySDt2fGayusSKPbYCJYipG4Sq7iPjMMbXDGE4");
 
 #[program]
 pub mod webdex_sub_accounts {

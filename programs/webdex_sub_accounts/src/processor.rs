@@ -52,6 +52,7 @@ pub fn _create_sub_account(
 
 pub fn _get_sub_account(ctx: Context<GetSubAccount>) -> Result<SubAccountInfo> {
     Ok(SubAccountInfo {
+        id: ctx.accounts.sub_account.id.clone(),
         name: ctx.accounts.sub_account.name.clone(),
         list_strategies: ctx.accounts.sub_account.list_strategies.clone(),
         strategies: ctx.accounts.sub_account.strategies.clone(),
@@ -131,7 +132,7 @@ pub fn _get_balance(
     
     // ✅ Verifica se o SubAccount pertence ao contrato
     if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountName.into());
+        return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
     // ✅ Verifica se a strategy está registrada
@@ -166,7 +167,7 @@ pub fn _get_balances(
 
     // Verifica ID da subconta
     if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountName.into());
+        return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
     // Verifica se a subconta está vinculada à estratégia
@@ -186,7 +187,7 @@ pub fn _get_sub_account_strategies(
 
     // ✅ Verifica se o ID da subconta bate com o informado
     if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountName.into());
+        return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
     // ✅ Retorna a lista de estratégias vinculadas
@@ -204,7 +205,7 @@ pub fn _toggle_pause(
     let strat_balance = &mut ctx.accounts.strategy_balance;
 
     if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountName.into());
+        return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
     let coin_index = strat_balance
@@ -250,7 +251,7 @@ pub fn _remove_liquidity(
 
     // ✅ Confirma subconta correta
     if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountName.into());
+        return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
     // ✅ Confirma que a moeda existe na lista
@@ -313,7 +314,7 @@ pub fn _position_liquidity(
     }
 
     if sub_account.id != account_id {
-        return Err(ErrorCode::InvalidSubAccountName.into());
+        return Err(ErrorCode::InvalidSubAccountId.into());
     }
 
     let strategy = strategy_list
