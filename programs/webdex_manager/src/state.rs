@@ -168,6 +168,48 @@ pub struct RemoveGas<'info> {
 }
 
 #[derive(Accounts)]
+pub struct CloseGasAccount<'info> {
+    #[account(
+        mut,
+        seeds = [b"user", signer.key().as_ref()],
+        bump,
+        constraint = user.status @ ErrorCode::DisabledUser
+    )]
+    pub user: Account<'info, User>,
+
+    #[account(
+        mut,
+        associated_token::mint = wsol_mint,
+        associated_token::authority = signer,
+    )]
+    pub user_wsol_account: Account<'info, TokenAccount>,
+
+    #[account(
+        seeds = [b"vault_sol", user.key().as_ref()],
+        bump,
+    )]
+    /// CHECK: conta PDA para armazenar SOL (lamports)
+    pub vault_wsol_authority: AccountInfo<'info>,
+
+    #[account(
+        mut,
+        associated_token::mint = wsol_mint,
+        associated_token::authority = vault_wsol_authority,
+    )]
+    pub vault_wsol_account: Account<'info, TokenAccount>,
+
+    #[account(address = _fixed_native_mint())]
+    pub wsol_mint: Account<'info, Mint>,
+
+    #[account(mut)]
+    pub signer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+    pub token_program: Program<'info, Token>,
+    pub associated_token_program: Program<'info, AssociatedToken>,
+}
+
+#[derive(Accounts)]
 pub struct PassAdd<'info> {
     #[account(
         mut,

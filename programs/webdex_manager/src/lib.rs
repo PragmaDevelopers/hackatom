@@ -31,6 +31,10 @@ pub mod webdex_manager {
         _remove_gas(ctx,amount)
     }
 
+    pub fn close_gas_account(ctx: Context<CloseGasAccount>, amount: u64) -> Result<()> {
+        _close_gas_account(ctx,amount)
+    }
+
     pub fn pass_add(ctx: Context<PassAdd>, amount: u64) -> Result<()> {
         _pass_add(ctx,amount)
     }

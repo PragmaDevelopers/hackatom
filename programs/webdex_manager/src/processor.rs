@@ -5,7 +5,7 @@ use anchor_lang::solana_program::{
     program::{invoke,invoke_signed},
     system_instruction,
 };
-use anchor_spl::token::{MintTo, Burn, mint_to, burn, transfer, Transfer};
+use anchor_spl::token::{MintTo, Burn, mint_to, burn, transfer, Transfer, close_account, CloseAccount};
 
 pub fn _register(ctx: Context<Register>) -> Result<()> {
     let user = &mut ctx.accounts.user;
@@ -120,6 +120,78 @@ pub fn _remove_gas(ctx: Context<RemoveGas>, amount: u64) -> Result<()> {
         value: amount,
         increase: false,
         is_operation: false,
+    });
+
+    Ok(())
+}
+
+pub fn _close_gas_account(ctx: Context<CloseGasAccount>, amount: u64) -> Result<()> {
+    let user = &mut ctx.accounts.user;
+    let user_key = user.key(); // Chave da conta de estado 'User'
+
+    // 1. Validar se o usuário tem saldo de gás interno suficiente.
+    require!(
+        user.gas_balance >= amount,
+        ErrorCode::InsufficientGasBalance
+    );
+
+    // 2. Obter o saldo atual de WSOL na vault_wsol_account.
+    // Este valor será unwrapped para SOL e enviado ao signer.
+    let current_vault_wsol_amount = ctx.accounts.vault_wsol_account.amount;
+
+    // 3. Preparar signer seeds para o PDA vault_wsol_authority
+    let bump_vault_authority = ctx.bumps.vault_wsol_authority;
+    let authority_seeds: &[&[&[u8]]] = &[&[
+        b"vault_sol",
+        user_key.as_ref(), // Usando a chave da conta 'user' como seed
+        &[bump_vault_authority],
+    ]];
+
+    // 4. Fechar a vault_wsol_account.
+    // Os WSOL serão unwrapped para SOL e enviados para o 'signer' junto com os lamports de aluguel da conta.
+    // A conta user_wsol_account não é mais o destino direto dos tokens da vault nesta operação.
+    if current_vault_wsol_amount > 0 {
+        msg!(
+            "Fechando a conta vault_wsol_account (contendo {} WSOL) e enviando SOL nativo para o signer.",
+            current_vault_wsol_amount
+        );
+    } else {
+        msg!("Fechando a conta vault_wsol_account (vazia de WSOL) e enviando lamports de aluguel para o signer.");
+    }
+    
+    let cpi_close_accounts = CloseAccount {
+        account: ctx.accounts.vault_wsol_account.to_account_info(),      // Conta a ser fechada
+        destination: ctx.accounts.signer.to_account_info(),          // Signer recebe os lamports (SOL nativo)
+        authority: ctx.accounts.vault_wsol_authority.to_account_info(), // Autoridade da conta (PDA)
+    };
+    let cpi_close_program = ctx.accounts.token_program.to_account_info();
+    let cpi_close_ctx = CpiContext::new_with_signer(
+        cpi_close_program,
+        cpi_close_accounts,
+        authority_seeds,
+    );
+    close_account(cpi_close_ctx)?;
+
+    // 5. Atualizar o saldo de gás interno do usuário.
+    // A quantidade de 'gas_balance' a ser subtraída deve corresponder ao que foi efetivamente
+    // creditado ao usuário (amount) ou ao total que estava na vault.
+    // Se amount representa o resgate total do saldo de gás,
+    // e o vault_wsol_account deveria ter esse valor, esta lógica está ok.
+    // Se o objetivo é zerar o saldo de gás porque o vault foi fechado,
+    // e o vault representava todo o gás do usuário, então user.gas_balance = 0; seria mais direto.
+    // A lógica atual subtrai o valor que o usuário "reivindicou".
+    user.gas_balance = user.gas_balance.saturating_sub(amount);
+
+    // 6. Emitir o evento
+    // O 'value' no evento deve refletir o que foi efetivamente movido para o usuário (current_vault_wsol_amount)
+    // ou o que foi reivindicado do saldo interno (amount).
+    // Manteremos amount por consistência com a redução do saldo.
+    emit!(BalanceGasEvent {
+        user: user.key(),
+        balance: user.gas_balance,
+        value: amount, 
+        increase: false,
+        is_operation: false, 
     });
 
     Ok(())
